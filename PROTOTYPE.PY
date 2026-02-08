@@ -30,7 +30,6 @@ USAGE:
 import cv2
 import mediapipe as mp
 import pyautogui
-import numpy as np
 import time
 import subprocess
 import platform
@@ -95,6 +94,7 @@ class Config:
     # Distance-based gestures
     PINCH_THRESHOLD = 0.05  # Max distance for pinch
     SPREAD_THRESHOLD = 0.15  # Min distance for spread
+    PINCH_DISTANCE_THRESHOLD = 0.08  # Threshold for pinch verification
     
     # REFINEMENT #4: Pinch zoom - smooth and isolated
     ZOOM_SMOOTH_STEPS = 2  # Number of incremental zoom steps for smoothness
@@ -161,7 +161,19 @@ class Config:
     ENABLE_GESTURE_HISTORY = True  # Log gestures
     ENABLE_LEARNING_MODE = True    # Adaptive thresholds
     ENABLE_VISUAL_TRAILS = True    # Show hand trails
-    SHOW_ADVANCED_UI = True        # Extended UI info
+    
+    # Mutable UI setting (not frozen)
+    @staticmethod
+    def toggle_advanced_ui():
+        """Toggle advanced UI display"""
+        Config._SHOW_ADVANCED_UI = not getattr(Config, '_SHOW_ADVANCED_UI', True)
+    
+    @staticmethod
+    def is_advanced_ui_enabled():
+        """Check if advanced UI is enabled"""
+        return getattr(Config, '_SHOW_ADVANCED_UI', True)
+    
+    _SHOW_ADVANCED_UI = True  # Internal mutable state
     
     # Performance
     HISTORY_SIZE = 100  # Gesture history buffer
@@ -241,32 +253,32 @@ class HandGestureRecognizer:
         self.swipe_confirmation_buffer = []  # ISSUE #4 FIX: Multi-frame swipe validation
         
         # Scroll gesture state (ISSUE #1 FIX: Dwell time tracking)
-        self.scroll_gesture_start_time = None
-        self.scroll_last_gesture = None
-        self.scroll_last_action_time = 0  # REFINEMENT #1: Track last scroll for continuous delay
+        self.scroll_gesture_start_time = 0.0  # Changed from None to 0.0
+        self.scroll_last_gesture = GestureType.NONE  # Changed from None
+        self.scroll_last_action_time = 0.0  # REFINEMENT #1: Track last scroll for continuous delay
         
         # REFINEMENT #2: Browser navigation safety timing
-        self.browser_nav_gesture_start_time = None
-        self.browser_nav_last_gesture = None
-        self.browser_nav_last_action_time = 0
+        self.browser_nav_gesture_start_time = 0.0  # Changed from None to 0.0
+        self.browser_nav_last_gesture = GestureType.NONE  # Changed from None
+        self.browser_nav_last_action_time = 0.0
         
         # REFINEMENT #3: Close tab safety timing
-        self.close_tab_gesture_start_time = None
+        self.close_tab_gesture_start_time = 0.0  # Changed from None to 0.0
         self.close_tab_gesture_stable = False
-        self.close_tab_last_action_time = 0
+        self.close_tab_last_action_time = 0.0
         self.close_tab_last_progress_printed = -1  # BUG FIX: Track last printed progress to prevent spam
         
         # REFINEMENT #4: Zoom gesture isolation
         self.zoom_active = False
-        self.zoom_last_action_time = 0
+        self.zoom_last_action_time = 0.0
         
         # REFINEMENT #5: Mute toggle timing
-        self.mute_gesture_start_time = None
-        self.mute_last_action_time = 0
+        self.mute_gesture_start_time = 0.0  # Changed from None to 0.0
+        self.mute_last_action_time = 0.0
         
         # Mode state (ISSUE #2 FIX: Mode separation)
         self.current_mode = 'GESTURE'  # 'GESTURE' or 'POINTER'
-        self.mode_switch_time = 0
+        self.mode_switch_time = 0.0
         
         self.hand_size_baseline = None  # For auto-calibration
         
@@ -276,35 +288,29 @@ class HandGestureRecognizer:
         
         if self.cnn_enabled:
             try:
-                print("🤖 Initializing CNN Gesture Classifier...")
-                self.cnn_classifier = CNNGestureClassifier(
-                    model_path=Config.CNN_MODEL_PATH,
-                    label_encoder_path=Config.CNN_LABEL_ENCODER_PATH,
-                    min_confidence=Config.CNN_MIN_CONFIDENCE,
-                    voting_window_size=Config.CNN_VOTING_WINDOW,
-                    voting_consistency_threshold=Config.CNN_VOTING_CONSISTENCY
-                )
-                if self.cnn_classifier.load_model():
-                    print("✅ CNN model loaded successfully")
+                print("Initializing CNN Gesture Classifier...")
+                # Create classifier without parameters (check actual CNNGestureClassifier signature)
+                self.cnn_classifier = CNNGestureClassifier()
+                try:
+                    self.cnn_classifier.load_model(Config.CNN_MODEL_PATH, Config.CNN_LABEL_ENCODER_PATH)
+                    print("CNN model loaded successfully")
                     print(f"   - Model: {Config.CNN_MODEL_PATH}")
                     print(f"   - Confidence threshold: {Config.CNN_MIN_CONFIDENCE}")
-                    print(f"   - Voting window: {Config.CNN_VOTING_WINDOW} frames")
-                    print(f"   - Consistency required: {Config.CNN_VOTING_CONSISTENCY*100}%")
-                else:
-                    print("⚠️  CNN model loading failed - falling back to rule-based recognition")
+                except:
+                    print("CNN model loading failed - falling back to rule-based recognition")
                     self.cnn_enabled = False
                     self.cnn_classifier = None
             except Exception as e:
-                print(f"⚠️  CNN initialization error: {e}")
+                print(f"CNN initialization error: {e}")
                 print("   Falling back to rule-based recognition")
                 self.cnn_enabled = False
                 self.cnn_classifier = None
         else:
             if Config.ENABLE_CNN_CLASSIFIER and not CNN_AVAILABLE:
-                print("⚠️  CNN recognition enabled but module not found")
+                print("CNN recognition enabled but module not found")
                 print("   Using rule-based recognition only")
             else:
-                print("ℹ️  CNN recognition disabled - using rule-based recognition")
+                print("CNN recognition disabled - using rule-based recognition")
         
         # CNN to GestureType Mapping (7 CNN gestures → GestureType enum)
         self.cnn_to_gesture_map = {
@@ -356,13 +362,16 @@ class HandGestureRecognizer:
         """
         thumb_tip = landmarks[self.THUMB_TIP]
         thumb_ip = landmarks[self.THUMB_IP]
+        thumb_mcp = landmarks[2]  # Thumb MCP joint
         wrist = landmarks[self.WRIST]
         
         # Calculate distance from wrist for tip and ip
-        tip_dist = abs(thumb_tip.x - wrist.x)
-        ip_dist = abs(thumb_ip.x - wrist.x)
+        tip_dist = ((thumb_tip.x - wrist.x)**2 + (thumb_tip.y - wrist.y)**2) ** 0.5
+        ip_dist = ((thumb_ip.x - wrist.x)**2 + (thumb_ip.y - wrist.y)**2) ** 0.5
+        mcp_dist = ((thumb_mcp.x - wrist.x)**2 + (thumb_mcp.y - wrist.y)**2) ** 0.5
         
-        return tip_dist > ip_dist
+        # Thumb is extended if tip > ip > mcp in distance from wrist
+        return tip_dist > ip_dist and ip_dist > mcp_dist * 0.8
     
     def count_extended_fingers(self, landmarks, ignore_thumb=None):
         """
@@ -399,35 +408,33 @@ class HandGestureRecognizer:
     
     def detect_thumb_up(self, landmarks):
         """
-        Detects thumbs-up gesture.
-        
-        ISSUE #5 FIX: Explicitly enable thumb detection for this gesture (thumb-ignored mode bypass).
+        Detects thumbs-up gesture - IMPROVED DISTINCTNESS.
         
         Logic:
             Thumb extended upward (tip.y < ip.y) while all other fingers folded.
+            Additional angle check to ensure thumb is vertical.
         
         Returns:
             bool: True if thumbs-up detected
         """
-        # ISSUE #5 FIX: Explicitly check thumb (ignore_thumb=False overrides global setting)
         count, fingers = self.count_extended_fingers(landmarks, ignore_thumb=False)
         
-        # Only thumb should be extended
-        if not fingers['thumb']:
-            return False
+        # Only thumb should be extended, all others folded
+        if fingers['thumb'] and not fingers['index'] and not fingers['middle'] and not fingers['ring'] and not fingers['pinky']:
+            thumb_tip_y = landmarks[self.THUMB_TIP].y
+            thumb_ip_y = landmarks[self.THUMB_IP].y
+            thumb_mcp_y = landmarks[2].y  # Thumb MCP
+            
+            # Thumb pointing up: tip above ip above mcp
+            vertical_alignment = thumb_tip_y < thumb_ip_y < thumb_mcp_y
+            
+            # Additional check: thumb should be significantly above wrist
+            wrist_y = landmarks[self.WRIST].y
+            thumb_elevated = thumb_tip_y < wrist_y - 0.1  # Above wrist by threshold
+            
+            return vertical_alignment and thumb_elevated
         
-        # Check thumb is pointing up (tip above IP joint)
-        thumb_tip_y = landmarks[self.THUMB_TIP].y
-        thumb_ip_y = landmarks[self.THUMB_IP].y
-        
-        # All other fingers should be folded
-        is_thumb_up = (thumb_tip_y < thumb_ip_y and 
-                      not fingers['index'] and 
-                      not fingers['middle'] and
-                      not fingers['ring'] and
-                      not fingers['pinky'])
-        
-        return is_thumb_up
+        return False
     
     def detect_swipe(self, landmarks):
         """
@@ -566,6 +573,20 @@ class HandGestureRecognizer:
                    (middle_tip.y - wrist.y)**2) ** 0.5
         return distance
     
+    def calculate_pinch_distance(self, landmarks):
+        """
+        Calculate distance between thumb and index finger tips.
+        
+        Returns:
+            float: Normalized distance between thumb and index tips
+        """
+        thumb_tip = landmarks[self.THUMB_TIP]
+        index_tip = landmarks[self.INDEX_TIP]
+        
+        distance = ((thumb_tip.x - index_tip.x)**2 + 
+                   (thumb_tip.y - index_tip.y)**2) ** 0.5
+        return distance
+    
     def detect_pinch_spread(self, landmarks):
         """
         Detect pinch (zoom in) or spread (zoom out) gestures.
@@ -621,33 +642,33 @@ class HandGestureRecognizer:
     
     def detect_thumb_down(self, landmarks):
         """
-        Detects thumbs-down gesture.
-        
-        ISSUE #5 FIX: Explicitly enable thumb detection (thumb-ignored mode bypass).
+        Detects thumbs-down gesture - IMPROVED DISTINCTNESS.
         
         Logic:
             Thumb pointing down (tip.y > ip.y) while other fingers folded.
+            Additional angle check to ensure thumb is vertical downward.
         
         Returns:
             bool: True if thumbs-down detected
         """
-        # ISSUE #5 FIX: Explicitly check thumb (ignore_thumb=False)
         count, fingers = self.count_extended_fingers(landmarks, ignore_thumb=False)
         
-        if not fingers['thumb']:
-            return False
+        # Only thumb extended, all others folded
+        if fingers['thumb'] and not fingers['index'] and not fingers['middle'] and not fingers['ring'] and not fingers['pinky']:
+            thumb_tip_y = landmarks[self.THUMB_TIP].y
+            thumb_ip_y = landmarks[self.THUMB_IP].y
+            thumb_mcp_y = landmarks[2].y  # Thumb MCP
+            
+            # Thumb pointing down: tip below ip below mcp
+            vertical_alignment = thumb_tip_y > thumb_ip_y > thumb_mcp_y
+            
+            # Additional check: thumb should be significantly below wrist
+            wrist_y = landmarks[self.WRIST].y
+            thumb_lowered = thumb_tip_y > wrist_y + 0.1  # Below wrist by threshold
+            
+            return vertical_alignment and thumb_lowered
         
-        thumb_tip_y = landmarks[self.THUMB_TIP].y
-        thumb_ip_y = landmarks[self.THUMB_IP].y
-        
-        # Thumb pointing down: tip below IP joint
-        is_thumb_down = (thumb_tip_y > thumb_ip_y and
-                        not fingers['index'] and
-                        not fingers['middle'] and
-                        not fingers['ring'] and
-                        not fingers['pinky'])
-        
-        return is_thumb_down
+        return False
     
     def recognize_gesture_hybrid(self, hand_landmarks, frame):
         """
@@ -682,42 +703,42 @@ class HandGestureRecognizer:
         # Attempt CNN classification if enabled and model loaded
         if self.cnn_enabled and self.cnn_classifier and frame is not None:
             try:
-                # Extract hand bounding box for ROI
-                frame_h, frame_w = frame.shape[:2]
-                x_coords = [lm.x * frame_w for lm in landmarks]
-                y_coords = [lm.y * frame_h for lm in landmarks]
-                
-                x_min, x_max = int(min(x_coords)), int(max(x_coords))
-                y_min, y_max = int(min(y_coords)), int(max(y_coords))
-                
-                # Add padding (20% like in dataset collector)
-                padding_x = int((x_max - x_min) * 0.2)
-                padding_y = int((y_max - y_min) * 0.2)
-                
-                x_min = max(0, x_min - padding_x)
-                y_min = max(0, y_min - padding_y)
-                x_max = min(frame_w, x_max + padding_x)
-                y_max = min(frame_h, y_max + padding_y)
-                
-                # Extract ROI
-                hand_roi = frame[y_min:y_max, x_min:x_max]
-                
-                # CNN Classification (with confidence filter + temporal voting)
-                cnn_label, cnn_confidence = self.cnn_classifier.classify(hand_roi)
-                
-                # If CNN returned valid prediction (passed all safety filters)
-                if cnn_label is not None and cnn_label in self.cnn_to_gesture_map:
-                    gesture_type = self.cnn_to_gesture_map[cnn_label]
+                    # Extract hand bounding box for ROI
+                    frame_h, frame_w = frame.shape[:2]
+                    x_coords = [lm.x * frame_w for lm in landmarks]
+                    y_coords = [lm.y * frame_h for lm in landmarks]
                     
-                    # Additional verification for pinch gesture (combine CNN + distance check)
-                    if gesture_type == GestureType.PINCH:
-                        # Verify with actual pinch distance measurement
-                        pinch_distance = self.calculate_pinch_distance(landmarks)
-                        if pinch_distance > Config.PINCH_DISTANCE_THRESHOLD:
-                            # Not actually a pinch - fall back to rule-based
-                            return self.recognize_gesture(hand_landmarks)
+                    x_min, x_max = int(min(x_coords)), int(max(x_coords))
+                    y_min, y_max = int(min(y_coords)), int(max(y_coords))
                     
-                    return gesture_type  # CNN prediction accepted
+                    # Add padding (20% like in dataset collector)
+                    padding_x = int((x_max - x_min) * 0.2)
+                    padding_y = int((y_max - y_min) * 0.2)
+                    
+                    x_min = max(0, x_min - padding_x)
+                    y_min = max(0, y_min - padding_y)
+                    x_max = min(frame_w, x_max + padding_x)
+                    y_max = min(frame_h, y_max + padding_y)
+                    
+                    # Extract ROI
+                    if x_max > x_min and y_max > y_min:
+                        hand_roi = frame[y_min:y_max, x_min:x_max]
+                        
+                        # CNN Classification (with confidence filter + temporal voting)
+                        cnn_label, cnn_confidence = self.cnn_classifier.classify(hand_roi)
+                        
+                        # If CNN returned valid prediction (passed all safety filters)
+                        if cnn_label is not None and cnn_label in self.cnn_to_gesture_map:
+                            gesture_type = self.cnn_to_gesture_map[cnn_label]
+                            
+                            # Additional verification for pinch gesture (combine CNN + distance check)
+                            if gesture_type == GestureType.PINCH:
+                                # Verify with actual pinch distance measurement
+                                pinch_distance = self.calculate_pinch_distance(landmarks)
+                                if pinch_distance < Config.PINCH_DISTANCE_THRESHOLD:
+                                    return gesture_type  # CNN prediction verified
+                            else:
+                                return gesture_type  # CNN prediction accepted
                 
                 # CNN rejected prediction (low confidence or voting failed)
                 # Fall back to rule-based recognition
@@ -755,9 +776,9 @@ class HandGestureRecognizer:
         if self.hand_size_baseline is None and Config.ENABLE_LEARNING_MODE:
             self.hand_size_baseline = self.calculate_hand_size(landmarks)
         
-        # MUTUALLY EXCLUSIVE PRIORITY ORDER (elif structure ensures only one gesture detected)
+        # MUTUALLY EXCLUSIVE PRIORITY ORDER - IMPROVED for distinct gestures
         
-        # PRIORITY 1: Thumb gestures (ISSUE #5 FIX: explicitly opt-in to thumb detection)
+        # PRIORITY 1: Thumb gestures (most distinct - check first)
         if Config.THUMB_EXPLICIT_GESTURES_ONLY:
             if self.detect_thumb_up(landmarks):
                 return GestureType.THUMB_UP
@@ -769,28 +790,36 @@ class HandGestureRecognizer:
         if special != GestureType.NONE:
             return special
         
-        # PRIORITY 3: Finger count-based gestures (THUMB EXCLUDED by default)
-        elif count == 0:
+        # PRIORITY 3: Closed fist (must check before other finger counts)
+        if count == 0:
             return GestureType.CLOSED_FIST
-        elif count == 5 if not Config.THUMB_IGNORED_MODE else count == 4:
-            # When thumb ignored: 4 fingers = open palm
-            return GestureType.OPEN_PALM
-        elif count == 4 and not Config.THUMB_IGNORED_MODE:
-            # Four fingers (no thumb) = refresh
-            if not fingers['thumb']:
+        
+        # PRIORITY 4: Open palm (all fingers extended)
+        elif count == 5 or (Config.THUMB_IGNORED_MODE and count == 4 and not fingers['thumb']):
+            # All non-thumb fingers extended
+            if fingers['index'] and fingers['middle'] and fingers['ring'] and fingers['pinky']:
+                return GestureType.OPEN_PALM
+        
+        # PRIORITY 5: Four fingers (refresh page)
+        elif count == 4:
+            if not fingers['thumb'] and fingers['index'] and fingers['middle'] and fingers['ring'] and fingers['pinky']:
                 return GestureType.FOUR_FINGERS
+        
+        # PRIORITY 6: Three fingers (screenshot)
         elif count == 3:
-            # Three fingers extended
-            if fingers['index'] and fingers['middle'] and fingers['ring']:
+            if fingers['index'] and fingers['middle'] and fingers['ring'] and not fingers['pinky']:
                 return GestureType.THREE_FINGERS
+        
+        # PRIORITY 7: Two fingers - Peace sign (V sign)
         elif count == 2:
-            if fingers['index'] and fingers['middle']:
+            if fingers['index'] and fingers['middle'] and not fingers['ring'] and not fingers['pinky']:
                 return GestureType.PEACE_SIGN
+        
+        # PRIORITY 8: One finger - pointer or pinky
         elif count == 1:
-            if fingers['index']:
-                # ISSUE #2 FIX: INDEX_ONLY triggers POINTER_MODE
+            if fingers['index'] and not fingers['middle']:
                 return GestureType.INDEX_ONLY
-            elif fingers['pinky']:
+            elif fingers['pinky'] and not fingers['index']:
                 return GestureType.PINKY_ONLY
         
         # PRIORITY 4: Distance-based gestures (pinch/spread)
@@ -852,7 +881,9 @@ class GestureStabilizer:
         Returns:
             GestureType: Stable gesture or NONE
         """
-        if len(self.buffer) < self.buffer.maxlen:
+        # Check if buffer is sufficiently filled
+        buffer_maxlen = self.buffer.maxlen if self.buffer.maxlen is not None else Config.GESTURE_BUFFER_SIZE
+        if len(self.buffer) < buffer_maxlen:
             return GestureType.NONE
         
         # Count occurrences of each gesture in buffer
@@ -861,7 +892,10 @@ class GestureStabilizer:
             gesture_counts[gesture] = gesture_counts.get(gesture, 0) + 1
         
         # Find most common gesture
-        most_common = max(gesture_counts, key=gesture_counts.get)
+        if not gesture_counts:
+            return GestureType.NONE
+            
+        most_common = max(gesture_counts, key=lambda k: gesture_counts[k])
         occurrence_ratio = gesture_counts[most_common] / len(self.buffer)
         
         # Require at least 60% consistency
@@ -1343,20 +1377,20 @@ class HandGestureControlSystem:
         """
         if gesture == GestureType.NONE:
             # Reset scroll dwell timer when no gesture
-            self.recognizer.scroll_gesture_start_time = None
-            self.recognizer.scroll_last_gesture = None
+            self.recognizer.scroll_gesture_start_time = 0.0
+            self.recognizer.scroll_last_gesture = GestureType.NONE
             
             # REFINEMENT #2: Reset browser navigation timers
-            self.recognizer.browser_nav_gesture_start_time = None
-            self.recognizer.browser_nav_last_gesture = None
+            self.recognizer.browser_nav_gesture_start_time = 0.0
+            self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
             # REFINEMENT #3: Reset close tab timers
-            self.recognizer.close_tab_gesture_start_time = None
+            self.recognizer.close_tab_gesture_start_time = 0.0
             self.recognizer.close_tab_gesture_stable = False
             self.recognizer.close_tab_last_progress_printed = -1  # BUG FIX: Reset progress tracking
             
             # REFINEMENT #5: Reset mute timer
-            self.recognizer.mute_gesture_start_time = None
+            self.recognizer.mute_gesture_start_time = 0.0
             
             # ISSUE #2 FIX: Exit POINTER_MODE when no gesture
             if Config.ENABLE_MODE_SEPARATION and self.recognizer.current_mode == 'POINTER':
@@ -1457,16 +1491,16 @@ class HandGestureControlSystem:
                 # Require stable gesture throughout dwell period
                 if Config.CLOSE_TAB_REQUIRE_STABILITY:
                     if not self.recognizer.close_tab_gesture_stable:
-                        self.recognizer.close_tab_gesture_start_time = None
+                        self.recognizer.close_tab_gesture_start_time = 0.0
                         return
                 
                 # Check if dwell time met
                 dwell_elapsed = current_time - self.recognizer.close_tab_gesture_start_time
                 if dwell_elapsed >= Config.CLOSE_TAB_DWELL_TIME:
                     self.controller.close_tab()
-                    print("❌ Tab closed (safe mode: 1.2s dwell + 2s cooldown)")
+                    print("Tab closed (safe mode: 1.2s dwell + 2s cooldown)")
                     self.recognizer.close_tab_last_action_time = current_time
-                    self.recognizer.close_tab_gesture_start_time = None
+                    self.recognizer.close_tab_gesture_start_time = 0.0
                     self.recognizer.close_tab_last_progress_printed = -1  # Reset for next time
                 else:
                     # BUG FIX: Show progress only once per milestone to prevent console spam
@@ -1497,9 +1531,9 @@ class HandGestureControlSystem:
                 # Check dwell time
                 if current_time - self.recognizer.browser_nav_gesture_start_time >= Config.BROWSER_NAV_DWELL_TIME:
                     self.controller.browser_back()
-                    print("◀️  Browser back (0.8s dwell + 1.5s cooldown)")
+                    print("Browser back (0.8s dwell + 1.5s cooldown)")
                     self.recognizer.browser_nav_last_action_time = current_time
-                    self.recognizer.browser_nav_last_gesture = None
+                    self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
             elif gesture == GestureType.SWIPE_RIGHT:
                 # Check cooldown first
@@ -1515,9 +1549,9 @@ class HandGestureControlSystem:
                 # Check dwell time
                 if current_time - self.recognizer.browser_nav_gesture_start_time >= Config.BROWSER_NAV_DWELL_TIME:
                     self.controller.browser_forward()
-                    print("▶️  Browser forward (0.8s dwell + 1.5s cooldown)")
+                    print("Browser forward (0.8s dwell + 1.5s cooldown)")
                     self.recognizer.browser_nav_last_action_time = current_time
-                    self.recognizer.browser_nav_last_gesture = None
+                    self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
             elif gesture == GestureType.SWIPE_UP:
                 self.controller.next_tab()
@@ -1551,7 +1585,7 @@ class HandGestureControlSystem:
                     self.controller.mute_toggle()
                     print("🔇 Mute toggled (0.6s dwell + 1s cooldown)")
                     self.recognizer.mute_last_action_time = current_time
-                    self.recognizer.mute_gesture_start_time = None
+                    self.recognizer.mute_gesture_start_time = 0.0
             
             # BUG FIX: Removed duplicate PEACE_SIGN handler for fullscreen toggle
             # PEACE_SIGN (2 fingers) is already used for left click above (line 1266)
@@ -1627,7 +1661,7 @@ class HandGestureControlSystem:
             self.visual_effects.draw_gesture_flash(frame, gesture)
         
         # Main info box (top-left)
-        info_height = 180 if Config.SHOW_ADVANCED_UI else 120
+        info_height = 180 if Config.is_advanced_ui_enabled() else 120
         cv2.rectangle(frame, (10, 10), (450, info_height), (0, 0, 0), -1)
         cv2.rectangle(frame, (10, 10), (450, info_height), (0, 255, 0), 2)
         
@@ -1643,13 +1677,14 @@ class HandGestureControlSystem:
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, gesture_color, 2)
         
         # Display buffer status
-        buffer_fill = len(self.stabilizer.buffer) / self.stabilizer.buffer.maxlen
-        buffer_text = f"Buffer: {len(self.stabilizer.buffer)}/{self.stabilizer.buffer.maxlen}"
+        buffer_maxlen = self.stabilizer.buffer.maxlen if self.stabilizer.buffer.maxlen is not None else Config.GESTURE_BUFFER_SIZE
+        buffer_fill = len(self.stabilizer.buffer) / buffer_maxlen
+        buffer_text = f"Buffer: {len(self.stabilizer.buffer)}/{buffer_maxlen}"
         cv2.putText(frame, buffer_text, (20, 105),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
         
         # PHASE 4: Display CNN recognition status
-        cnn_status_y = 135 if not Config.SHOW_ADVANCED_UI else 165
+        cnn_status_y = 135 if not Config.is_advanced_ui_enabled() else 165
         if self.recognizer.cnn_enabled and self.recognizer.cnn_classifier:
             cnn_color = (0, 255, 255)  # Cyan for CNN active
             cv2.putText(frame, "🤖 CNN: ON", (320, 40),
@@ -1658,7 +1693,7 @@ class HandGestureControlSystem:
             cv2.putText(frame, "Rule-based", (320, 40),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
         
-        if Config.SHOW_ADVANCED_UI:
+        if Config.is_advanced_ui_enabled():
             # Display session stats
             if self.history:
                 stats = self.history.get_session_stats()
@@ -1672,7 +1707,7 @@ class HandGestureControlSystem:
                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
         
         # Gesture hints (bottom)
-        if Config.SHOW_ADVANCED_UI:
+        if Config.is_advanced_ui_enabled():
             hint_y = height - 100
             cv2.rectangle(frame, (10, hint_y), (width - 10, height - 10), (0, 0, 0), -1)
             
@@ -1770,8 +1805,8 @@ class HandGestureControlSystem:
                     self.print_statistics()
                 elif key == ord('h'):
                     # Toggle advanced UI
-                    Config.SHOW_ADVANCED_UI = not Config.SHOW_ADVANCED_UI
-                    print(f"Advanced UI: {'ON' if Config.SHOW_ADVANCED_UI else 'OFF'}")
+                    Config.toggle_advanced_ui()
+                    print(f"Advanced UI: {'ON' if Config.is_advanced_ui_enabled() else 'OFF'}")
                 elif key == ord('b') and Config.BROWSER_LAUNCH_ENABLED:
                     # REFINEMENT #6: Launch browser with 'b' key
                     print(f"🌐 Launching {Config.BROWSER_LAUNCH_TARGET} browser...")
