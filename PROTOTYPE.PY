@@ -593,13 +593,35 @@ class HandGestureRecognizer:
         """
         Detect pinch (zoom in) or spread (zoom out) gestures.
         
+        FIXED: Ultra-strict detection to prevent confusion with open palm.
+        Requires EXACTLY thumb and index extended, all others folded.
+        
         Logic:
-            Measures distance between thumb and index finger.
-            Close distance = pinch, far distance = spread.
+            - Measures distance between thumb and index finger
+            - Requires EXACT finger count of 2 (thumb + index ONLY)
+            - All other fingers MUST be folded
+            - Close distance = pinch, far distance = spread
         
         Returns:
             GestureType: PINCH, SPREAD, or NONE
         """
+        # Check finger states with thumb NOT ignored (we need accurate thumb state)
+        count, fingers = self.count_extended_fingers(landmarks, ignore_thumb=False)
+        
+        # ULTRA-STRICT: Must have EXACTLY 2 fingers extended (thumb + index)
+        # This prevents confusion with open palm (5 fingers) or any other gesture
+        if count != 2:
+            return GestureType.NONE
+        
+        # Verify it's specifically thumb and index, not any other 2-finger combo
+        if not (fingers['thumb'] and fingers['index']):
+            return GestureType.NONE
+        
+        # Explicitly check other fingers are folded
+        if fingers['middle'] or fingers['ring'] or fingers['pinky']:
+            return GestureType.NONE
+        
+        # Now safe to check thumb-index distance for pinch/spread
         thumb_tip = landmarks[self.THUMB_TIP]
         index_tip = landmarks[self.INDEX_TIP]
         
@@ -617,7 +639,7 @@ class HandGestureRecognizer:
         """
         Detect special hand signs (OK, Rock, Call) with STRICT conditions.
         
-        IMPROVED: Added explicit finger state checks to prevent conflicts.
+        FIXED: Call sign now checks thumb state explicitly to work with THUMB_IGNORED_MODE.
         
         Returns:
             GestureType: Special gesture or NONE
@@ -641,8 +663,9 @@ class HandGestureRecognizer:
             return GestureType.ROCK_SIGN
         
         # Call Sign: Thumb and pinky extended, others folded
-        # Already strict - no changes needed
-        if (fingers['thumb'] and fingers['pinky'] and
+        # CRITICAL FIX: Check thumb explicitly to bypass THUMB_IGNORED_MODE
+        thumb_extended = self.is_thumb_extended(landmarks)
+        if (thumb_extended and fingers['pinky'] and
             not fingers['index'] and not fingers['middle'] and not fingers['ring']):
             return GestureType.CALL_SIGN
         
@@ -809,14 +832,7 @@ class HandGestureRecognizer:
         if swipe_v != GestureType.NONE:
             return swipe_v
         
-        # PRIORITY 4: Distance-based gestures (pinch/spread)
-        # ISSUE #2 FIX: Skip zoom gestures in POINTER_MODE if mode separation enabled
-        if not (Config.ENABLE_MODE_SEPARATION and self.current_mode == 'POINTER' and Config.DISABLE_ZOOM_IN_POINTER_MODE):
-            pinch_spread = self.detect_pinch_spread(landmarks)
-            if pinch_spread != GestureType.NONE:
-                return pinch_spread
-        
-        # PRIORITY 5: Finger-count based gestures (static poses - checked last as fallback)
+        # PRIORITY 4: Finger-count based gestures (static poses)
         # Must use strict elif chain to ensure mutual exclusivity
         
         # Closed fist (0 fingers)
@@ -855,6 +871,15 @@ class HandGestureRecognizer:
             # PINKY_ONLY: Only pinky extended
             elif fingers['pinky'] and not fingers['index'] and not fingers['middle'] and not fingers['ring'] and not fingers['thumb']:
                 return GestureType.PINKY_ONLY
+        
+        # PRIORITY 5: Distance-based gestures (pinch/spread) - MOVED TO LAST
+        # CRITICAL FIX: Check pinch/spread AFTER all other gestures to prevent zoom interference
+        # This ensures zoom only triggers when user is intentionally making pinch pose
+        # ISSUE #2 FIX: Skip zoom gestures in POINTER_MODE if mode separation enabled
+        if not (Config.ENABLE_MODE_SEPARATION and self.current_mode == 'POINTER' and Config.DISABLE_ZOOM_IN_POINTER_MODE):
+            pinch_spread = self.detect_pinch_spread(landmarks)
+            if pinch_spread != GestureType.NONE:
+                return pinch_spread
         
         return GestureType.NONE
 
