@@ -239,8 +239,10 @@ class HandGestureRecognizer:
     MIDDLE_MCP = 9
     RING_TIP = 16
     RING_DIP = 15
+    RING_MCP = 13
     PINKY_TIP = 20
     PINKY_DIP = 19
+    PINKY_MCP = 17
     
     def __init__(self):
         """Initialize the gesture recognizer"""
@@ -398,9 +400,9 @@ class HandGestureRecognizer:
             'middle': self.is_finger_extended(landmarks, self.MIDDLE_TIP,
                                              self.MIDDLE_DIP, self.MIDDLE_MCP),
             'ring': self.is_finger_extended(landmarks, self.RING_TIP,
-                                           self.RING_DIP, self.INDEX_MCP),
+                                           self.RING_DIP, self.RING_MCP),
             'pinky': self.is_finger_extended(landmarks, self.PINKY_TIP,
-                                            self.PINKY_DIP, self.INDEX_MCP)
+                                            self.PINKY_DIP, self.PINKY_MCP)
         }
         
         count = sum(fingers.values())
@@ -613,27 +615,33 @@ class HandGestureRecognizer:
     
     def detect_special_gestures(self, landmarks, fingers):
         """
-        Detect special hand signs (OK, Rock, Call, Peace, etc.).
+        Detect special hand signs (OK, Rock, Call) with STRICT conditions.
+        
+        IMPROVED: Added explicit finger state checks to prevent conflicts.
         
         Returns:
             GestureType: Special gesture or NONE
         """
-        # OK Sign: Thumb and index form circle, others extended
+        # OK Sign: Thumb and index form circle, other three fingers extended
+        # STRICT: Index must NOT be extended straight (tip near thumb = circle)
         thumb_tip = landmarks[self.THUMB_TIP]
         index_tip = landmarks[self.INDEX_TIP]
         thumb_index_distance = ((thumb_tip.x - index_tip.x)**2 + 
                                (thumb_tip.y - index_tip.y)**2) ** 0.5
         
         if (thumb_index_distance < 0.05 and 
+            not fingers['index'] and  # Index NOT straight (forming circle with thumb)
             fingers['middle'] and fingers['ring'] and fingers['pinky']):
             return GestureType.OK_SIGN
         
-        # Rock Sign: Index and pinky extended, middle and ring folded
+        # Rock Sign: Index and pinky extended, middle and ring folded, thumb folded
+        # STRICT: Thumb must be folded to distinguish from other gestures
         if (fingers['index'] and fingers['pinky'] and 
-            not fingers['middle'] and not fingers['ring']):
+            not fingers['middle'] and not fingers['ring'] and not fingers['thumb']):
             return GestureType.ROCK_SIGN
         
         # Call Sign: Thumb and pinky extended, others folded
+        # Already strict - no changes needed
         if (fingers['thumb'] and fingers['pinky'] and
             not fingers['index'] and not fingers['middle'] and not fingers['ring']):
             return GestureType.CALL_SIGN
@@ -776,51 +784,30 @@ class HandGestureRecognizer:
         if self.hand_size_baseline is None and Config.ENABLE_LEARNING_MODE:
             self.hand_size_baseline = self.calculate_hand_size(landmarks)
         
-        # MUTUALLY EXCLUSIVE PRIORITY ORDER - IMPROVED for distinct gestures
+        # MUTUALLY EXCLUSIVE PRIORITY ORDER - FIXED to prevent gesture mixing
+        # CRITICAL FIX: Movement gestures checked BEFORE static poses to ensure proper detection
         
-        # PRIORITY 1: Thumb gestures (most distinct - check first)
+        # PRIORITY 1: Thumb gestures (most distinct - explicit thumb-only poses)
         if Config.THUMB_EXPLICIT_GESTURES_ONLY:
             if self.detect_thumb_up(landmarks):
                 return GestureType.THUMB_UP
             elif self.detect_thumb_down(landmarks):
                 return GestureType.THUMB_DOWN
         
-        # PRIORITY 2: Special hand signs (require precise detection)
+        # PRIORITY 2: Special hand signs (require precise finger configurations)
         special = self.detect_special_gestures(landmarks, fingers)
         if special != GestureType.NONE:
             return special
         
-        # PRIORITY 3: Closed fist (must check before other finger counts)
-        if count == 0:
-            return GestureType.CLOSED_FIST
+        # PRIORITY 3: Movement-based gestures (swipes) - CHECK BEFORE static finger counts
+        # This prevents swipes from being misclassified as peace sign or other static poses
+        swipe_h = self.detect_swipe(landmarks)
+        if swipe_h != GestureType.NONE:
+            return swipe_h
         
-        # PRIORITY 4: Open palm (all fingers extended)
-        elif count == 5 or (Config.THUMB_IGNORED_MODE and count == 4 and not fingers['thumb']):
-            # All non-thumb fingers extended
-            if fingers['index'] and fingers['middle'] and fingers['ring'] and fingers['pinky']:
-                return GestureType.OPEN_PALM
-        
-        # PRIORITY 5: Four fingers (refresh page)
-        elif count == 4:
-            if not fingers['thumb'] and fingers['index'] and fingers['middle'] and fingers['ring'] and fingers['pinky']:
-                return GestureType.FOUR_FINGERS
-        
-        # PRIORITY 6: Three fingers (screenshot)
-        elif count == 3:
-            if fingers['index'] and fingers['middle'] and fingers['ring'] and not fingers['pinky']:
-                return GestureType.THREE_FINGERS
-        
-        # PRIORITY 7: Two fingers - Peace sign (V sign)
-        elif count == 2:
-            if fingers['index'] and fingers['middle'] and not fingers['ring'] and not fingers['pinky']:
-                return GestureType.PEACE_SIGN
-        
-        # PRIORITY 8: One finger - pointer or pinky
-        elif count == 1:
-            if fingers['index'] and not fingers['middle']:
-                return GestureType.INDEX_ONLY
-            elif fingers['pinky'] and not fingers['index']:
-                return GestureType.PINKY_ONLY
+        swipe_v = self.detect_vertical_swipe(landmarks)
+        if swipe_v != GestureType.NONE:
+            return swipe_v
         
         # PRIORITY 4: Distance-based gestures (pinch/spread)
         # ISSUE #2 FIX: Skip zoom gestures in POINTER_MODE if mode separation enabled
@@ -829,16 +816,45 @@ class HandGestureRecognizer:
             if pinch_spread != GestureType.NONE:
                 return pinch_spread
         
-        # PRIORITY 5: Movement-based gestures (swipes) - ALWAYS LAST to avoid false positives
-        # Check horizontal swipe first (ISSUE #3 FIX applied in method)
-        swipe_h = self.detect_swipe(landmarks)
-        if swipe_h != GestureType.NONE:
-            return swipe_h
+        # PRIORITY 5: Finger-count based gestures (static poses - checked last as fallback)
+        # Must use strict elif chain to ensure mutual exclusivity
         
-        # Check vertical swipe (ISSUE #4 FIX applied in method)
-        swipe_v = self.detect_vertical_swipe(landmarks)
-        if swipe_v != GestureType.NONE:
-            return swipe_v
+        # Closed fist (0 fingers)
+        if count == 0:
+            return GestureType.CLOSED_FIST
+        
+        # Open palm (all fingers extended)
+        elif count == 5 or (Config.THUMB_IGNORED_MODE and count == 4 and not fingers['thumb']):
+            # STRICT CHECK: All non-thumb fingers must be extended
+            if fingers['index'] and fingers['middle'] and fingers['ring'] and fingers['pinky']:
+                return GestureType.OPEN_PALM
+        
+        # Four fingers (refresh page)
+        elif count == 4:
+            # STRICT CHECK: Thumb folded, all others extended
+            if not fingers['thumb'] and fingers['index'] and fingers['middle'] and fingers['ring'] and fingers['pinky']:
+                return GestureType.FOUR_FINGERS
+        
+        # Three fingers (screenshot)
+        elif count == 3:
+            # STRICT CHECK: Index, middle, ring extended; pinky and thumb folded
+            if fingers['index'] and fingers['middle'] and fingers['ring'] and not fingers['pinky'] and not fingers['thumb']:
+                return GestureType.THREE_FINGERS
+        
+        # Two fingers - Peace sign (V sign for left click)
+        elif count == 2:
+            # STRICT CHECK: Only index and middle extended; others folded
+            if fingers['index'] and fingers['middle'] and not fingers['ring'] and not fingers['pinky'] and not fingers['thumb']:
+                return GestureType.PEACE_SIGN
+        
+        # One finger - pointer or pinky
+        elif count == 1:
+            # INDEX_ONLY: Only index extended
+            if fingers['index'] and not fingers['middle'] and not fingers['ring'] and not fingers['pinky'] and not fingers['thumb']:
+                return GestureType.INDEX_ONLY
+            # PINKY_ONLY: Only pinky extended
+            elif fingers['pinky'] and not fingers['index'] and not fingers['middle'] and not fingers['ring'] and not fingers['thumb']:
+                return GestureType.PINKY_ONLY
         
         return GestureType.NONE
 
@@ -875,15 +891,19 @@ class GestureStabilizer:
         """
         Returns gesture only if it's been consistent across buffer.
         
+        IMPROVED: Better transition handling to reduce flickering.
+        
         Logic:
-            If majority of frames in buffer show same gesture, it's stable.
+            - If majority of frames in buffer show same gesture, it's stable
+            - Requires higher consistency (60%) to prevent jitter
+            - Smoothly transitions by requiring new gesture to dominate buffer
             
         Returns:
             GestureType: Stable gesture or NONE
         """
         # Check if buffer is sufficiently filled
         buffer_maxlen = self.buffer.maxlen if self.buffer.maxlen is not None else Config.GESTURE_BUFFER_SIZE
-        if len(self.buffer) < buffer_maxlen:
+        if len(self.buffer) < buffer_maxlen * 0.8:  # Allow 80% fill for faster initial response
             return GestureType.NONE
         
         # Count occurrences of each gesture in buffer
@@ -898,12 +918,21 @@ class GestureStabilizer:
         most_common = max(gesture_counts, key=lambda k: gesture_counts[k])
         occurrence_ratio = gesture_counts[most_common] / len(self.buffer)
         
-        # Require at least 60% consistency
-        if occurrence_ratio >= Config.CONFIDENCE_THRESHOLD:
+        # IMPROVED: Apply hysteresis for transition smoothing
+        # If switching from one gesture to another, require higher confidence
+        if self.current_stable_gesture != GestureType.NONE and most_common != self.current_stable_gesture:
+            # Require 70% consistency when switching gestures (prevents flickering)
+            required_confidence = 0.7
+        else:
+            # Use standard 60% consistency for maintaining current gesture
+            required_confidence = Config.CONFIDENCE_THRESHOLD
+        
+        if occurrence_ratio >= required_confidence:
             self.current_stable_gesture = most_common
             return most_common
         
-        return GestureType.NONE
+        # If not confident enough, maintain previous stable gesture (reduces jitter)
+        return self.current_stable_gesture
     
     def should_execute_action(self, gesture):
         """
