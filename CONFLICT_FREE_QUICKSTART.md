@@ -285,14 +285,6 @@ buffer_fill: 1.0
 action_count: 3
 ```
 
-### Console Logging
-
-Actions are logged as:
-```
-✓ [fist] → left_click
-✓ [peace_sign] → right_click
-✗ [thumbs_up] → scroll_up FAILED
-```
 
 ---
 
