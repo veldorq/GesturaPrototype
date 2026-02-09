@@ -253,6 +253,11 @@ class HandGestureRecognizer:
         self.previous_index_y = None
         self.swipe_start_time = None
         self.swipe_confirmation_buffer = []  # ISSUE #4 FIX: Multi-frame swipe validation
+        # Persist confirmed swipes so dwell-based actions can complete
+        self.active_horizontal_swipe = GestureType.NONE
+        self.active_horizontal_swipe_start = 0.0
+        self.active_vertical_swipe = GestureType.NONE
+        self.active_vertical_swipe_start = 0.0
         
         # Scroll gesture state (ISSUE #1 FIX: Dwell time tracking)
         self.scroll_gesture_start_time = 0.0  # Changed from None to 0.0
@@ -458,6 +463,15 @@ class HandGestureRecognizer:
         current_wrist_x = landmarks[self.WRIST].x
         current_wrist_y = landmarks[self.WRIST].y
         current_index_x = landmarks[self.INDEX_TIP].x
+
+        # If a horizontal swipe was recently confirmed, persist it for a short window
+        if (self.active_horizontal_swipe != GestureType.NONE and
+            time.time() - self.active_horizontal_swipe_start < Config.BROWSER_NAV_DWELL_TIME):
+            return self.active_horizontal_swipe
+        else:
+            # expire active swipe
+            if time.time() - self.active_horizontal_swipe_start >= Config.BROWSER_NAV_DWELL_TIME:
+                self.active_horizontal_swipe = GestureType.NONE
         
         if self.previous_wrist_x is None or self.previous_index_x is None:
             self.previous_wrist_x = current_wrist_x
@@ -495,6 +509,9 @@ class HandGestureRecognizer:
             # Check if last N frames agree on direction
             if len(self.swipe_confirmation_buffer) == Config.SWIPE_CONFIRMATION_FRAMES:
                 if all(d == swipe_direction for d in self.swipe_confirmation_buffer):
+                    # Persist confirmed swipe so execute_gesture_action can observe it across frames
+                    self.active_horizontal_swipe = swipe_direction
+                    self.active_horizontal_swipe_start = time.time()
                     self.swipe_confirmation_buffer.clear()
                     self.previous_wrist_x = current_wrist_x
                     self.previous_wrist_y = current_wrist_y
@@ -540,6 +557,11 @@ class HandGestureRecognizer:
         vertical_movement = abs(delta_y)
         horizontal_movement = abs(delta_x)
         
+        # Persist a recently confirmed vertical swipe for dwell-based actions
+        if (self.active_vertical_swipe != GestureType.NONE and
+            time.time() - self.active_vertical_swipe_start < Config.BROWSER_NAV_DWELL_TIME):
+            return self.active_vertical_swipe
+
         if vertical_movement > Config.SWIPE_VERTICAL_THRESHOLD and vertical_movement > Config.SWIPE_VELOCITY_MIN:
             # ISSUE #4 FIX: Require vertical dominance to avoid confusion with horizontal swipes
             if horizontal_movement > 0 and (vertical_movement / horizontal_movement) < Config.SWIPE_DIRECTION_DOMINANCE_RATIO:
@@ -550,9 +572,10 @@ class HandGestureRecognizer:
             
             # Determine direction (negative delta_y = upward movement in screen coordinates)
             swipe_direction = GestureType.SWIPE_UP if delta_y < 0 else GestureType.SWIPE_DOWN
-            
-            # Note: Using same confirmation buffer as horizontal swipes for now
-            # In production, you might want separate buffers
+
+            # Persist confirmed vertical swipe so execute_gesture_action can observe it across frames
+            self.active_vertical_swipe = swipe_direction
+            self.active_vertical_swipe_start = time.time()
             self.previous_wrist_y = current_wrist_y
             self.previous_wrist_x = current_wrist_x
             return swipe_direction
@@ -864,13 +887,16 @@ class HandGestureRecognizer:
                 return GestureType.PEACE_SIGN
         
         # One finger - pointer or pinky
-        elif count == 1:
-            # INDEX_ONLY: Only index extended
-            if fingers['index'] and not fingers['middle'] and not fingers['ring'] and not fingers['pinky'] and not fingers['thumb']:
-                return GestureType.INDEX_ONLY
-            # PINKY_ONLY: Only pinky extended
-            elif fingers['pinky'] and not fingers['index'] and not fingers['middle'] and not fingers['ring'] and not fingers['thumb']:
-                return GestureType.PINKY_ONLY
+        # For single-finger checks, use a full count that includes the thumb
+        elif True:
+            count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
+            if count_full == 1:
+                # INDEX_ONLY: Only index extended
+                if fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['pinky'] and not fingers_full['thumb']:
+                    return GestureType.INDEX_ONLY
+                # PINKY_ONLY: Only pinky extended (ensures thumb presence prevents misclassification)
+                elif fingers_full['pinky'] and not fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['thumb']:
+                    return GestureType.PINKY_ONLY
         
         # PRIORITY 5: Distance-based gestures (pinch/spread) - MOVED TO LAST
         # CRITICAL FIX: Check pinch/spread AFTER all other gestures to prevent zoom interference
