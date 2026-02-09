@@ -25,19 +25,22 @@ warnings.filterwarnings('ignore')
 
 # Optional imports with graceful fallback
 try:
-    from filterpy.kalman import KalmanFilter
-    from filterpy.common import Q_discrete_white_noise
+    from filterpy.kalman import KalmanFilter  # type: ignore
+    from filterpy.common import Q_discrete_white_noise  # type: ignore
     FILTERPY_AVAILABLE = True
 except ImportError:
     FILTERPY_AVAILABLE = False
+    KalmanFilter = None  # type: ignore
+    Q_discrete_white_noise = None  # type: ignore
     print("WARNING: filterpy not installed - confidence smoothing disabled")
     print("   Install with: pip install filterpy")
 
 try:
-    from scipy.signal import savgol_filter
+    from scipy.signal import savgol_filter  # type: ignore
     SCIPY_AVAILABLE = True
 except ImportError:
     SCIPY_AVAILABLE = False
+    savgol_filter = None  # type: ignore
     print("WARNING: scipy not installed - jitter reduction disabled")
     print("   Install with: pip install scipy")
 
@@ -82,17 +85,17 @@ class ConfidenceKalmanFilter:
         
         if self.enabled:
             # Create 1D Kalman filter (state = [confidence, confidence_velocity])
-            self.kf = KalmanFilter(dim_x=2, dim_z=1)
+            self.kf = KalmanFilter(dim_x=2, dim_z=1)  # type: ignore
             
             # State transition matrix (constant velocity model)
             self.kf.F = np.array([[1., 1.],   # confidence(t+1) = confidence(t) + velocity(t)
                                   [0., 1.]])   # velocity(t+1) = velocity(t)
             
             # Measurement matrix (we only observe confidence directly)
-            self.kf.H = np.array([[1., 0.]])
+            self.kf.H = np.array([[1., 0.]])  # type: ignore
             
             # Process noise (how much confidence can change frame-to-frame)
-            self.kf.Q = Q_discrete_white_noise(dim=2, dt=1./30., 
+            self.kf.Q = Q_discrete_white_noise(dim=2, dt=1./30.,  # type: ignore
                                               var=SmoothingConfig.KALMAN_PROCESS_VARIANCE)
             
             # Measurement noise (uncertainty in CNN confidence readings)
@@ -122,9 +125,12 @@ class ConfidenceKalmanFilter:
             return confidence_raw
         
         # Initialize on first measurement
-        if not self.initialized:
+        if not self.initialized and self.kf is not None:
             self.kf.x = np.array([[confidence_raw], [0.]])
             self.initialized = True
+            return confidence_raw
+        
+        if self.kf is None:
             return confidence_raw
         
         # Predict next state
@@ -191,7 +197,7 @@ class SavitzkyGolayJitterReducer:
         
         # Apply Savitzky-Golay filter
         try:
-            smoothed_array = savgol_filter(
+            smoothed_array = savgol_filter(  # type: ignore
                 buffer_array,
                 window_length=SmoothingConfig.SAVGOL_WINDOW_LENGTH,
                 polyorder=SmoothingConfig.SAVGOL_POLYORDER,

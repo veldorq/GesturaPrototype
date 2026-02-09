@@ -46,10 +46,11 @@ except ImportError:
 
 # Smoothing pipeline for stability improvements (optional, graceful degradation)
 try:
-    from smoothing_pipeline import GestureSmoothingPipeline
+    from smoothing_pipeline import GestureSmoothingPipeline  # type: ignore
     SMOOTHING_AVAILABLE = True
 except ImportError:
     SMOOTHING_AVAILABLE = False
+    GestureSmoothingPipeline = None  # type: ignore
     print("WARNING: Smoothing pipeline not available - install filterpy/scipy for better stability")
     print("   pip install filterpy scipy")
 
@@ -75,9 +76,9 @@ class Config:
     MAX_NUM_HANDS = 1
     
     # Gesture stabilization
-    GESTURE_BUFFER_SIZE = 5  # Frames to buffer before confirming gesture
-    DEBOUNCE_TIME = 0.5  # Seconds between repeated actions
-    CONFIDENCE_THRESHOLD = 0.6  # Minimum confidence for gesture recognition
+    GESTURE_BUFFER_SIZE = 3  # Frames to buffer (REDUCED from 5 for faster response)
+    DEBOUNCE_TIME = 0.2  # Seconds between repeated actions (REDUCED from 0.5)
+    CONFIDENCE_THRESHOLD = 0.4  # Minimum confidence (REDUCED from 0.6 for easier detection)
     
     # Movement settings - OPTIMIZED for natural pointer control
     MOUSE_SMOOTHING = 0.15  # 0=instant, 1=no movement (OPTIMIZED: reduced from 0.3 for faster response)
@@ -89,27 +90,28 @@ class Config:
     SCROLL_SPEED_MULTIPLIER = 3.5  # Slightly faster than 3.0 (controlled increase)
     SCROLL_BASE_AMOUNT = 20  # Base scroll amount per action
     SCROLL_SMOOTH_STEPS = 4  # Increased to 4 for smoother visual experience
-    SCROLL_DWELL_TIME = 0.15  # Reduced for faster response (was 0.25)
-    SCROLL_CONTINUOUS_DELAY = 0.15  # Delay between continuous scroll actions (prevents spam)
+    SCROLL_DWELL_TIME = 0.08  # ULTRA FAST (was 0.15 - 90% faster response)
+    SCROLL_CONTINUOUS_DELAY = 0.08  # ULTRA FAST delay (was 0.15)
     
     # ISSUE #3 & #4 FIX: Improved swipe detection with direction dominance
-    SWIPE_THRESHOLD = 0.20  # Minimum movement to detect swipe (INCREASED from 0.15 for stricter detection)
-    SWIPE_VERTICAL_THRESHOLD = 0.18  # For up/down swipes (INCREASED for stricter detection)
-    SWIPE_DIRECTION_DOMINANCE_RATIO = 2.5  # Required ratio: primary_axis_movement / secondary_axis_movement
-    SWIPE_CONFIRMATION_FRAMES = 3  # Frames needed to confirm swipe (multi-frame validation)
-    SWIPE_VELOCITY_MIN = 0.08  # Minimum velocity per frame
+    SWIPE_THRESHOLD = 0.05  # Minimum movement to detect swipe (90% EASIER - was 0.20)
+    SWIPE_VERTICAL_THRESHOLD = 0.05  # For up/down swipes (90% EASIER - was 0.18)
+    SWIPE_DIRECTION_DOMINANCE_RATIO = 1.3  # Required ratio (VERY RELAXED - was 2.5)
+    SWIPE_CONFIRMATION_FRAMES = 1  # Frames needed (INSTANT - was 3)
+    SWIPE_VELOCITY_MIN = 0.02  # Minimum velocity (90% EASIER - was 0.08)
     
     # REFINEMENT #2: Browser navigation safety - slower, more controlled
-    BROWSER_NAV_DWELL_TIME = 0.8  # Deliberate delay before browser back/forward (prevents accidents)
-    BROWSER_NAV_COOLDOWN = 1.5  # Strong cooldown between navigation actions (ensures one action per gesture)
+    BROWSER_NAV_DWELL_TIME = 0.3  # Deliberate delay (REDUCED from 0.8 for faster response)
+    BROWSER_NAV_COOLDOWN = 0.5  # Cooldown (REDUCED from 1.5 for faster actions)
     
     # Distance-based gestures
-    PINCH_THRESHOLD = 0.05  # Max distance for pinch
-    SPREAD_THRESHOLD = 0.15  # Min distance for spread
+    ENABLE_ZOOM_GESTURES = False  # DISABLED BY DEFAULT - too easy to trigger accidentally
+    PINCH_THRESHOLD = 0.04  # Max distance for pinch (VERY CLOSE - strict)
+    SPREAD_THRESHOLD = 0.20  # Min distance for spread (VERY WIDE - much stricter than before)
     PINCH_DISTANCE_THRESHOLD = 0.08  # Threshold for pinch verification
     
     # Finger extension detection
-    FINGER_EXTENSION_THRESHOLD = 0.02  # Y-axis threshold for finger curl detection (helps with loose fists)
+    FINGER_EXTENSION_THRESHOLD = 0.005  # Y-axis threshold (95% EASIER - was 0.02 - very sensitive now)
     
     # REFINEMENT #4: Pinch zoom - smooth and isolated
     ZOOM_SMOOTH_STEPS = 2  # Number of incremental zoom steps for smoothness
@@ -131,18 +133,21 @@ class Config:
     POINTER_INVERT_Y = False  # Set to False for natural up/down movement
     
     # REFINEMENT #3: Close tab safety - high-risk action needs maximum protection
-    CLOSE_TAB_DWELL_TIME = 1.2  # Long dwell time before closing tab (prevents accidental closure)
-    CLOSE_TAB_COOLDOWN = 2.0  # Strong cooldown after closing (prevents rapid tab loss)
+    CLOSE_TAB_DWELL_TIME = 0.5  # FAST (was 1.2 - 58% faster for quick actions)
+    CLOSE_TAB_COOLDOWN = 0.8  # FAST cooldown (was 2.0 - 60% faster)
     CLOSE_TAB_REQUIRE_STABILITY = True  # Require stable gesture across dwell period
     
     # REFINEMENT #5: Mute toggle - slower, controlled execution
-    MUTE_TOGGLE_DWELL_TIME = 0.6  # Deliberate delay before mute/unmute
-    MUTE_TOGGLE_COOLDOWN = 1.0  # Strong cooldown to prevent rapid toggling
+    MUTE_TOGGLE_DWELL_TIME = 0.2  # Deliberate delay (REDUCED from 0.6 for faster response)
+    MUTE_TOGGLE_COOLDOWN = 0.4  # Cooldown (REDUCED from 1.0 for faster actions)
     
     # REFINEMENT #6: Browser launch keyboard shortcut
     BROWSER_LAUNCH_KEY = 'ctrl+shift+b'  # Configurable keyboard shortcut
     BROWSER_LAUNCH_TARGET = 'chrome'  # Options: 'chrome', 'edge', 'firefox', 'default'
     BROWSER_LAUNCH_ENABLED = True  # Enable/disable keyboard shortcut feature
+    
+    # DEBUG MODE: Enable detailed gesture detection logging
+    DEBUG_GESTURE_DETECTION = True  # Print what gestures are being detected
     
     # ========================================================================
     # CNN GESTURE RECOGNITION (DataFlair-based integration)
@@ -262,19 +267,19 @@ class GestureStateMachine:
         self.cooldown_start_time = 0.0
         
         # Tuning parameters (accessibility-focused)
-        self.CANDIDATE_CONFIRMATION_FRAMES = 5  # Require 5 frames (166ms @ 30fps)
+        self.CANDIDATE_CONFIRMATION_FRAMES = 2  # ULTRA FAST (was 5 - 60% faster)
         self.CANDIDATE_TIMEOUT = 1.0  # Reset if gesture not maintained
-        self.COOLDOWN_DURATION = 0.6  # Default cooldown (gesture-specific overrides)
+        self.COOLDOWN_DURATION = 0.2  # ULTRA FAST cooldown (was 0.6 - 67% faster)
         
         # FIX #1: Gesture-specific dwell requirements (consolidates timing logic)
         # These gestures require holding after confirmation before action triggers
         self.DWELL_GESTURES = {
-            GestureType.OPEN_PALM: 0.15,      # Scroll down dwell
-            GestureType.CLOSED_FIST: 0.15,    # Scroll up dwell
-            GestureType.THUMB_DOWN: 1.2,      # Close tab safety dwell
-            GestureType.PINKY_ONLY: 0.6,      # Mute toggle dwell
-            GestureType.SWIPE_LEFT: 0.8,      # Browser back dwell
-            GestureType.SWIPE_RIGHT: 0.8,     # Browser forward dwell
+            GestureType.OPEN_PALM: 0.08,      # Scroll down (ULTRA FAST - was 0.15)
+            GestureType.CLOSED_FIST: 0.08,    # Scroll up (ULTRA FAST - was 0.15)
+            GestureType.THUMB_DOWN: 0.5,      # Close tab (FAST - was 1.2)
+            GestureType.PINKY_ONLY: 0.2,      # Mute toggle (ULTRA FAST - was 0.6)
+            GestureType.SWIPE_LEFT: 0.3,      # Browser back (FAST - was 0.8)
+            GestureType.SWIPE_RIGHT: 0.3,     # Browser forward (FAST - was 0.8)
         }
         
         # FIX #1: Continuous gestures that don't need confirmation
@@ -530,9 +535,9 @@ class HandGestureRecognizer:
         # PERFORMANCE IMPROVEMENT: Initialize smoothing pipeline
         # Post-CNN smoothing (after prediction, before state machine)
         self.smoothing_pipeline = None
-        if SMOOTHING_AVAILABLE:
+        if SMOOTHING_AVAILABLE and GestureSmoothingPipeline is not None:
             try:
-                self.smoothing_pipeline = GestureSmoothingPipeline()
+                self.smoothing_pipeline = GestureSmoothingPipeline()  # type: ignore
                 print("[SUCCESS] Smoothing pipeline active (filterpy + scipy)")
             except Exception as e:
                 print(f"WARNING: Smoothing pipeline initialization error: {e}")
@@ -573,27 +578,40 @@ class HandGestureRecognizer:
     
     def is_thumb_extended(self, landmarks):
         """
-        Checks if thumb is extended.
+        Checks if thumb is extended (spread away from palm).
+        
+        STRICT: Made strict to distinguish between tucked thumb vs extended thumb.
+        This is critical for differentiating FOUR_FINGERS (thumb tucked) from OPEN_PALM (thumb spread).
         
         Logic:
             Thumb extends horizontally. It's extended if the TIP is
-            farther from the wrist in x-direction than the IP joint.
+            clearly farther from the wrist with progressive joint distances.
         
         Returns:
-            bool: True if thumb is extended
+            bool: True if thumb is clearly extended (not tucked)
         """
         thumb_tip = landmarks[self.THUMB_TIP]
         thumb_ip = landmarks[self.THUMB_IP]
         thumb_mcp = landmarks[2]  # Thumb MCP joint
         wrist = landmarks[self.WRIST]
+        index_mcp = landmarks[self.INDEX_MCP]
         
         # Calculate distance from wrist for tip and ip
         tip_dist = ((thumb_tip.x - wrist.x)**2 + (thumb_tip.y - wrist.y)**2) ** 0.5
         ip_dist = ((thumb_ip.x - wrist.x)**2 + (thumb_ip.y - wrist.y)**2) ** 0.5
         mcp_dist = ((thumb_mcp.x - wrist.x)**2 + (thumb_mcp.y - wrist.y)**2) ** 0.5
         
-        # Thumb is extended if tip > ip > mcp in distance from wrist
-        return tip_dist > ip_dist and ip_dist > mcp_dist * 0.8
+        # STRICT: Require clear progressive extension
+        is_progressive = tip_dist > ip_dist and ip_dist > mcp_dist * 0.95
+        
+        # STRICT: Thumb must be reasonably far from wrist
+        is_clearly_away = tip_dist > 0.10
+        
+        # ADDITIONAL CHECK: Thumb should be away from index finger base (not tucked alongside)
+        thumb_index_dist = ((thumb_tip.x - index_mcp.x)**2 + (thumb_tip.y - index_mcp.y)**2) ** 0.5
+        is_away_from_index = thumb_index_dist > 0.08
+        
+        return is_progressive and is_clearly_away and is_away_from_index
     
     def count_extended_fingers(self, landmarks, ignore_thumb=None):
         """
@@ -634,7 +652,7 @@ class HandGestureRecognizer:
         
         Logic:
             Thumb extended upward (tip.y < ip.y) while all other fingers folded.
-            Additional angle check to ensure thumb is vertical.
+            Additional angle check to ensure thumb is vertical and clearly pointing up.
         
         Returns:
             bool: True if thumbs-up detected
@@ -646,15 +664,23 @@ class HandGestureRecognizer:
             thumb_tip_y = landmarks[self.THUMB_TIP].y
             thumb_ip_y = landmarks[self.THUMB_IP].y
             thumb_mcp_y = landmarks[2].y  # Thumb MCP
+            wrist_y = landmarks[self.WRIST].y
             
             # Thumb pointing up: tip above ip above mcp
             vertical_alignment = thumb_tip_y < thumb_ip_y < thumb_mcp_y
             
-            # Additional check: thumb should be significantly above wrist
-            wrist_y = landmarks[self.WRIST].y
-            thumb_elevated = thumb_tip_y < wrist_y - 0.1  # Above wrist by threshold
+            # STRICT: Thumb must be significantly above wrist (not just tucked to side)
+            thumb_elevated = thumb_tip_y < wrist_y - 0.15  # INCREASED threshold
             
-            return vertical_alignment and thumb_elevated
+            # STRICT: Thumb tip should be higher than all other fingertips (confirm it's pointing UP not sideways)
+            index_tip_y = landmarks[self.INDEX_TIP].y
+            middle_tip_y = landmarks[self.MIDDLE_TIP].y
+            ring_tip_y = landmarks[self.RING_TIP].y
+            pinky_tip_y = landmarks[self.PINKY_TIP].y
+            thumb_is_highest = (thumb_tip_y < index_tip_y and thumb_tip_y < middle_tip_y and 
+                               thumb_tip_y < ring_tip_y and thumb_tip_y < pinky_tip_y)
+            
+            return vertical_alignment and thumb_elevated and thumb_is_highest
         
         return False
     
@@ -867,6 +893,14 @@ class HandGestureRecognizer:
         distance = ((thumb_tip.x - index_tip.x)**2 + 
                    (thumb_tip.y - index_tip.y)**2) ** 0.5
         
+        # ADDITIONAL CHECK: Ensure hand orientation is correct (thumb and index horizontal, not vertical)
+        # This prevents accidental detection when pointing or making other gestures
+        thumb_index_horizontal = abs(thumb_tip.y - index_tip.y) < 0.15  # Fingers roughly same height
+        
+        if not thumb_index_horizontal:
+            return GestureType.NONE
+        
+        # STRICT THRESHOLDS: Very close for pinch, very wide for spread
         if distance < Config.PINCH_THRESHOLD:
             return GestureType.PINCH
         elif distance > Config.SPREAD_THRESHOLD:
@@ -901,12 +935,19 @@ class HandGestureRecognizer:
             not fingers['middle'] and not fingers['ring'] and not fingers['thumb']):
             return GestureType.ROCK_SIGN
         
-        # Call Sign: Thumb and pinky extended, others folded
-        # CRITICAL FIX: Check thumb explicitly to bypass THUMB_IGNORED_MODE
+        # Call Sign: Thumb and pinky extended, others folded ("hang loose" gesture)
+        # RELAXED: Easier detection with lower separation threshold
         thumb_extended = self.is_thumb_extended(landmarks)
         if (thumb_extended and fingers['pinky'] and
             not fingers['index'] and not fingers['middle'] and not fingers['ring']):
-            return GestureType.CALL_SIGN
+            # Additional check: thumb and pinky must be separated (not touching)
+            thumb_tip = landmarks[self.THUMB_TIP]
+            pinky_tip = landmarks[self.PINKY_TIP]
+            thumb_pinky_distance = ((thumb_tip.x - pinky_tip.x)**2 + 
+                                   (thumb_tip.y - pinky_tip.y)**2) ** 0.5
+            # ULTRA RELAXED: Very low separation threshold (was 0.15, then 0.10)
+            if thumb_pinky_distance > 0.06:
+                return GestureType.CALL_SIGN
         
         return GestureType.NONE
     
@@ -1154,6 +1195,8 @@ class HandGestureRecognizer:
         if candidates:
             # Movement gesture confirmed - return highest confidence
             best = max(candidates, key=lambda x: x[1])
+            if Config.DEBUG_GESTURE_DETECTION:
+                print(f"\n[DETECTED] {best[0].name}: {best[2]}")
             return best[0]
         
         # PRIORITY 4: Finger-count based gestures (static poses)
@@ -1161,32 +1204,44 @@ class HandGestureRecognizer:
         
         # Closed fist (0 fingers)
         if count == 0:
-            if Config.is_advanced_ui_enabled():
-                print("[DEBUG] CLOSED_FIST detected (0 fingers extended)")
+            if Config.DEBUG_GESTURE_DETECTION:
+                print(f"\n[DETECTED] CLOSED_FIST")
             return GestureType.CLOSED_FIST
         
-        # Open palm (all fingers extended)
-        elif count == 5 or (Config.THUMB_IGNORED_MODE and count == 4 and not fingers['thumb']):
-            # STRICT CHECK: All non-thumb fingers must be extended
-            if fingers['index'] and fingers['middle'] and fingers['ring'] and fingers['pinky']:
-                return GestureType.OPEN_PALM
-        
-        # Four fingers (refresh page)
+        # Open palm (all 5 fingers spread including thumb)
+        # Check with thumb included to differentiate from four fingers
         elif count == 4:
-            # STRICT CHECK: Thumb folded, all others extended
-            if not fingers['thumb'] and fingers['index'] and fingers['middle'] and fingers['ring'] and fingers['pinky']:
+            # Get count including thumb to check if it's open palm
+            count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+            
+            if Config.DEBUG_GESTURE_DETECTION:
+                print(f"\r4-finger detection: Thumb={int(fingers_with_thumb['thumb'])} Count_with_thumb={count_with_thumb}", end='', flush=True)
+            
+            if count_with_thumb == 5 and fingers_with_thumb['thumb'] and fingers_with_thumb['index'] and fingers_with_thumb['middle'] and fingers_with_thumb['ring'] and fingers_with_thumb['pinky']:
+                # All 5 fingers spread = OPEN_PALM
+                if Config.DEBUG_GESTURE_DETECTION:
+                    print("\n[DETECTED] OPEN_PALM (5 fingers spread)")
+                return GestureType.OPEN_PALM
+            # Only 4 fingers extended (thumb not detected as extended) = FOUR_FINGERS
+            elif count_with_thumb == 4 and fingers_with_thumb['index'] and fingers_with_thumb['middle'] and fingers_with_thumb['ring'] and fingers_with_thumb['pinky'] and not fingers_with_thumb['thumb']:
+                if Config.DEBUG_GESTURE_DETECTION:
+                    print("\n[DETECTED] FOUR_FINGERS (thumb tucked)")
                 return GestureType.FOUR_FINGERS
         
         # Three fingers (screenshot)
         elif count == 3:
             # STRICT CHECK: Index, middle, ring extended; pinky and thumb folded
             if fingers['index'] and fingers['middle'] and fingers['ring'] and not fingers['pinky'] and not fingers['thumb']:
+                if Config.DEBUG_GESTURE_DETECTION:
+                    print(f"\n[DETECTED] THREE_FINGERS")
                 return GestureType.THREE_FINGERS
         
         # Two fingers - Peace sign (V sign for left click)
         elif count == 2:
             # STRICT CHECK: Only index and middle extended; others folded
             if fingers['index'] and fingers['middle'] and not fingers['ring'] and not fingers['pinky'] and not fingers['thumb']:
+                if Config.DEBUG_GESTURE_DETECTION:
+                    print(f"\n[DETECTED] PEACE_SIGN")
                 return GestureType.PEACE_SIGN
         
         # One finger - pointer or pinky
@@ -1196,19 +1251,35 @@ class HandGestureRecognizer:
             if count_full == 1:
                 # INDEX_ONLY: Only index extended
                 if fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['pinky'] and not fingers_full['thumb']:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print(f"\n[DETECTED] INDEX_ONLY (pointer)")
                     return GestureType.INDEX_ONLY
-                # PINKY_ONLY: Only pinky extended (ensures thumb presence prevents misclassification)
-                elif fingers_full['pinky'] and not fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['thumb']:
-                    return GestureType.PINKY_ONLY
+                # PINKY_ONLY: Only pinky extended
+                # RELAXED: Allow thumb to be slightly extended as long as pinky is clearly the dominant finger
+                elif fingers_full['pinky'] and not fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring']:
+                    # Additional check: ensure pinky is clearly highest finger
+                    pinky_tip_y = landmarks[self.PINKY_TIP].y
+                    index_tip_y = landmarks[self.INDEX_TIP].y
+                    middle_tip_y = landmarks[self.MIDDLE_TIP].y
+                    ring_tip_y = landmarks[self.RING_TIP].y
+                    # Pinky should be higher (VERY RELAXED - was 0.05, now 0.02)
+                    if pinky_tip_y < (index_tip_y - 0.02) and pinky_tip_y < (middle_tip_y - 0.02) and pinky_tip_y < (ring_tip_y - 0.02):
+                        if Config.DEBUG_GESTURE_DETECTION:
+                            print(f"\n[DETECTED] PINKY_ONLY (mute)")
+                        return GestureType.PINKY_ONLY
         
-        # PRIORITY 5: Distance-based gestures (pinch/spread) - MOVED TO LAST
+        # PRIORITY 5: Distance-based gestures (pinch/spread) - MOVED TO LAST & DISABLED BY DEFAULT
         # CRITICAL FIX: Check pinch/spread AFTER all other gestures to prevent zoom interference
         # This ensures zoom only triggers when user is intentionally making pinch pose
-        # ISSUE #2 FIX: Skip zoom gestures in POINTER_MODE if mode separation enabled
-        if not (Config.ENABLE_MODE_SEPARATION and self.current_mode == 'POINTER' and Config.DISABLE_ZOOM_IN_POINTER_MODE):
-            pinch_spread = self.detect_pinch_spread(landmarks)
-            if pinch_spread != GestureType.NONE:
-                return pinch_spread
+        # DISABLED BY DEFAULT: Too easy to trigger accidentally with other gestures
+        if Config.ENABLE_ZOOM_GESTURES:
+            # ISSUE #2 FIX: Skip zoom gestures in POINTER_MODE if mode separation enabled
+            if not (Config.ENABLE_MODE_SEPARATION and self.current_mode == 'POINTER' and Config.DISABLE_ZOOM_IN_POINTER_MODE):
+                pinch_spread = self.detect_pinch_spread(landmarks)
+                if pinch_spread != GestureType.NONE:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print(f"\n[DETECTED] {pinch_spread.name} (zoom)")
+                    return pinch_spread
         
         return GestureType.NONE
 
@@ -1257,7 +1328,7 @@ class GestureStabilizer:
         """
         # Check if buffer is sufficiently filled
         buffer_maxlen = self.buffer.maxlen if self.buffer.maxlen is not None else Config.GESTURE_BUFFER_SIZE
-        if len(self.buffer) < buffer_maxlen * 0.8:  # Allow 80% fill for faster initial response
+        if len(self.buffer) < buffer_maxlen * 0.5:  # ULTRA FAST (was 0.8 - 50% fill for instant response)
             return GestureType.NONE
         
         # Count occurrences of each gesture in buffer
@@ -1272,14 +1343,13 @@ class GestureStabilizer:
         most_common = max(gesture_counts, key=lambda k: gesture_counts[k])
         occurrence_ratio = gesture_counts[most_common] / len(self.buffer)
         
-        # FIX #2: IMPROVED hysteresis with wider gap to prevent flicker
-        # When switching from one gesture to another, require much higher confidence
+        # FIX #2: ULTRA RELAXED hysteresis for instant gesture switching
+        # When switching from one gesture to another, require minimal confidence
         if self.current_stable_gesture != GestureType.NONE and most_common != self.current_stable_gesture:
-            # FIX #2: Require 80% consistency when switching gestures (was 70%)
-            # This prevents rapid flickering between similar gestures like OPEN_PALM ↔ FOUR_FINGERS
-            required_confidence = 0.80
+            # ULTRA FAST: Only 50% consistency for switching (was 80% - much easier now)
+            required_confidence = 0.50
         else:
-            # Use standard 60% consistency for maintaining current gesture
+            # Use ultra-low confidence for maintaining current gesture
             required_confidence = Config.CONFIDENCE_THRESHOLD
         
         if occurrence_ratio >= required_confidence:
@@ -1730,14 +1800,14 @@ class HandGestureControlSystem:
         print("🚀 Initializing Hand Gesture Control System...")
         
         # Initialize MediaPipe Hands
-        self.mp_hands = mp.solutions.hands
+        self.mp_hands = mp.solutions.hands  # type: ignore
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
             max_num_hands=Config.MAX_NUM_HANDS,
             min_detection_confidence=Config.MIN_DETECTION_CONFIDENCE,
             min_tracking_confidence=Config.MIN_TRACKING_CONFIDENCE
         )
-        self.mp_draw = mp.solutions.drawing_utils
+        self.mp_draw = mp.solutions.drawing_utils  # type: ignore
         
         # Initialize components
         self.recognizer = HandGestureRecognizer()

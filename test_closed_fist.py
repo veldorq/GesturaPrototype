@@ -17,14 +17,14 @@ import mediapipe as mp
 import time
 
 # MediaPipe setup
-mp_hands = mp.solutions.hands
+mp_hands = mp.solutions.hands  # type: ignore
 hands = mp_hands.Hands(
     static_image_mode=False,
     max_num_hands=1,
     min_detection_confidence=0.7,
     min_tracking_confidence=0.7
 )
-mp_draw = mp.solutions.drawing_utils
+mp_draw = mp.solutions.drawing_utils  # type: ignore
 
 # Open camera
 cap = cv2.VideoCapture(0)
@@ -130,7 +130,7 @@ while True:
                         gesture_start_time = time.time()
                         last_gesture = 'CLOSED_FIST'
                         print("  → Hold for 0.15s to trigger scroll...")
-                    elif time.time() - gesture_start_time >= 0.15:
+                    elif gesture_start_time is not None and time.time() - gesture_start_time >= 0.15:
                         print("  → [SCROLL UP] Would trigger now!")
                 else:
                     last_gesture = None

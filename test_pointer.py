@@ -31,14 +31,14 @@ MOUSE_EDGE_PADDING = 50
 INDEX_TIP = 8
 
 # MediaPipe setup
-mp_hands = mp.solutions.hands
+mp_hands = mp.solutions.hands  # type: ignore
 hands = mp_hands.Hands(
     static_image_mode=False,
     max_num_hands=1,
     min_detection_confidence=0.7,
     min_tracking_confidence=0.7
 )
-mp_draw = mp.solutions.drawing_utils
+mp_draw = mp.solutions.drawing_utils  # type: ignore
 
 # Camera
 cap = cv2.VideoCapture(0)

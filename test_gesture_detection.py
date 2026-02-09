@@ -25,8 +25,8 @@ def test_camera_and_gestures():
     print("="*70 + "\n")
     
     # Initialize MediaPipe
-    mp_hands = mp.solutions.hands
-    mp_draw = mp.solutions.drawing_utils
+    mp_hands = mp.solutions.hands  # type: ignore
+    mp_draw = mp.solutions.drawing_utils  # type: ignore
     
     hands = mp_hands.Hands(
         static_image_mode=False,

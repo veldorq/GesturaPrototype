@@ -41,13 +41,13 @@ class QuickCollector:
         self.setup_folders()
         
         # MediaPipe
-        self.mp_hands = mp.solutions.hands
+        self.mp_hands = mp.solutions.hands  # type: ignore
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
             max_num_hands=1,
-            min_detection_confidence=0.7
+            min_detection_confidence=0.5
         )
-        self.mp_draw = mp.solutions.drawing_utils
+        self.mp_draw = mp.solutions.drawing_utils  # type: ignore
         
         # Camera
         self.cap = cv2.VideoCapture(0)
@@ -147,7 +147,7 @@ class QuickCollector:
                     
                     roi, bbox = self.extract_hand_roi(frame, hand_lm.landmark)
                     
-                    if roi is not None:
+                    if roi is not None and bbox is not None:
                         # Draw bbox
                         x1, y1, x2, y2 = bbox
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
