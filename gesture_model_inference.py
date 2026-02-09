@@ -32,7 +32,7 @@ try:
     CNN_AVAILABLE = True
 except ImportError:
     CNN_AVAILABLE = False
-    print("⚠️  TensorFlow not available - CNN inference disabled")
+    print(f"WARNING: TensorFlow not available - CNN inference disabled")
 
 
 class GestureInferenceConfig:
@@ -46,12 +46,14 @@ class GestureInferenceConfig:
     IMAGE_SIZE = (64, 64)
     
     # Confidence thresholding (CRITICAL for anti-glitch)
-    MIN_CONFIDENCE_THRESHOLD = 0.75  # Ignore predictions below 75%
-    HIGH_CONFIDENCE_THRESHOLD = 0.85  # Strong confidence for immediate acceptance
+    # TUNED: Higher threshold (0.80) reduces false positives for accessibility
+    MIN_CONFIDENCE_THRESHOLD = 0.80  # Ignore predictions below 80% (was 75%)
+    HIGH_CONFIDENCE_THRESHOLD = 0.88  # Strong confidence threshold (was 85%)
     
     # Temporal voting (CRITICAL for stability)
-    VOTING_WINDOW_SIZE = 5  # Last 5 frames must agree
-    VOTING_CONSISTENCY_THRESHOLD = 0.8  # 80% of frames must show same gesture
+    # TUNED: Longer window (7 frames) for shaky hand tolerance
+    VOTING_WINDOW_SIZE = 7  # Last 7 frames must agree (was 5)
+    VOTING_CONSISTENCY_THRESHOLD = 0.85  # 85% of frames must show same gesture (was 80%)
     
     # Safety
     ENABLE_CONFIDENCE_FILTER = True  # Must be True for production
@@ -88,42 +90,42 @@ class CNNGestureClassifier:
             bool: True if loaded successfully
         """
         if not CNN_AVAILABLE:
-            print("❌ TensorFlow not available - CNN classifier disabled")
+            print("[ERROR] TensorFlow not available - CNN classifier disabled")
             return False
         
         model_path = Path(GestureInferenceConfig.MODEL_PATH)
         encoder_path = Path(GestureInferenceConfig.LABEL_ENCODER_PATH)
         
         if not model_path.exists():
-            print(f"❌ Model not found: {model_path}")
+            print(f"[ERROR] Model not found: {model_path}")
             print("   Train model first using: python train_gesture_model.py")
             return False
         
         if not encoder_path.exists():
-            print(f"❌ Label encoder not found: {encoder_path}")
+            print(f"[ERROR] Label encoder not found: {encoder_path}")
             return False
         
         try:
             # Load model
             self.model = keras.models.load_model(str(model_path))
-            print(f"✅ CNN model loaded: {model_path}")
+            print(f"[SUCCESS] CNN model loaded: {model_path}")
             
             # Load label encoder
             with open(encoder_path, 'rb') as f:
                 self.label_encoder = pickle.load(f)
-            print(f"✅ Label encoder loaded: {encoder_path}")
+            print(f"[SUCCESS] Label encoder loaded: {encoder_path}")
             
             # Verify model input shape
             input_shape = self.model.input_shape
             expected_shape = (None, 64, 64, 1)
             if input_shape != expected_shape:
-                print(f"⚠️  Warning: Unexpected input shape: {input_shape}")
+                print(f"WARNING: Unexpected input shape: {input_shape}")
             
             self.is_loaded = True
             return True
         
         except Exception as e:
-            print(f"❌ Error loading model: {e}")
+            print(f"[ERROR] Error loading model: {e}")
             return False
     
     def preprocess_hand_roi(self, hand_roi):
@@ -188,7 +190,7 @@ class CNNGestureClassifier:
             return gesture_label, confidence
         
         except Exception as e:
-            print(f"⚠️  Prediction error: {e}")
+            print(f"WARNING: Prediction error: {e}")
             return None, 0.0
     
     def apply_confidence_filter(self, gesture_label, confidence):
@@ -220,12 +222,12 @@ class CNNGestureClassifier:
         
         SAFETY MECHANISM: Require consistent predictions over N frames.
         
-        Logic:
+        DataFlair-based anti-flicker logic:
             1. Add current prediction to buffer
-            2. Check if buffer is full
+            2. Check if buffer is full (prevents premature detection)
             3. Find most common gesture in buffer
-            4. Check if it appears in ≥80% of frames
-            5. Return only if consistent, else None
+            4. Check if it appears in ≥85% of frames (strict consistency)
+            5. Return only if consistent, else None (false negative > false positive)
         
         Args:
             gesture_label: Current gesture prediction
@@ -343,9 +345,9 @@ class HybridGestureSystem:
         # Try to load CNN model
         if self.cnn_classifier.load_model():
             self.use_cnn = True
-            print("✅ CNN classifier active")
+            print("[SUCCESS] CNN classifier active")
         else:
-            print("⚠️  CNN classifier not available - using rule-based fallback")
+            print("WARNING: CNN classifier not available - using rule-based fallback")
             self.use_cnn = False
         
         return self.use_cnn
@@ -387,7 +389,7 @@ def test_inference():
     classifier = CNNGestureClassifier()
     
     if classifier.load_model():
-        print("\n✅ Model loaded successfully")
+        print("\n[SUCCESS] Model loaded successfully")
         
         # Create dummy hand ROI
         dummy_roi = np.random.randint(0, 255, (100, 100), dtype=np.uint8)
@@ -403,7 +405,7 @@ def test_inference():
         print(f"  Filtered predictions: {stats['filtered_predictions']}")
         print(f"  Filter rate: {stats['filter_rate']:.2f}%")
     else:
-        print("\n❌ Model not loaded - cannot test inference")
+        print("\n[ERROR] Model not loaded - cannot test inference")
 
 
 if __name__ == "__main__":

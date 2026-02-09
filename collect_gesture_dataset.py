@@ -140,6 +140,13 @@ class GestureDataCollector:
         """
         Extract hand region of interest (ROI) with padding.
         
+        CRITICAL: This preprocessing MUST match inference exactly.
+        DataFlair consistency requirements:
+            - Same bounding box calculation (min/max with 20% padding)
+            - Same grayscale conversion
+            - Same normalization (histogram equalization)
+            - Same resize (64x64)
+        
         Returns normalized, grayscale hand image ready for CNN training.
         """
         h, w, _ = frame.shape
