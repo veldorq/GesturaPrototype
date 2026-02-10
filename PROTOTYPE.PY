@@ -80,18 +80,32 @@ class Config:
     DEBOUNCE_TIME = 0.4  # Seconds between repeated actions - STABLE (prevents accidental double-trigger)
     CONFIDENCE_THRESHOLD = 0.6  # Minimum confidence - STABLE (reduces false positives)
     
-    # Movement settings - OPTIMIZED for natural pointer control
-    MOUSE_SMOOTHING = 0.15  # 0=instant, 1=no movement (OPTIMIZED: reduced from 0.3 for faster response)
-    MOUSE_ACCELERATION = 1.5  # Speed multiplier for large movements (makes big movements faster)
-    MOUSE_DEAD_ZONE = 0.005  # Ignore movements smaller than this (prevents micro-jitter)
-    MOUSE_EDGE_PADDING = 50  # Pixels from edge where movement slows down (prevents getting stuck)
+    # Movement settings - ENHANCED for precision pointer control
+    MOUSE_SMOOTHING = 0.2  # 0=instant, 1=no movement (balanced for smooth tracking)
+    MOUSE_ACCELERATION = 1.8  # Speed multiplier for large movements (responsive)
+    MOUSE_DEAD_ZONE = 0.003  # Ignore movements smaller than this (reduced for finer control)
+    MOUSE_EDGE_PADDING = 50  # Pixels from edge where movement slows down
     
-    # SCROLL: Smooth and deliberate for demo (no accidental triggers)
-    SCROLL_SPEED_MULTIPLIER = 2.5  # Moderate speed - predictable for judges
-    SCROLL_BASE_AMOUNT = 20  # Base scroll amount per action
-    SCROLL_SMOOTH_STEPS = 3  # Smooth but not sluggish
-    SCROLL_DWELL_TIME = 0.4  # STABLE - hold gesture 0.4s before scrolling (prevents accidental scroll)
-    SCROLL_CONTINUOUS_DELAY = 0.3  # STABLE - 0.3s between scroll actions (calm, accessible)
+    # POINTER PRECISION: Dual-zone sensitivity for fine control
+    POINTER_PRECISION_MODE = True  # Enable center-area precision zone
+    POINTER_PRECISION_ZONE = 0.3  # Center 30% of screen = precision zone (0.0-1.0)
+    POINTER_PRECISION_MULTIPLIER = 0.5  # In precision zone, movements are 50% slower for accuracy
+    POINTER_EDGE_BOOST = 1.3  # Boost speed near edges to reach corners easily
+    
+    # SCROLL: Configurable sensitivity (3 levels)
+    SCROLL_SENSITIVITY = "high"  # Options: "low" (gentle), "medium" (balanced), "high" (fast)
+    # Scroll profiles (amount, smoothness, delay)
+    SCROLL_PROFILES = {
+        "low": {"base": 15, "multiplier": 2.0, "steps": 4, "delay": 0.015},     # Gentle, very smooth
+        "medium": {"base": 20, "multiplier": 2.5, "steps": 3, "delay": 0.012}, # Balanced (default)
+        "high": {"base": 30, "multiplier": 3.0, "steps": 2, "delay": 0.008}    # Fast, responsive
+    }
+    SCROLL_BASE_AMOUNT = SCROLL_PROFILES[SCROLL_SENSITIVITY]["base"]
+    SCROLL_SPEED_MULTIPLIER = SCROLL_PROFILES[SCROLL_SENSITIVITY]["multiplier"]
+    SCROLL_SMOOTH_STEPS = SCROLL_PROFILES[SCROLL_SENSITIVITY]["steps"]
+    SCROLL_STEP_DELAY = SCROLL_PROFILES[SCROLL_SENSITIVITY]["delay"]
+    SCROLL_DWELL_TIME = 0.4  # STABLE - hold gesture 0.4s before scrolling
+    SCROLL_CONTINUOUS_DELAY = 0.3  # STABLE - 0.3s between scroll actions
     
     # SWIPE: Clear intentional movements only (browser navigation safety)
     SWIPE_THRESHOLD = 0.12  # Minimum movement - DELIBERATE (prevents drift detection)
@@ -228,6 +242,9 @@ class GestureType(Enum):
     
     # Page Actions (1 gesture)
     FOUR_FINGERS = 9     # Refresh page - 4 fingers without thumb
+    
+    # Click gesture (1 gesture)
+    THREE_FINGERS = 8    # Left click - index, middle, ring extended
     
     # Accessibility (1 gesture)
     PINKY_ONLY = 10      # Mute toggle (pinky extended)
@@ -1229,7 +1246,7 @@ class HandGestureRecognizer:
                     return GestureType.PEACE_SIGN
         
         # ========================================
-        # GESTURE 5: INDEX_ONLY (1 finger: index only)
+        # GESTURE 5A: INDEX_ONLY (1 finger: index only - POINTER MODE)
         # ========================================
         # DEFINITION: ONLY index extended, ALL others curled
         # WHY STRICT: Prevents partial finger extension from triggering pointer mode
@@ -1248,6 +1265,24 @@ class HandGestureRecognizer:
                     if Config.DEBUG_GESTURE_DETECTION:
                         print("\n[DETECTED] INDEX_ONLY (pointer mode - index only)") 
                     return GestureType.INDEX_ONLY
+        
+        # ========================================
+        # GESTURE 5B: THREE_FINGERS (click gesture - index, middle, ring)
+        # ========================================
+        # DEFINITION: Index, middle, and ring extended (thumb and pinky curled)
+        # WHY: Easy to do from pointer mode - just extend 2 more fingers
+        # NO INTERFERENCE: Different from all other gestures, natural click motion
+        if count == 3:
+            # Check if it's index, middle, ring (NOT including thumb or pinky)
+            if fingers['index'] and fingers['middle'] and fingers['ring'] and not fingers['pinky']:
+                # Verify pinky is curled and thumb is not extended
+                pinky_curled = self.is_finger_curled(landmarks, self.PINKY_TIP, self.PINKY_DIP, self.PINKY_MCP)
+                thumb_not_extended = not fingers_full.get('thumb', False)
+                
+                if pinky_curled and thumb_not_extended:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("\n[DETECTED] THREE_FINGERS (click - index, middle, ring extended)")
+                    return GestureType.THREE_FINGERS
         
         # ========================================
         # GESTURE 6: PINKY_ONLY (1 finger: pinky only)
@@ -1546,11 +1581,11 @@ class BrowserController:
         """
         Move mouse cursor based on index finger position.
         
-        OPTIMIZED: Enhanced with acceleration, dead zone, and edge dampening.
-        - Faster response (smoothing 0.15)
-        - Acceleration for large movements
-        - Dead zone to prevent micro-jitter
-        - Edge padding to prevent cursor getting stuck
+        ENHANCED: Dual-zone precision control
+        - Precision zone in center 30% of screen (slower, accurate)
+        - Fast movement in outer areas (quick navigation)
+        - Adaptive smoothing based on velocity
+        - Edge boost for reaching corners
         
         Args:
             hand_landmarks: MediaPipe hand landmarks
@@ -1578,15 +1613,44 @@ class BrowserController:
         if movement_magnitude < Config.MOUSE_DEAD_ZONE * Config.SCREEN_WIDTH:
             return  # No movement, stay at current position
         
+        # PRECISION ENHANCEMENT: Dual-zone sensitivity
+        # Detect if cursor is in precision zone (center area)
+        sensitivity_multiplier = 1.0
+        if Config.POINTER_PRECISION_MODE:
+            # Calculate distance from screen center (normalized 0-1)
+            center_x = Config.SCREEN_WIDTH / 2
+            center_y = Config.SCREEN_HEIGHT / 2
+            dist_from_center_x = abs(self.prev_mouse_x - center_x) / (Config.SCREEN_WIDTH / 2)
+            dist_from_center_y = abs(self.prev_mouse_y - center_y) / (Config.SCREEN_HEIGHT / 2)
+            max_dist_from_center = max(dist_from_center_x, dist_from_center_y)
+            
+            # If in precision zone (center area), reduce sensitivity for fine control
+            if max_dist_from_center < Config.POINTER_PRECISION_ZONE:
+                # Smoothly transition from precision to normal based on distance
+                precision_factor = 1 - (max_dist_from_center / Config.POINTER_PRECISION_ZONE)
+                sensitivity_multiplier = 1.0 - (precision_factor * (1.0 - Config.POINTER_PRECISION_MULTIPLIER))
+            
+            # If near edges, boost speed to reach corners easily
+            elif max_dist_from_center > 0.85:
+                edge_factor = (max_dist_from_center - 0.85) / 0.15  # 0-1 scale near edges
+                sensitivity_multiplier = 1.0 + (edge_factor * (Config.POINTER_EDGE_BOOST - 1.0))
+        
+        # Apply sensitivity multiplier to deltas
+        delta_x = int(delta_x * sensitivity_multiplier)
+        delta_y = int(delta_y * sensitivity_multiplier)
+        screen_x = self.prev_mouse_x + delta_x
+        screen_y = self.prev_mouse_y + delta_y
+        
         # OPTIMIZATION #2: Velocity-based smoothing
         # Large movements = less smoothing (faster), small movements = more smoothing (precise)
         normalized_velocity = min(movement_magnitude / 100.0, 1.0)  # 0-1 scale
-        dynamic_smoothing = Config.MOUSE_SMOOTHING * (1 - normalized_velocity * 0.5)
+        dynamic_smoothing = Config.MOUSE_SMOOTHING * (1 - normalized_velocity * 0.4)
         
         # OPTIMIZATION #3: Acceleration for large movements
-        if movement_magnitude > 50:  # If moving fast/far
-            delta_x *= Config.MOUSE_ACCELERATION
-            delta_y *= Config.MOUSE_ACCELERATION
+        if movement_magnitude > 60:  # If moving fast/far
+            accel_factor = min(movement_magnitude / 100.0, Config.MOUSE_ACCELERATION)
+            delta_x = int(delta_x * accel_factor)
+            delta_y = int(delta_y * accel_factor)
             screen_x = int(self.prev_mouse_x + delta_x)
             screen_y = int(self.prev_mouse_y + delta_y)
         
@@ -1596,18 +1660,17 @@ class BrowserController:
         smooth_y = int(self.prev_mouse_y * dynamic_smoothing + 
                       screen_y * (1 - dynamic_smoothing))
         
-        # OPTIMIZATION #4: Edge dampening - slow down near screen edges
-        # This prevents cursor from getting stuck at edges
+        # OPTIMIZATION #4: Edge dampening - prevent overshooting at screen edges
         edge_damping = 1.0
         if smooth_x < Config.MOUSE_EDGE_PADDING:
-            edge_damping *= smooth_x / Config.MOUSE_EDGE_PADDING
+            edge_damping *= max(0.3, smooth_x / Config.MOUSE_EDGE_PADDING)  # Min 30% speed
         elif smooth_x > Config.SCREEN_WIDTH - Config.MOUSE_EDGE_PADDING:
-            edge_damping *= (Config.SCREEN_WIDTH - smooth_x) / Config.MOUSE_EDGE_PADDING
+            edge_damping *= max(0.3, (Config.SCREEN_WIDTH - smooth_x) / Config.MOUSE_EDGE_PADDING)
         
         if smooth_y < Config.MOUSE_EDGE_PADDING:
-            edge_damping *= smooth_y / Config.MOUSE_EDGE_PADDING
+            edge_damping *= max(0.3, smooth_y / Config.MOUSE_EDGE_PADDING)
         elif smooth_y > Config.SCREEN_HEIGHT - Config.MOUSE_EDGE_PADDING:
-            edge_damping *= (Config.SCREEN_HEIGHT - smooth_y) / Config.MOUSE_EDGE_PADDING
+            edge_damping *= max(0.3, (Config.SCREEN_HEIGHT - smooth_y) / Config.MOUSE_EDGE_PADDING)
         
         # Apply edge dampening to movement
         if edge_damping < 1.0:
@@ -1629,31 +1692,32 @@ class BrowserController:
         """
         Scroll webpage down.
         
-        REFINEMENT #1: Slightly faster scroll (3.5x), smoother with 4 steps.
-        OPTIMIZED: Reduced sleep time for better performance.
+        ENHANCED: Configurable sensitivity profiles (low/medium/high)
+        Uses profile-specific amount, multiplier, steps, and delay for optimal feel.
         """
         total_scroll = int(Config.SCROLL_BASE_AMOUNT * Config.SCROLL_SPEED_MULTIPLIER)
         step = total_scroll // Config.SCROLL_SMOOTH_STEPS
         
-        # Smooth scrolling in increments (4 steps for smoother visual experience)
+        # Smooth scrolling in increments with profile-specific delay
         for i in range(Config.SCROLL_SMOOTH_STEPS):
             pyautogui.scroll(-step)
-            if i < Config.SCROLL_SMOOTH_STEPS - 1:  # Skip sleep on last iteration
-                time.sleep(0.01)  # Optimized delay
+            if i < Config.SCROLL_SMOOTH_STEPS - 1:
+                time.sleep(Config.SCROLL_STEP_DELAY)
     
     def scroll_up(self):
         """
         Scroll webpage up.
         
-        REFINEMENT #1: Slightly faster scroll (3.5x), smoother with 4 steps.
+        ENHANCED: Configurable sensitivity profiles (low/medium/high)
+        Uses profile-specific amount, multiplier, steps, and delay for optimal feel.
         """
         total_scroll = int(Config.SCROLL_BASE_AMOUNT * Config.SCROLL_SPEED_MULTIPLIER)
         step = total_scroll // Config.SCROLL_SMOOTH_STEPS
         
-        # Smooth scrolling in increments (4 steps for smoother animation)
+        # Smooth scrolling in increments with profile-specific delay
         for _ in range(Config.SCROLL_SMOOTH_STEPS):
             pyautogui.scroll(step)
-            time.sleep(0.012)  # Slightly increased delay for smoother animation
+            time.sleep(Config.SCROLL_STEP_DELAY)
     
     def left_click(self):
         """Perform left mouse click"""
@@ -1843,11 +1907,12 @@ class HandGestureControlSystem:
         print("GESTURE CONTROLS:")
         print("="*70)
         print("  SCROLLING:")
-        print("    [PALM] Open Palm       -> Scroll Down")
-        print("    ✊ Closed Fist     → Scroll Up")
+        print("    [PALM] Open Palm       -> Scroll Down (fast!)")
+        print("    ✊ Closed Fist     → Scroll Up (fast!)")
         print("\n  MOUSE CONTROL:")
-        print("    [FINGER] Index Finger    -> Move Mouse")
-        print("    [PEACE] Peace Sign      -> Left Click")
+        print("    ☝️ Index Finger     → Move Mouse (Pointer Mode)")
+        print("    � Thumb Out        → Click! (show thumb to click)")
+        print("    [PEACE] Peace Sign      -> Click (alternative)")
         print("\n  NAVIGATION:")
         print("    👈 Swipe Left      → Browser Back")
         print("    👉 Swipe Right     → Browser Forward")
@@ -1947,10 +2012,10 @@ class HandGestureControlSystem:
                 # State machine marks this as CONTINUOUS_GESTURE
                 self.controller.move_mouse(hand_landmarks)
             
-            # 4. LEFT CLICK - Peace sign (2 fingers)
-            elif gesture == GestureType.PEACE_SIGN:
+            # 4. LEFT CLICK - Three fingers (index, middle, ring)
+            elif gesture == GestureType.THREE_FINGERS:
                 self.controller.left_click()
-                print("[CLICK] ✌️ Peace sign → Left click")
+                print("[CLICK] 🖖 Three fingers → Left click")
             
             # 5. REFRESH PAGE - Four fingers (4 fingers, thumb curled)
             elif gesture == GestureType.FOUR_FINGERS:
@@ -1962,7 +2027,12 @@ class HandGestureControlSystem:
                 self.controller.zoom_in()
                 print("[ZOOM IN] 👍 Thumb up → Zoom in")
             
-            # 7. BROWSER BACK - Swipe left
+            # 7. PEACE SIGN - Alternative click (optional)
+            elif gesture == GestureType.PEACE_SIGN:
+                self.controller.left_click()
+                print("[CLICK] ✌️ Peace sign → Left click")
+            
+            # 8. BROWSER BACK - Swipe left
             elif gesture == GestureType.SWIPE_LEFT:
                 # Check cooldown
                 if current_time - self.recognizer.browser_nav_last_action_time < Config.BROWSER_NAV_COOLDOWN:
@@ -1981,7 +2051,7 @@ class HandGestureControlSystem:
                     self.recognizer.browser_nav_last_action_time = current_time
                     self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
-            # 8. BROWSER FORWARD - Swipe right
+            # 9. BROWSER FORWARD - Swipe right
             elif gesture == GestureType.SWIPE_RIGHT:
                 # Check cooldown
                 if current_time - self.recognizer.browser_nav_last_action_time < Config.BROWSER_NAV_COOLDOWN:
@@ -2000,7 +2070,7 @@ class HandGestureControlSystem:
                     self.recognizer.browser_nav_last_action_time = current_time
                     self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
-            # 9. MUTE TOGGLE - Pinky only (accessibility feature)
+            # 10. MUTE TOGGLE - Pinky only (accessibility feature)
             elif gesture == GestureType.PINKY_ONLY:
                 # Check cooldown
                 if current_time - self.recognizer.mute_last_action_time < Config.MUTE_TOGGLE_COOLDOWN:
