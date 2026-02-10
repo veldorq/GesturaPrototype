@@ -75,10 +75,10 @@ class Config:
     MIN_TRACKING_CONFIDENCE = 0.7
     MAX_NUM_HANDS = 1
     
-    # Gesture stabilization
-    GESTURE_BUFFER_SIZE = 3  # Frames to buffer (REDUCED from 5 for faster response)
-    DEBOUNCE_TIME = 0.2  # Seconds between repeated actions (REDUCED from 0.5)
-    CONFIDENCE_THRESHOLD = 0.4  # Minimum confidence (REDUCED from 0.6 for easier detection)
+    # Gesture stabilization - HACKATHON STABLE (prioritize reliability over speed)
+    GESTURE_BUFFER_SIZE = 5  # Frames to buffer - STABLE (was 3, too fast for clean demo)
+    DEBOUNCE_TIME = 0.4  # Seconds between repeated actions - STABLE (prevents accidental double-trigger)
+    CONFIDENCE_THRESHOLD = 0.6  # Minimum confidence - STABLE (reduces false positives)
     
     # Movement settings - OPTIMIZED for natural pointer control
     MOUSE_SMOOTHING = 0.15  # 0=instant, 1=no movement (OPTIMIZED: reduced from 0.3 for faster response)
@@ -86,23 +86,23 @@ class Config:
     MOUSE_DEAD_ZONE = 0.005  # Ignore movements smaller than this (prevents micro-jitter)
     MOUSE_EDGE_PADDING = 50  # Pixels from edge where movement slows down (prevents getting stuck)
     
-    # REFINEMENT #1: Scroll speed - slightly increased for better responsiveness, kept smooth
-    SCROLL_SPEED_MULTIPLIER = 3.5  # Slightly faster than 3.0 (controlled increase)
+    # SCROLL: Smooth and deliberate for demo (no accidental triggers)
+    SCROLL_SPEED_MULTIPLIER = 2.5  # Moderate speed - predictable for judges
     SCROLL_BASE_AMOUNT = 20  # Base scroll amount per action
-    SCROLL_SMOOTH_STEPS = 4  # Increased to 4 for smoother visual experience
-    SCROLL_DWELL_TIME = 0.08  # ULTRA FAST (was 0.15 - 90% faster response)
-    SCROLL_CONTINUOUS_DELAY = 0.08  # ULTRA FAST delay (was 0.15)
+    SCROLL_SMOOTH_STEPS = 3  # Smooth but not sluggish
+    SCROLL_DWELL_TIME = 0.4  # STABLE - hold gesture 0.4s before scrolling (prevents accidental scroll)
+    SCROLL_CONTINUOUS_DELAY = 0.3  # STABLE - 0.3s between scroll actions (calm, accessible)
     
-    # ISSUE #3 & #4 FIX: Improved swipe detection with direction dominance
-    SWIPE_THRESHOLD = 0.05  # Minimum movement to detect swipe (90% EASIER - was 0.20)
-    SWIPE_VERTICAL_THRESHOLD = 0.05  # For up/down swipes (90% EASIER - was 0.18)
-    SWIPE_DIRECTION_DOMINANCE_RATIO = 1.3  # Required ratio (VERY RELAXED - was 2.5)
-    SWIPE_CONFIRMATION_FRAMES = 1  # Frames needed (INSTANT - was 3)
-    SWIPE_VELOCITY_MIN = 0.02  # Minimum velocity (90% EASIER - was 0.08)
+    # SWIPE: Clear intentional movements only (browser navigation safety)
+    SWIPE_THRESHOLD = 0.12  # Minimum movement - DELIBERATE (prevents drift detection)
+    SWIPE_VERTICAL_THRESHOLD = 0.12  # For up/down swipes - CONSISTENT
+    SWIPE_DIRECTION_DOMINANCE_RATIO = 2.0  # Required ratio - STRICT (swipe must be clearly directional)
+    SWIPE_CONFIRMATION_FRAMES = 4  # Frames needed - STABLE (prevents single-frame glitches)
+    SWIPE_VELOCITY_MIN = 0.05  # Minimum velocity - MODERATE (intentional swipe, not drift)
     
-    # REFINEMENT #2: Browser navigation safety - slower, more controlled
-    BROWSER_NAV_DWELL_TIME = 0.3  # Deliberate delay (REDUCED from 0.8 for faster response)
-    BROWSER_NAV_COOLDOWN = 0.5  # Cooldown (REDUCED from 1.5 for faster actions)
+    # BROWSER NAVIGATION: High-stakes action (back/forward affects user state)
+    BROWSER_NAV_DWELL_TIME = 0.5  # DELIBERATE - hold 0.5s (prevents accidental navigation)
+    BROWSER_NAV_COOLDOWN = 0.8  # SAFE - 0.8s cooldown between nav actions
     
     # Distance-based gestures
     ENABLE_ZOOM_GESTURES = False  # DISABLED BY DEFAULT - too easy to trigger accidentally
@@ -132,14 +132,16 @@ class Config:
     POINTER_INVERT_X = False  # Set to False for natural left/right movement (was causing inverted feeling)
     POINTER_INVERT_Y = False  # Set to False for natural up/down movement
     
-    # REFINEMENT #3: Close tab safety - high-risk action needs maximum protection
-    CLOSE_TAB_DWELL_TIME = 0.5  # FAST (was 1.2 - 58% faster for quick actions)
-    CLOSE_TAB_COOLDOWN = 0.8  # FAST cooldown (was 2.0 - 60% faster)
-    CLOSE_TAB_REQUIRE_STABILITY = True  # Require stable gesture across dwell period
+    # CLOSE TAB: REMOVED - too risky for hackathon demo (choose MUTE instead)
+    # Accidentally closing tabs during demo = bad UX. Gestura favors MUTE for accessibility.
+    CLOSE_TAB_ENABLED = False  # DISABLED - use MUTE as the destructive action alternative
+    CLOSE_TAB_DWELL_TIME = 0.5  # (legacy)
+    CLOSE_TAB_COOLDOWN = 0.8  # (legacy)
+    CLOSE_TAB_REQUIRE_STABILITY = True  # (legacy)
     
-    # REFINEMENT #5: Mute toggle - slower, controlled execution
-    MUTE_TOGGLE_DWELL_TIME = 0.2  # Deliberate delay (REDUCED from 0.6 for faster response)
-    MUTE_TOGGLE_COOLDOWN = 0.4  # Cooldown (REDUCED from 1.0 for faster actions)
+    # MUTE TOGGLE: Key accessibility feature (replaces close tab)
+    MUTE_TOGGLE_DWELL_TIME = 0.4  # STABLE - intentional hold (prevents accidental mute)
+    MUTE_TOGGLE_COOLDOWN = 0.6  # STABLE - prevents rapid toggle spam
     
     # REFINEMENT #6: Browser launch keyboard shortcut
     BROWSER_LAUNCH_KEY = 'ctrl+shift+b'  # Configurable keyboard shortcut
@@ -204,28 +206,37 @@ class Config:
 
 
 class GestureType(Enum):
-    """Enumeration of all recognized gestures"""
+    """Enumeration of all recognized gestures - HACKATHON SIMPLIFIED (8 core gestures)"""
     NONE = 0
-    OPEN_PALM = 1  # Can be detected by CNN as 'scroll_down'
-    CLOSED_FIST = 2  # Can be detected by CNN as 'scroll_up'
-    INDEX_ONLY = 3  # POINTER MODE - mouse movement only (MediaPipe ONLY, not CNN)
-    INDEX_MIDDLE = 4  # Reserved for future use
-    THUMB_UP = 5
-    SWIPE_LEFT = 6  # Can be detected by CNN
-    SWIPE_RIGHT = 7  # Can be detected by CNN
-    # NEW GESTURES
-    THREE_FINGERS = 8      # Screenshot
-    FOUR_FINGERS = 9       # Refresh page
-    PINKY_ONLY = 10        # Can be detected by CNN as 'mute_toggle'
-    PEACE_SIGN = 11        # Left Click (2 fingers: index + middle)
-    PINCH = 12             # Can be detected by CNN as 'pinch_zoom'
-    SPREAD = 13            # Zoom out (far distance)
-    SWIPE_UP = 14          # Next tab
-    SWIPE_DOWN = 15        # Previous tab
-    THUMB_DOWN = 16        # Can be detected by CNN as 'thumb_down_close'
-    OK_SIGN = 17           # New tab
-    ROCK_SIGN = 18         # Copy
-    CALL_SIGN = 19         # Paste
+    
+    # === ESSENTIAL BROWSER GESTURES (8 total) ===
+    # Scrolling (2 gestures)
+    OPEN_PALM = 1        # Scroll down - all 5 fingers spread
+    CLOSED_FIST = 2      # Scroll up - all fingers folded
+    
+    # Pointing & Clicking (2 gestures)
+    INDEX_ONLY = 3       # Mouse move - pointer mode
+    PEACE_SIGN = 11      # Left click - index + middle extended
+    
+    # Navigation (2 gestures)
+    SWIPE_LEFT = 6       # Browser back
+    SWIPE_RIGHT = 7      # Browser forward
+    
+    # Zoom (1 gesture - simple)
+    THUMB_UP = 5         # Zoom in (thumb-up gesture)
+    
+    # Accessibility (1 gesture)
+    PINKY_ONLY = 10      # Mute toggle (pinky extended)
+    
+    # === REMOVED/DISABLED GESTURES (not demo-ready) ===
+    # These caused conflicts, instability, or were too risky for hackathon:
+    # - THUMB_DOWN / Close tab: Too risky (accidental tab closure)
+    # - FOUR_FINGERS / Refresh: Conflicts with OPEN_PALM
+    # - THREE_FINGERS / Screenshot: Not essential browser action
+    # - PINCH/SPREAD: Disabled by default, conflicts with other poses
+    # - SWIPE_UP/DOWN: Conflicts with vertical hand movement
+    # - OK_SIGN, ROCK_SIGN, CALL_SIGN: Experimental, not essential
+    # - INDEX_MIDDLE: Reserved, never implemented
 
 
 # ============================================================================
@@ -266,20 +277,19 @@ class GestureStateMachine:
         self.confirmed_start_time = 0.0
         self.cooldown_start_time = 0.0
         
-        # Tuning parameters (accessibility-focused)
-        self.CANDIDATE_CONFIRMATION_FRAMES = 2  # ULTRA FAST (was 5 - 60% faster)
-        self.CANDIDATE_TIMEOUT = 1.0  # Reset if gesture not maintained
-        self.COOLDOWN_DURATION = 0.2  # ULTRA FAST cooldown (was 0.6 - 67% faster)
+        # Tuning parameters - HACKATHON STABLE (one gesture → one intent → one action)
+        self.CANDIDATE_CONFIRMATION_FRAMES = 5  # STABLE - 5 frames @ 30fps = 167ms (prevents flicker)
+        self.CANDIDATE_TIMEOUT = 1.5  # GENEROUS - allows natural gesture formation
+        self.COOLDOWN_DURATION = 0.4  # STABLE - clear separation between gestures
         
-        # FIX #1: Gesture-specific dwell requirements (consolidates timing logic)
-        # These gestures require holding after confirmation before action triggers
+        # DWELL TIMES: Gestures require holding after confirmation (prevents false triggers)
+        # HACKATHON PRINCIPLE: Calm, predictable gestures > frantic responsiveness
         self.DWELL_GESTURES = {
-            GestureType.OPEN_PALM: 0.08,      # Scroll down (ULTRA FAST - was 0.15)
-            GestureType.CLOSED_FIST: 0.08,    # Scroll up (ULTRA FAST - was 0.15)
-            GestureType.THUMB_DOWN: 0.5,      # Close tab (FAST - was 1.2)
-            GestureType.PINKY_ONLY: 0.2,      # Mute toggle (ULTRA FAST - was 0.6)
-            GestureType.SWIPE_LEFT: 0.3,      # Browser back (FAST - was 0.8)
-            GestureType.SWIPE_RIGHT: 0.3,     # Browser forward (FAST - was 0.8)
+            GestureType.OPEN_PALM: 0.4,      # Scroll down - STABLE hold
+            GestureType.CLOSED_FIST: 0.4,    # Scroll up - STABLE hold
+            GestureType.PINKY_ONLY: 0.4,     # Mute toggle - STABLE (key accessibility feature)
+            GestureType.SWIPE_LEFT: 0.5,     # Browser back - DELIBERATE (high-stakes navigation)
+            GestureType.SWIPE_RIGHT: 0.5,    # Browser forward - DELIBERATE
         }
         
         # FIX #1: Continuous gestures that don't need confirmation
@@ -521,15 +531,15 @@ class HandGestureRecognizer:
             else:
                 print("[INFO] CNN recognition disabled - using rule-based recognition")
         
-        # CNN to GestureType Mapping (7 CNN gestures → GestureType enum)
+        # CNN to GestureType Mapping (5 CNN gestures → GestureType enum)
+        # HACKATHON SIMPLIFIED: Only map gestures that are still active
         self.cnn_to_gesture_map = {
             'scroll_up': GestureType.CLOSED_FIST,
             'scroll_down': GestureType.OPEN_PALM,
             'swipe_left': GestureType.SWIPE_LEFT,
             'swipe_right': GestureType.SWIPE_RIGHT,
-            'pinch_zoom': GestureType.PINCH,
-            'thumb_down_close': GestureType.THUMB_DOWN,
-            'mute_toggle': GestureType.PINKY_ONLY
+            'mute_toggle': GestureType.PINKY_ONLY,
+            # Removed: 'pinch_zoom' (PINCH disabled), 'thumb_down_close' (THUMB_DOWN removed)
         }
         
         # PERFORMANCE IMPROVEMENT: Initialize smoothing pipeline
@@ -767,63 +777,17 @@ class HandGestureRecognizer:
     
     def detect_vertical_swipe(self, landmarks):
         """
-        Detects vertical swipe gestures (up or down).
+        REMOVED: Vertical swipes disabled for hackathon (conflicts with hand movement).
         
-        ISSUE #4 FIX: Strict angle and velocity thresholds to prevent confusion with close gestures.
-        ISSUE #4 FIX: Requires vertical dominance (Y movement >> X movement).
-        ISSUE #4 FIX: Multi-frame confirmation.
-        
-        Logic:
-            Tracks wrist + index finger. Requires:
-            1. Significant vertical movement (exceeds threshold)
-            2. Vertical movement >> horizontal movement (direction dominance)
-            3. Minimum velocity requirement
-            4. Consistent direction across multiple frames
+        Vertical swipes (SWIPE_UP/SWIPE_DOWN) were removed because:
+        - Conflict with natural vertical hand positioning
+        - Not essential for browser control (tab switching not critical)
+        - Simplifies gesture set to 8 core actions
         
         Returns:
-            GestureType: SWIPE_UP, SWIPE_DOWN, or NONE
+            GestureType.NONE (always - function disabled)
         """
-        current_wrist_y = landmarks[self.WRIST].y
-        current_wrist_x = landmarks[self.WRIST].x
-        
-        if self.previous_wrist_y is None:
-            self.previous_wrist_y = current_wrist_y
-            self.previous_wrist_x = current_wrist_x
-            return GestureType.NONE
-        
-        # Calculate movement
-        delta_y = current_wrist_y - self.previous_wrist_y
-        delta_x = current_wrist_x - self.previous_wrist_x
-        
-        # ISSUE #4 FIX: Enforce vertical dominance and velocity
-        vertical_movement = abs(delta_y)
-        horizontal_movement = abs(delta_x)
-        
-        # Persist a recently confirmed vertical swipe for dwell-based actions
-        if (self.active_vertical_swipe != GestureType.NONE and
-            time.time() - self.active_vertical_swipe_start < Config.BROWSER_NAV_DWELL_TIME):
-            return self.active_vertical_swipe
-
-        if vertical_movement > Config.SWIPE_VERTICAL_THRESHOLD and vertical_movement > Config.SWIPE_VELOCITY_MIN:
-            # ISSUE #4 FIX: Require vertical dominance to avoid confusion with horizontal swipes
-            if horizontal_movement > 0 and (vertical_movement / horizontal_movement) < Config.SWIPE_DIRECTION_DOMINANCE_RATIO:
-                # Too much horizontal movement - reject as vertical swipe
-                self.previous_wrist_y = current_wrist_y
-                self.previous_wrist_x = current_wrist_x
-                return GestureType.NONE
-            
-            # Determine direction (negative delta_y = upward movement in screen coordinates)
-            swipe_direction = GestureType.SWIPE_UP if delta_y < 0 else GestureType.SWIPE_DOWN
-
-            # Persist confirmed vertical swipe so execute_gesture_action can observe it across frames
-            self.active_vertical_swipe = swipe_direction
-            self.active_vertical_swipe_start = time.time()
-            self.previous_wrist_y = current_wrist_y
-            self.previous_wrist_x = current_wrist_x
-            return swipe_direction
-        
-        self.previous_wrist_y = current_wrist_y
-        self.previous_wrist_x = current_wrist_x
+        # DISABLED FOR HACKATHON STABILITY
         return GestureType.NONE
     
     def calculate_hand_size(self, landmarks):
@@ -856,129 +820,50 @@ class HandGestureRecognizer:
     
     def detect_pinch_spread(self, landmarks):
         """
-        Detect pinch (zoom in) or spread (zoom out) gestures.
+        DISABLED: Pinch/spread gestures removed for hackathon (conflict-prone).
         
-        FIXED: Ultra-strict detection to prevent confusion with open palm.
-        Requires EXACTLY thumb and index extended, all others folded.
-        
-        Logic:
-            - Measures distance between thumb and index finger
-            - Requires EXACT finger count of 2 (thumb + index ONLY)
-            - All other fingers MUST be folded
-            - Close distance = pinch, far distance = spread
+        Pinch/spread (zoom) gestures were removed because:
+        - Conflict with other two-finger poses (peace sign)
+        - Accidental triggers during hand positioning
+        - THUMB_UP provides simpler zoom-in alternative
+        - Zoom-out not essential for browser demos
         
         Returns:
-            GestureType: PINCH, SPREAD, or NONE
+            GestureType.NONE (always - function disabled)
         """
-        # Check finger states with thumb NOT ignored (we need accurate thumb state)
-        count, fingers = self.count_extended_fingers(landmarks, ignore_thumb=False)
-        
-        # ULTRA-STRICT: Must have EXACTLY 2 fingers extended (thumb + index)
-        # This prevents confusion with open palm (5 fingers) or any other gesture
-        if count != 2:
-            return GestureType.NONE
-        
-        # Verify it's specifically thumb and index, not any other 2-finger combo
-        if not (fingers['thumb'] and fingers['index']):
-            return GestureType.NONE
-        
-        # Explicitly check other fingers are folded
-        if fingers['middle'] or fingers['ring'] or fingers['pinky']:
-            return GestureType.NONE
-        
-        # Now safe to check thumb-index distance for pinch/spread
-        thumb_tip = landmarks[self.THUMB_TIP]
-        index_tip = landmarks[self.INDEX_TIP]
-        
-        distance = ((thumb_tip.x - index_tip.x)**2 + 
-                   (thumb_tip.y - index_tip.y)**2) ** 0.5
-        
-        # ADDITIONAL CHECK: Ensure hand orientation is correct (thumb and index horizontal, not vertical)
-        # This prevents accidental detection when pointing or making other gestures
-        thumb_index_horizontal = abs(thumb_tip.y - index_tip.y) < 0.15  # Fingers roughly same height
-        
-        if not thumb_index_horizontal:
-            return GestureType.NONE
-        
-        # STRICT THRESHOLDS: Very close for pinch, very wide for spread
-        if distance < Config.PINCH_THRESHOLD:
-            return GestureType.PINCH
-        elif distance > Config.SPREAD_THRESHOLD:
-            return GestureType.SPREAD
-        
+        # DISABLED FOR HACKATHON STABILITY
+        # Config.ENABLE_ZOOM_GESTURES = False by default
         return GestureType.NONE
     
     def detect_special_gestures(self, landmarks, fingers):
         """
-        Detect special hand signs (OK, Rock, Call) with STRICT conditions.
+        DISABLED: Special hand signs removed for hackathon (not essential).
         
-        FIXED: Call sign now checks thumb state explicitly to work with THUMB_IGNORED_MODE.
+        Special gestures (OK_SIGN, ROCK_SIGN, CALL_SIGN) were removed because:
+        - Not essential for browser control
+        - Require complex finger configurations (unreliable detection)
+        - Simplifies gesture set to 8 core actions
+        - Reduces cognitive load for judges
         
         Returns:
-            GestureType: Special gesture or NONE
+            GestureType.NONE (always - function disabled)
         """
-        # OK Sign: Thumb and index form circle, other three fingers extended
-        # STRICT: Index must NOT be extended straight (tip near thumb = circle)
-        thumb_tip = landmarks[self.THUMB_TIP]
-        index_tip = landmarks[self.INDEX_TIP]
-        thumb_index_distance = ((thumb_tip.x - index_tip.x)**2 + 
-                               (thumb_tip.y - index_tip.y)**2) ** 0.5
-        
-        if (thumb_index_distance < 0.05 and 
-            not fingers['index'] and  # Index NOT straight (forming circle with thumb)
-            fingers['middle'] and fingers['ring'] and fingers['pinky']):
-            return GestureType.OK_SIGN
-        
-        # Rock Sign: Index and pinky extended, middle and ring folded, thumb folded
-        # STRICT: Thumb must be folded to distinguish from other gestures
-        if (fingers['index'] and fingers['pinky'] and 
-            not fingers['middle'] and not fingers['ring'] and not fingers['thumb']):
-            return GestureType.ROCK_SIGN
-        
-        # Call Sign: Thumb and pinky extended, others folded ("hang loose" gesture)
-        # RELAXED: Easier detection with lower separation threshold
-        thumb_extended = self.is_thumb_extended(landmarks)
-        if (thumb_extended and fingers['pinky'] and
-            not fingers['index'] and not fingers['middle'] and not fingers['ring']):
-            # Additional check: thumb and pinky must be separated (not touching)
-            thumb_tip = landmarks[self.THUMB_TIP]
-            pinky_tip = landmarks[self.PINKY_TIP]
-            thumb_pinky_distance = ((thumb_tip.x - pinky_tip.x)**2 + 
-                                   (thumb_tip.y - pinky_tip.y)**2) ** 0.5
-            # ULTRA RELAXED: Very low separation threshold (was 0.15, then 0.10)
-            if thumb_pinky_distance > 0.06:
-                return GestureType.CALL_SIGN
-        
+        # DISABLED FOR HACKATHON STABILITY
         return GestureType.NONE
     
     def detect_thumb_down(self, landmarks):
         """
-        Detects thumbs-down gesture - IMPROVED DISTINCTNESS.
+        DISABLED: Thumbs-down gesture removed for hackathon (close tab too risky).
         
-        Logic:
-            Thumb pointing down (tip.y > ip.y) while other fingers folded.
-            Additional angle check to ensure thumb is vertical downward.
+        THUMB_DOWN (close tab) was removed because:
+        - High-stakes action (accidental tab closure)  
+        - Too risky for live demos
+        - Replaced with PINKY_ONLY for mute (safer alternative)
         
         Returns:
-            bool: True if thumbs-down detected
+            False (always - function disabled)
         """
-        count, fingers = self.count_extended_fingers(landmarks, ignore_thumb=False)
-        
-        # Only thumb extended, all others folded
-        if fingers['thumb'] and not fingers['index'] and not fingers['middle'] and not fingers['ring'] and not fingers['pinky']:
-            thumb_tip_y = landmarks[self.THUMB_TIP].y
-            thumb_ip_y = landmarks[self.THUMB_IP].y
-            thumb_mcp_y = landmarks[2].y  # Thumb MCP
-            
-            # Thumb pointing down: tip below ip below mcp
-            vertical_alignment = thumb_tip_y > thumb_ip_y > thumb_mcp_y
-            
-            # Additional check: thumb should be significantly below wrist
-            wrist_y = landmarks[self.WRIST].y
-            thumb_lowered = thumb_tip_y > wrist_y + 0.1  # Below wrist by threshold
-            
-            return vertical_alignment and thumb_lowered
-        
+        # DISABLED FOR HACKATHON SAFETY
         return False
     
     def recognize_gesture_hybrid(self, hand_landmarks, frame):
@@ -1035,14 +920,8 @@ class HandGestureRecognizer:
                     if cnn_label is not None and cnn_label in self.cnn_to_gesture_map:
                         gesture_type = self.cnn_to_gesture_map[cnn_label]
                         
-                        # Additional verification for pinch gesture (combine CNN + distance check)
-                        if gesture_type == GestureType.PINCH:
-                            # Verify with actual pinch distance measurement
-                            pinch_distance = self.calculate_pinch_distance(landmarks)
-                            if pinch_distance < Config.PINCH_DISTANCE_THRESHOLD:
-                                return gesture_type  # CNN prediction verified
-                        else:
-                            return gesture_type  # CNN prediction accepted
+                        # CNN prediction accepted (PINCH gesture verification removed - zoom disabled)
+                        return gesture_type
                 
                 # CNN rejected prediction (low confidence or voting failed)
                 # Fall back to rule-based recognition
@@ -1160,127 +1039,88 @@ class HandGestureRecognizer:
         if self.hand_size_baseline is None and Config.ENABLE_LEARNING_MODE:
             self.hand_size_baseline = self.calculate_hand_size(landmarks)
         
-        # MUTUALLY EXCLUSIVE PRIORITY ORDER (DataFlair Anti-Conflict Pattern)
-        # CRITICAL FIX: Movement gestures checked BEFORE static poses to ensure proper detection
+        # MUTUALLY EXCLUSIVE PRIORITY ORDER (8 essential gestures only)
+        # HACKATHON PRINCIPLE: Movement gestures FIRST, then static poses (prevents overlap)
         # Collect candidates with confidence for conflict resolution
         candidates = []  # List of (gesture, confidence, reason) tuples
         
-        # PRIORITY 1: Thumb gestures (most distinct - explicit thumb-only poses)
-        # These require thumb extended and all others folded
-        if Config.THUMB_EXPLICIT_GESTURES_ONLY:
-            if self.detect_thumb_up(landmarks):
-                candidates.append((GestureType.THUMB_UP, 0.95, 'Distinct thumb-up pose'))
-            elif self.detect_thumb_down(landmarks):
-                candidates.append((GestureType.THUMB_DOWN, 0.95, 'Distinct thumb-down pose'))
-        
-        # PRIORITY 2: Special hand signs (require precise finger configurations)
-        # These are mutually exclusive by definition
-        special = self.detect_special_gestures(landmarks, fingers)
-        if special != GestureType.NONE:
-            candidates.append((special, 0.90, 'Special hand sign detected'))
-        
-        # PRIORITY 3: Movement-based gestures (swipes) - CHECK BEFORE static finger counts
-        # CRITICAL: This prevents swipes from being misclassified as peace sign or other static poses
+        # PRIORITY 1: Movement-based gestures (swipes) - CHECK FIRST
+        # CRITICAL: Movement detection BEFORE static poses prevents "swipe + peace" conflicts
         # Swipes require sustained motion AND direction dominance AND multi-frame confirmation
         swipe_h = self.detect_swipe(landmarks)
         if swipe_h != GestureType.NONE:
-            candidates.append((swipe_h, 0.88, 'Horizontal swipe with direction dominance'))
+            candidates.append((swipe_h, 0.95, 'Horizontal swipe detected'))
         
-        swipe_v = self.detect_vertical_swipe(landmarks)
-        if swipe_v != GestureType.NONE:
-            candidates.append((swipe_v, 0.88, 'Vertical swipe with direction dominance'))
-        
-        # STRICT EXCLUSIVITY: If movement detected, block static pose detection
-        # This prevents "swipe + peace sign" conflicts
+        # STRICT EXCLUSIVITY: If movement detected, BLOCK all static pose detection
+        # This is the key anti-conflict measure for hackathon demos
         if candidates:
-            # Movement gesture confirmed - return highest confidence
             best = max(candidates, key=lambda x: x[1])
             if Config.DEBUG_GESTURE_DETECTION:
                 print(f"\n[DETECTED] {best[0].name}: {best[2]}")
             return best[0]
         
-        # PRIORITY 4: Finger-count based gestures (static poses)
-        # Must use strict elif chain to ensure mutual exclusivity
+        # PRIORITY 2: Thumb gestures (explicit thumb-only poses)
+        # Only THUMB_UP supported (THUMB_DOWN removed - too risky for demo)
+        if self.detect_thumb_up(landmarks):
+            if Config.DEBUG_GESTURE_DETECTION:
+                print("\n[DETECTED] THUMB_UP (zoom in)")
+            return GestureType.THUMB_UP
         
-        # Closed fist (0 fingers)
+        # PRIORITY 3: Finger-count based gestures (static poses)
+        # STRICT elif chain ensures mutual exclusivity (only ONE gesture can match)
+        
+        # Closed fist (0 fingers) - scroll up
         if count == 0:
             if Config.DEBUG_GESTURE_DETECTION:
-                print(f"\n[DETECTED] CLOSED_FIST")
+                print("\n[DETECTED] CLOSED_FIST (scroll up)")
             return GestureType.CLOSED_FIST
         
-        # Open palm (all 5 fingers spread including thumb)
-        # Check with thumb included to differentiate from four fingers
+        # Open palm (5 fingers spread including thumb) - scroll down
         elif count == 4:
-            # Get count including thumb to check if it's open palm
+            # Check with thumb to see if all 5 fingers spread (OPEN_PALM)
             count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
             
-            if Config.DEBUG_GESTURE_DETECTION:
-                print(f"\r4-finger detection: Thumb={int(fingers_with_thumb['thumb'])} Count_with_thumb={count_with_thumb}", end='', flush=True)
-            
-            if count_with_thumb == 5 and fingers_with_thumb['thumb'] and fingers_with_thumb['index'] and fingers_with_thumb['middle'] and fingers_with_thumb['ring'] and fingers_with_thumb['pinky']:
-                # All 5 fingers spread = OPEN_PALM
+            if count_with_thumb == 5 and fingers_with_thumb['thumb']:
                 if Config.DEBUG_GESTURE_DETECTION:
-                    print("\n[DETECTED] OPEN_PALM (5 fingers spread)")
+                    print("\n[DETECTED] OPEN_PALM (scroll down - 5 fingers)")
                 return GestureType.OPEN_PALM
-            # Only 4 fingers extended (thumb not detected as extended) = FOUR_FINGERS
-            elif count_with_thumb == 4 and fingers_with_thumb['index'] and fingers_with_thumb['middle'] and fingers_with_thumb['ring'] and fingers_with_thumb['pinky'] and not fingers_with_thumb['thumb']:
-                if Config.DEBUG_GESTURE_DETECTION:
-                    print("\n[DETECTED] FOUR_FINGERS (thumb tucked)")
-                return GestureType.FOUR_FINGERS
+            # Else: 4 fingers without thumb = ambiguous, reject (prevents FOUR_FINGERS conflict)
         
-        # Three fingers (screenshot)
-        elif count == 3:
-            # STRICT CHECK: Index, middle, ring extended; pinky and thumb folded
-            if fingers['index'] and fingers['middle'] and fingers['ring'] and not fingers['pinky'] and not fingers['thumb']:
-                if Config.DEBUG_GESTURE_DETECTION:
-                    print(f"\n[DETECTED] THREE_FINGERS")
-                return GestureType.THREE_FINGERS
-        
-        # Two fingers - Peace sign (V sign for left click)
+        # Two fingers - Peace sign (index + middle) - left click
         elif count == 2:
             # STRICT CHECK: Only index and middle extended; others folded
-            if fingers['index'] and fingers['middle'] and not fingers['ring'] and not fingers['pinky'] and not fingers['thumb']:
+            if fingers['index'] and fingers['middle'] and not fingers['ring'] and not fingers['pinky']:
                 if Config.DEBUG_GESTURE_DETECTION:
-                    print(f"\n[DETECTED] PEACE_SIGN")
+                    print("\n[DETECTED] PEACE_SIGN (left click)")
                 return GestureType.PEACE_SIGN
         
-        # One finger - pointer or pinky
-        # For single-finger checks, use a full count that includes the thumb
+        # One finger checks
         elif True:
             count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
             if count_full == 1:
-                # INDEX_ONLY: Only index extended
+                # INDEX_ONLY: Only index extended - pointer mode
                 if fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['pinky'] and not fingers_full['thumb']:
                     if Config.DEBUG_GESTURE_DETECTION:
-                        print(f"\n[DETECTED] INDEX_ONLY (pointer)")
+                        print("\n[DETECTED] INDEX_ONLY (pointer mode)")
                     return GestureType.INDEX_ONLY
-                # PINKY_ONLY: Only pinky extended
-                # RELAXED: Allow thumb to be slightly extended as long as pinky is clearly the dominant finger
+                
+                # PINKY_ONLY: Only pinky extended - mute toggle
                 elif fingers_full['pinky'] and not fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring']:
-                    # Additional check: ensure pinky is clearly highest finger
+                    # Additional check: pinky should be clearly highest finger
                     pinky_tip_y = landmarks[self.PINKY_TIP].y
                     index_tip_y = landmarks[self.INDEX_TIP].y
                     middle_tip_y = landmarks[self.MIDDLE_TIP].y
                     ring_tip_y = landmarks[self.RING_TIP].y
-                    # Pinky should be higher (VERY RELAXED - was 0.05, now 0.02)
-                    if pinky_tip_y < (index_tip_y - 0.02) and pinky_tip_y < (middle_tip_y - 0.02) and pinky_tip_y < (ring_tip_y - 0.02):
+                    
+                    # Pinky must be clearly elevated
+                    if pinky_tip_y < (index_tip_y - 0.03) and pinky_tip_y < (middle_tip_y - 0.03):
                         if Config.DEBUG_GESTURE_DETECTION:
-                            print(f"\n[DETECTED] PINKY_ONLY (mute)")
+                            print("\n[DETECTED] PINKY_ONLY (mute toggle)")
                         return GestureType.PINKY_ONLY
         
-        # PRIORITY 5: Distance-based gestures (pinch/spread) - MOVED TO LAST & DISABLED BY DEFAULT
-        # CRITICAL FIX: Check pinch/spread AFTER all other gestures to prevent zoom interference
-        # This ensures zoom only triggers when user is intentionally making pinch pose
-        # DISABLED BY DEFAULT: Too easy to trigger accidentally with other gestures
-        if Config.ENABLE_ZOOM_GESTURES:
-            # ISSUE #2 FIX: Skip zoom gestures in POINTER_MODE if mode separation enabled
-            if not (Config.ENABLE_MODE_SEPARATION and self.current_mode == 'POINTER' and Config.DISABLE_ZOOM_IN_POINTER_MODE):
-                pinch_spread = self.detect_pinch_spread(landmarks)
-                if pinch_spread != GestureType.NONE:
-                    if Config.DEBUG_GESTURE_DETECTION:
-                        print(f"\n[DETECTED] {pinch_spread.name} (zoom)")
-                    return pinch_spread
-        
+        # NO OTHER GESTURES DETECTED - return NONE
+        # Removed: PINCH/SPREAD (disabled), SWIPE_UP/DOWN (conflict-prone),
+        #          THREE_FINGERS, FOUR_FINGERS, THUMB_DOWN (not essential)
         return GestureType.NONE
 
 
@@ -1461,15 +1301,17 @@ class VisualEffects:
         self.trail_points = deque(maxlen=30)
         self.gesture_flash = None
         self.flash_time = 0
+        # Color mapping for 8 core gestures only
         self.color_map = {
             GestureType.OPEN_PALM: (0, 255, 0),      # Green
             GestureType.CLOSED_FIST: (255, 0, 0),    # Red
             GestureType.INDEX_ONLY: (255, 255, 0),   # Yellow
             GestureType.PEACE_SIGN: (0, 255, 255),   # Cyan
             GestureType.THUMB_UP: (0, 128, 255),     # Orange
-            GestureType.THUMB_DOWN: (128, 0, 255),   # Purple
-            GestureType.THREE_FINGERS: (255, 128, 0), # Light Blue
-            GestureType.FOUR_FINGERS: (255, 0, 255),  # Magenta
+            GestureType.SWIPE_LEFT: (128, 0, 255),   # Purple
+            GestureType.SWIPE_RIGHT: (255, 128, 0),  # Light Blue
+            GestureType.PINKY_ONLY: (0, 255, 128),   # Cyan-Green
+            # Removed: THUMB_DOWN, THREE_FINGERS, FOUR_FINGERS (disabled for hackathon)
         }
     
     def add_trail_point(self, x, y):
@@ -1863,9 +1705,10 @@ class HandGestureControlSystem:
     def execute_gesture_action(self, gesture, hand_landmarks, is_first_confirmation=False):
         """
         Execute browser action based on detected gesture.
+        HACKATHON VERSION: Only 8 essential gestures supported.
         
-        FIX #1: Simplified - state machine now handles timing confirmation.
-        Duplicate dwell time checks removed. Trust state machine's timing.
+        State machine handles timing confirmation.
+        This function trusts confirmed gestures and executes actions cleanly.
         
         Args:
             gesture: GestureType to execute (already confirmed by state machine)
@@ -1873,139 +1716,82 @@ class HandGestureControlSystem:
             is_first_confirmation: True if this is first frame of CONFIRMED state
         """
         if gesture == GestureType.NONE:
-            # Reset scroll dwell timer when no gesture
+            # Reset all gesture timers when no gesture detected
             self.recognizer.scroll_gesture_start_time = 0.0
             self.recognizer.scroll_last_gesture = GestureType.NONE
-            
-            # REFINEMENT #2: Reset browser navigation timers
             self.recognizer.browser_nav_gesture_start_time = 0.0
             self.recognizer.browser_nav_last_gesture = GestureType.NONE
-            
-            # REFINEMENT #3: Reset close tab timers
-            self.recognizer.close_tab_gesture_start_time = 0.0
-            self.recognizer.close_tab_gesture_stable = False
-            self.recognizer.close_tab_last_progress_printed = -1  # BUG FIX: Reset progress tracking
-            
-            # REFINEMENT #5: Reset mute timer
             self.recognizer.mute_gesture_start_time = 0.0
             
-            # ISSUE #2 FIX: Exit POINTER_MODE when no gesture
+            # Exit POINTER_MODE when no gesture
             if Config.ENABLE_MODE_SEPARATION and self.recognizer.current_mode == 'POINTER':
                 if time.time() - self.recognizer.mode_switch_time > Config.MODE_SWITCH_DEBOUNCE:
                     self.recognizer.current_mode = 'GESTURE'
             return
         
-        # ISSUE #2 FIX: Mode management - INDEX_ONLY triggers POINTER_MODE
+        # Mode management: INDEX_ONLY triggers POINTER_MODE
         current_time = time.time()
         if Config.ENABLE_MODE_SEPARATION:
             if gesture == GestureType.INDEX_ONLY:
                 if self.recognizer.current_mode != 'POINTER':
                     self.recognizer.current_mode = 'POINTER'
                     self.recognizer.mode_switch_time = current_time
-                    print("[POINTER MODE] activated (zoom disabled)")
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("[POINTER MODE] activated")
             else:
                 # Any other gesture switches back to GESTURE_MODE
                 if self.recognizer.current_mode == 'POINTER':
                     if current_time - self.recognizer.mode_switch_time > Config.MODE_SWITCH_DEBOUNCE:
                         self.recognizer.current_mode = 'GESTURE'
-                        print("[GESTURE MODE] activated")
+                        if Config.DEBUG_GESTURE_DETECTION:
+                            print("[GESTURE MODE] activated")
         
         # Check debounce for non-continuous actions
         if gesture not in [GestureType.INDEX_ONLY]:
             if not self.stabilizer.should_execute_action(gesture):
                 return
         
-        # REFINEMENT #4: Check if zoom is active - isolate zoom gestures
-        if Config.ZOOM_GESTURE_ISOLATION and self.recognizer.zoom_active:
-            # Only allow zoom gestures to complete, block others
-            if gesture not in [GestureType.PINCH, GestureType.SPREAD]:
-                if current_time - self.recognizer.zoom_last_action_time >= Config.ZOOM_COOLDOWN:
-                    self.recognizer.zoom_active = False  # Exit zoom mode
-                else:
-                    return  # Still in zoom cooldown, ignore other gestures
-        
-        # Execute appropriate action
+        # === EXECUTE ACTIONS (8 essential gestures only) ===
         try:
-            # FIX #1: Simplified scroll gestures - state machine handles dwell time
+            # 1. SCROLL DOWN - Open palm (5 fingers)
             if gesture == GestureType.OPEN_PALM:
-                # Check continuous scroll delay to prevent spam
                 if current_time - self.recognizer.scroll_last_action_time < Config.SCROLL_CONTINUOUS_DELAY:
                     return
                 
                 self.controller.scroll_down()
-                print("[SCROLL DOWN] Scrolling down (3.5x speed, 4-step smooth)...")
+                print("[SCROLL DOWN] ✋ Open palm → Scrolling down")
                 self.recognizer.scroll_last_action_time = current_time
                 self.recognizer.scroll_last_gesture = gesture
             
+            # 2. SCROLL UP - Closed fist (0 fingers)
             elif gesture == GestureType.CLOSED_FIST:
-                # Check continuous scroll delay to prevent spam
                 if current_time - self.recognizer.scroll_last_action_time < Config.SCROLL_CONTINUOUS_DELAY:
                     return
                 
                 self.controller.scroll_up()
-                print("[SCROLL UP] Scrolling up (3.5x speed, 4-step smooth)...")
+                print("[SCROLL UP] ✊ Closed fist → Scrolling up")
                 self.recognizer.scroll_last_action_time = current_time
                 self.recognizer.scroll_last_gesture = gesture
             
+            # 3. POINTER MODE - Index finger only (continuous)
             elif gesture == GestureType.INDEX_ONLY:
-                # FIX #4: Pointer mode - continuous mouse movement with dead zone protection
-                # State machine marks INDEX_ONLY as CONTINUOUS_GESTURE (no confirmation delay)
-                # move_mouse() has built-in dead zone (0.005 * screen_width) to prevent micro-jitter
                 # Continuous mouse movement (no debounce)
+                # State machine marks this as CONTINUOUS_GESTURE
                 self.controller.move_mouse(hand_landmarks)
             
+            # 4. LEFT CLICK - Peace sign (2 fingers)
             elif gesture == GestureType.PEACE_SIGN:
                 self.controller.left_click()
-                print("[CLICK] Left click")
+                print("[CLICK] ✌️ Peace sign → Left click")
             
+            # 5. ZOOM IN - Thumb up
             elif gesture == GestureType.THUMB_UP:
                 self.controller.zoom_in()
-                print("[ZOOM IN] Zoom in (smooth 2-step)")
+                print("[ZOOM IN] 👍 Thumb up → Zoom in")
             
-            # REFINEMENT #3: Close tab - HIGH SAFETY with long dwell time and strong cooldown
-            elif gesture == GestureType.THUMB_DOWN:
-                # Check cooldown first (prevent rapid tab closure)
-                if current_time - self.recognizer.close_tab_last_action_time < Config.CLOSE_TAB_COOLDOWN:
-                    return  # Still in cooldown
-                
-                # Initialize dwell timer
-                if self.recognizer.close_tab_gesture_start_time is None:
-                    self.recognizer.close_tab_gesture_start_time = current_time
-                    self.recognizer.close_tab_gesture_stable = True
-                    print("WARNING: Hold thumb-down for 1.2s to close tab...")
-                    return
-                
-                # Require stable gesture throughout dwell period
-                if Config.CLOSE_TAB_REQUIRE_STABILITY:
-                    if not self.recognizer.close_tab_gesture_stable:
-                        self.recognizer.close_tab_gesture_start_time = 0.0
-                        return
-                
-                # Check if dwell time met
-                dwell_elapsed = current_time - self.recognizer.close_tab_gesture_start_time
-                if dwell_elapsed >= Config.CLOSE_TAB_DWELL_TIME:
-                    self.controller.close_tab()
-                    print("Tab closed (safe mode: 1.2s dwell + 2s cooldown)")
-                    self.recognizer.close_tab_last_action_time = current_time
-                    self.recognizer.close_tab_gesture_start_time = 0.0
-                    self.recognizer.close_tab_last_progress_printed = -1  # Reset for next time
-                else:
-                    # BUG FIX: Show progress only once per milestone to prevent console spam
-                    progress = int((dwell_elapsed / Config.CLOSE_TAB_DWELL_TIME) * 100)
-                    # Print at 25%, 50%, 75% milestones only once
-                    if progress >= 25 and self.recognizer.close_tab_last_progress_printed < 25:
-                        print("[PROGRESS] Close tab progress: 25%")
-                        self.recognizer.close_tab_last_progress_printed = 25
-                    elif progress >= 50 and self.recognizer.close_tab_last_progress_printed < 50:
-                        print("[PROGRESS] Close tab progress: 50%")
-                        self.recognizer.close_tab_last_progress_printed = 50
-                    elif progress >= 75 and self.recognizer.close_tab_last_progress_printed < 75:
-                        print("[PROGRESS] Close tab progress: 75%")
-                        self.recognizer.close_tab_last_progress_printed = 75
-            
-            # REFINEMENT #2: Browser navigation - slower, more controlled with deliberate delay
+            # 6. BROWSER BACK - Swipe left
             elif gesture == GestureType.SWIPE_LEFT:
-                # Check cooldown first
+                # Check cooldown
                 if current_time - self.recognizer.browser_nav_last_action_time < Config.BROWSER_NAV_COOLDOWN:
                     return
                 
@@ -2018,12 +1804,13 @@ class HandGestureControlSystem:
                 # Check dwell time
                 if current_time - self.recognizer.browser_nav_gesture_start_time >= Config.BROWSER_NAV_DWELL_TIME:
                     self.controller.browser_back()
-                    print("Browser back (0.8s dwell + 1.5s cooldown)")
+                    print("[BROWSER BACK] ← Swipe left → Navigate back")
                     self.recognizer.browser_nav_last_action_time = current_time
                     self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
+            # 7. BROWSER FORWARD - Swipe right
             elif gesture == GestureType.SWIPE_RIGHT:
-                # Check cooldown first
+                # Check cooldown
                 if current_time - self.recognizer.browser_nav_last_action_time < Config.BROWSER_NAV_COOLDOWN:
                     return
                 
@@ -2036,29 +1823,13 @@ class HandGestureControlSystem:
                 # Check dwell time
                 if current_time - self.recognizer.browser_nav_gesture_start_time >= Config.BROWSER_NAV_DWELL_TIME:
                     self.controller.browser_forward()
-                    print("Browser forward (0.8s dwell + 1.5s cooldown)")
+                    print("[BROWSER FORWARD] → Swipe right → Navigate forward")
                     self.recognizer.browser_nav_last_action_time = current_time
                     self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
-            elif gesture == GestureType.SWIPE_UP:
-                self.controller.next_tab()
-                print("[NEXT TAB] Next tab")
-            
-            elif gesture == GestureType.SWIPE_DOWN:
-                self.controller.previous_tab()
-                print("[PREV TAB] Previous tab")
-            
-            elif gesture == GestureType.THREE_FINGERS:
-                filename = self.controller.take_screenshot()
-                print(f"[SCREENSHOT] Screenshot saved: {filename}")
-            
-            elif gesture == GestureType.FOUR_FINGERS:
-                self.controller.refresh_page()
-                print("[REFRESH] Page refresh")
-            
-            # REFINEMENT #5: Mute toggle - slower, controlled execution with cooldown
+            # 8. MUTE TOGGLE - Pinky only (accessibility feature)
             elif gesture == GestureType.PINKY_ONLY:
-                # Check cooldown first
+                # Check cooldown
                 if current_time - self.recognizer.mute_last_action_time < Config.MUTE_TOGGLE_COOLDOWN:
                     return
                 
@@ -2070,38 +1841,9 @@ class HandGestureControlSystem:
                 # Check dwell time
                 if current_time - self.recognizer.mute_gesture_start_time >= Config.MUTE_TOGGLE_DWELL_TIME:
                     self.controller.mute_toggle()
-                    print("[MUTE] Mute toggled (0.6s dwell + 1s cooldown)")
+                    print("[MUTE TOGGLE] 🤙 Pinky gesture → Mute toggled")
                     self.recognizer.mute_last_action_time = current_time
                     self.recognizer.mute_gesture_start_time = 0.0
-            
-            # BUG FIX: Removed duplicate PEACE_SIGN handler for fullscreen toggle
-            # PEACE_SIGN (2 fingers) is already used for left click above (line 1266)
-            # Fullscreen functionality can be reassigned to a different gesture if needed
-            
-            # REFINEMENT #4: Pinch/spread zoom - smooth with gesture isolation
-            elif gesture == GestureType.PINCH:
-                self.recognizer.zoom_active = True  # Enter zoom mode
-                self.controller.zoom_in()
-                print("[PINCH] Pinch zoom in (smooth 2-step, isolated)")
-                self.recognizer.zoom_last_action_time = current_time
-            
-            elif gesture == GestureType.SPREAD:
-                self.recognizer.zoom_active = True  # Enter zoom mode
-                self.controller.zoom_out()
-                print("[SPREAD] Spread zoom out (smooth 2-step, isolated)")
-                self.recognizer.zoom_last_action_time = current_time
-            
-            elif gesture == GestureType.OK_SIGN:
-                self.controller.new_tab()
-                print("➕ New tab")
-            
-            elif gesture == GestureType.ROCK_SIGN:
-                self.controller.copy_text()
-                print("📋 Copy")
-            
-            elif gesture == GestureType.CALL_SIGN:
-                self.controller.paste_text()
-                print("📋 Paste")
             
             # Add to history
             if self.history:
@@ -2112,7 +1854,7 @@ class HandGestureControlSystem:
                 self.visual_effects.flash_gesture(gesture)
         
         except Exception as e:
-            print(f"WARNING: Action error: {e}")
+            print(f"WARNING: Action execution error: {e}")
     
     def draw_info_overlay(self, frame, gesture, hand_landmarks):
         """
