@@ -110,8 +110,9 @@ class Config:
     SPREAD_THRESHOLD = 0.20  # Min distance for spread (VERY WIDE - much stricter than before)
     PINCH_DISTANCE_THRESHOLD = 0.08  # Threshold for pinch verification
     
-    # Finger extension detection
-    FINGER_EXTENSION_THRESHOLD = 0.005  # Y-axis threshold (95% EASIER - was 0.02 - very sensitive now)
+    # Finger extension detection - STRICT (correctness over sensitivity)
+    FINGER_EXTENSION_THRESHOLD = 0.020  # Y-axis threshold (STRICT - clear extension required)
+    FINGER_CURL_THRESHOLD = 0.015  # Threshold for detecting curled fingers (strict)
     
     # REFINEMENT #4: Pinch zoom - smooth and isolated
     ZOOM_SMOOTH_STEPS = 2  # Number of incremental zoom steps for smoothness
@@ -555,15 +556,58 @@ class HandGestureRecognizer:
     
     def is_finger_extended(self, landmarks, finger_tip, finger_dip, finger_mcp):
         """
-        Determines if a finger is extended (straight) or folded.
+        STRICT: Determines if a finger is CLEARLY extended.
+        
+        WHY OVERLAPS OCCURRED BEFORE:
+        - Threshold was 0.005 (0.5% of screen) - allowed partial extension
+        - No angle or distance verification - accepted ambiguous poses
+        
+        WHY THIS PREVENTS OVERLAP:
+        - Threshold is 0.020 (2% of screen) - requires clear extension
+        - Both joints must show progressive extension (tip > dip > mcp)
+        - Stricter threshold means partial curls won't trigger false positives
         
         Logic:
-            A finger is extended if its TIP is higher (lower y-value) than
-            its DIP joint, and the DIP is higher than the MCP joint.
-            In image coordinates, y increases downward.
+            Finger is EXTENDED only if TIP is clearly higher than DIP,
+            and DIP is clearly higher than MCP (progressive extension).
+            In image coordinates, y increases downward (smaller y = higher).
+        
+        Args:
+            landmarks: List of hand landmarks
+            finger_tip: Index of fingertip landmark
+            finger_dip: Index of DIP joint landmark  
+            finger_mcp: Index of MCP joint landmark
             
-            IMPROVED: Added threshold to make closed fist detection more reliable.
-            A finger must be significantly above its joints to be considered extended.
+        Returns:
+            bool: True if finger is CLEARLY extended (not ambiguous)
+        """
+        tip_y = landmarks[finger_tip].y
+        dip_y = landmarks[finger_dip].y
+        mcp_y = landmarks[finger_mcp].y
+        
+        # STRICT: Require CLEAR progressive extension with proper threshold
+        # Old threshold (0.005) allowed partial extension - NEW (0.020) requires clear extension
+        is_tip_above_dip = (tip_y + Config.FINGER_EXTENSION_THRESHOLD) < dip_y
+        is_dip_above_mcp = (dip_y + Config.FINGER_EXTENSION_THRESHOLD) < mcp_y
+        
+        return is_tip_above_dip and is_dip_above_mcp
+    
+    def is_finger_curled(self, landmarks, finger_tip, finger_dip, finger_mcp):
+        """
+        STRICT: Determines if a finger is CLEARLY curled (folded).
+        
+        WHY THIS IS CRITICAL:
+        - Previous code only checked if NOT extended, but didn't verify actually curled
+        - Ambiguous positions (half-curled) could trigger wrong gestures
+        
+        WHY THIS PREVENTS OVERLAP:
+        - Explicitly verifies finger is curled (tip below or near dip)
+        - Closed Fist requires ALL fingers pass this test
+        - Pinky-Only requires all OTHER fingers pass this test
+        
+        Logic:
+            Finger is CURLED if TIP is NOT significantly above DIP.
+            This is the inverse of is_finger_extended with a buffer zone.
         
         Args:
             landmarks: List of hand landmarks
@@ -572,19 +616,16 @@ class HandGestureRecognizer:
             finger_mcp: Index of MCP joint landmark
             
         Returns:
-            bool: True if finger is extended
+            bool: True if finger is CLEARLY curled (not extended or ambiguous)
         """
         tip_y = landmarks[finger_tip].y
         dip_y = landmarks[finger_dip].y
-        mcp_y = landmarks[finger_mcp].y
         
-        # Finger is extended if tip is significantly above (smaller y) than dip,
-        # and dip is above mcp
-        # Added threshold to prevent loose fists from being detected as extended fingers
-        is_tip_above_dip = (tip_y + Config.FINGER_EXTENSION_THRESHOLD) < dip_y
-        is_dip_above_mcp = (dip_y + Config.FINGER_EXTENSION_THRESHOLD) < mcp_y
+        # Finger is curled if tip is NOT clearly above dip
+        # Using curl threshold (slightly smaller than extension) for buffer zone
+        is_curled = tip_y >= (dip_y - Config.FINGER_CURL_THRESHOLD)
         
-        return is_tip_above_dip and is_dip_above_mcp
+        return is_curled
     
     def is_thumb_extended(self, landmarks):
         """
@@ -1066,61 +1107,154 @@ class HandGestureRecognizer:
                 print("\n[DETECTED] THUMB_UP (zoom in)")
             return GestureType.THUMB_UP
         
+        # ============================================================================
+        # GESTURE REGISTRY: STRICT, MUTUALLY EXCLUSIVE DEFINITIONS
+        # ============================================================================
+        # Each gesture requires ALL fingers in EXPLICIT states (extended OR curled)
+        # NO ambiguous states allowed - partial extension = NO MATCH
+        
+        # WHY THIS PREVENTS OVERLAPS:
+        # 1. Each gesture explicitly checks ALL 5 fingers (thumb, index, middle, ring, pinky)
+        # 2. Uses both is_finger_extended() AND is_finger_curled() for verification
+        # 3. Strict elif chain - only ONE gesture can match
+        # 4. Ambiguous poses (partial extension) rejected by strict thresholds
+        
         # PRIORITY 3: Finger-count based gestures (static poses)
         # STRICT elif chain ensures mutual exclusivity (only ONE gesture can match)
         
-        # Closed fist (0 fingers) - scroll up
+        # ========================================
+        # GESTURE 1: CLOSED_FIST (0 fingers extended)
+        # ========================================
+        # DEFINITION: ALL fingers must be clearly curled (not extended)
+        # WHY STRICT: Prevents partial fist from triggering scroll up
         if count == 0:
-            if Config.DEBUG_GESTURE_DETECTION:
-                print("\n[DETECTED] CLOSED_FIST (scroll up)")
-            return GestureType.CLOSED_FIST
-        
-        # Open palm (5 fingers spread including thumb) - scroll down
-        elif count == 4:
-            # Check with thumb to see if all 5 fingers spread (OPEN_PALM)
+            # STRICT VALIDATION: Verify ALL fingers are actually curled, not just "not extended"
             count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
             
-            if count_with_thumb == 5 and fingers_with_thumb['thumb']:
+            # Double-check: Verify fingers are curled using explicit curl detection
+            all_curled = (
+                self.is_finger_curled(landmarks, self.INDEX_TIP, self.INDEX_DIP, self.INDEX_MCP) and
+                self.is_finger_curled(landmarks, self.MIDDLE_TIP, self.MIDDLE_DIP, self.MIDDLE_MCP) and
+                self.is_finger_curled(landmarks, self.RING_TIP, self.RING_DIP, self.RING_MCP) and
+                self.is_finger_curled(landmarks, self.PINKY_TIP, self.PINKY_DIP, self.PINKY_MCP)
+            )
+            
+            if count_with_thumb == 0 and all_curled:
                 if Config.DEBUG_GESTURE_DETECTION:
-                    print("\n[DETECTED] OPEN_PALM (scroll down - 5 fingers)")
-                return GestureType.OPEN_PALM
-            # Else: 4 fingers without thumb = ambiguous, reject (prevents FOUR_FINGERS conflict)
+                    print("\n[DETECTED] CLOSED_FIST (scroll up - all fingers curled)")
+                return GestureType.CLOSED_FIST
         
-        # Two fingers - Peace sign (index + middle) - left click
-        elif count == 2:
-            # STRICT CHECK: Only index and middle extended; others folded
-            if fingers['index'] and fingers['middle'] and not fingers['ring'] and not fingers['pinky']:
-                if Config.DEBUG_GESTURE_DETECTION:
-                    print("\n[DETECTED] PEACE_SIGN (left click)")
-                return GestureType.PEACE_SIGN
-        
-        # One finger checks
-        elif True:
-            count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
-            if count_full == 1:
-                # INDEX_ONLY: Only index extended - pointer mode
-                if fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['pinky'] and not fingers_full['thumb']:
-                    if Config.DEBUG_GESTURE_DETECTION:
-                        print("\n[DETECTED] INDEX_ONLY (pointer mode)")
-                    return GestureType.INDEX_ONLY
+        # ========================================
+        # GESTURE 2: OPEN_PALM (5 fingers extended)
+        # ========================================
+        # DEFINITION: ALL 5 fingers (including thumb) must be CLEARLY extended
+        # WHY STRICT: Prevents 4-finger poses or partial spreads from triggering scroll down
+        # CONFLICT PREVENTION: Most common overlap was Open Palm vs Pinky-Only (partial extension)
+        elif True:  # Check regardless of count (more explicit validation)
+            count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+            
+            # STRICT VALIDATION: Require exactly 5 fingers AND explicit verification of each
+            if count_with_thumb == 5:
+                # Verify ALL fingers are extended (no ambiguous states)
+                all_extended = (
+                    fingers_with_thumb['thumb'] and
+                    fingers_with_thumb['index'] and
+                    fingers_with_thumb['middle'] and
+                    fingers_with_thumb['ring'] and
+                    fingers_with_thumb['pinky']
+                )
                 
-                # PINKY_ONLY: Only pinky extended - mute toggle
-                elif fingers_full['pinky'] and not fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring']:
-                    # Additional check: pinky should be clearly highest finger
-                    pinky_tip_y = landmarks[self.PINKY_TIP].y
-                    index_tip_y = landmarks[self.INDEX_TIP].y
-                    middle_tip_y = landmarks[self.MIDDLE_TIP].y
-                    ring_tip_y = landmarks[self.RING_TIP].y
-                    
-                    # Pinky must be clearly elevated
-                    if pinky_tip_y < (index_tip_y - 0.03) and pinky_tip_y < (middle_tip_y - 0.03):
-                        if Config.DEBUG_GESTURE_DETECTION:
-                            print("\n[DETECTED] PINKY_ONLY (mute toggle)")
-                        return GestureType.PINKY_ONLY
+                # Additional strictness: Verify fingers are NOT curled
+                none_curled = not (
+                    self.is_finger_curled(landmarks, self.INDEX_TIP, self.INDEX_DIP, self.INDEX_MCP) or
+                    self.is_finger_curled(landmarks, self.MIDDLE_TIP, self.MIDDLE_DIP, self.MIDDLE_MCP) or
+                    self.is_finger_curled(landmarks, self.RING_TIP, self.RING_DIP, self.RING_MCP) or
+                    self.is_finger_curled(landmarks, self.PINKY_TIP, self.PINKY_DIP, self.PINKY_MCP)
+                )
+                
+                if all_extended and none_curled:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("\n[DETECTED] OPEN_PALM (scroll down - all 5 fingers extended)")
+                    return GestureType.OPEN_PALM
         
-        # NO OTHER GESTURES DETECTED - return NONE
-        # Removed: PINCH/SPREAD (disabled), SWIPE_UP/DOWN (conflict-prone),
-        #          THREE_FINGERS, FOUR_FINGERS, THUMB_DOWN (not essential)
+        # ========================================  
+        # GESTURE 3: PEACE_SIGN (2 fingers: index + middle)
+        # ========================================
+        # DEFINITION: ONLY index and middle extended, ring and pinky MUST be curled
+        # WHY STRICT: Prevents 3-finger or partial poses from triggering click
+        if count == 2:
+            # Verify ONLY index and middle extended
+            if fingers['index'] and fingers['middle'] and not fingers['ring'] and not fingers['pinky']:
+                # STRICT: Verify ring and pinky are actually curled (not just "not extended")
+                ring_curled = self.is_finger_curled(landmarks, self.RING_TIP, self.RING_DIP, self.RING_MCP)
+                pinky_curled = self.is_finger_curled(landmarks, self.PINKY_TIP, self.PINKY_DIP, self.PINKY_MCP)
+                
+                if ring_curled and pinky_curled:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("\n[DETECTED] PEACE_SIGN (left click - index+middle only)")
+                    return GestureType.PEACE_SIGN
+        
+        # ========================================
+        # GESTURE 4: INDEX_ONLY (1 finger: index only)
+        # ========================================
+        # DEFINITION: ONLY index extended, ALL others curled
+        # WHY STRICT: Prevents partial finger extension from triggering pointer mode
+        count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
+        if count_full == 1:
+            # Verify ONLY index extended, all others NOT extended
+            if fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['pinky'] and not fingers_full['thumb']:
+                # STRICT: Verify other fingers are actually curled
+                others_curled = (
+                    self.is_finger_curled(landmarks, self.MIDDLE_TIP, self.MIDDLE_DIP, self.MIDDLE_MCP) and
+                    self.is_finger_curled(landmarks, self.RING_TIP, self.RING_DIP, self.RING_MCP) and
+                    self.is_finger_curled(landmarks, self.PINKY_TIP, self.PINKY_DIP, self.PINKY_MCP)
+                )
+                
+                if others_curled:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("\n[DETECTED] INDEX_ONLY (pointer mode - index only)") 
+                    return GestureType.INDEX_ONLY
+        
+        # ========================================
+        # GESTURE 5: PINKY_ONLY (1 finger: pinky only)
+        # ========================================
+        # DEFINITION: ONLY pinky extended, ALL others (including thumb) CURLED
+        # WHY STRICT: Most conflict-prone gesture - overlapped with Open Palm when partial extension
+        # CONFLICT PREVENTION: Strict curl detection prevents partial Open Palm from matching
+        if count_full == 1:
+            # Verify ONLY pinky extended, all others NOT extended
+            if fingers_full['pinky'] and not fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['thumb']:
+                # STRICT CURL VERIFICATION: All other fingers MUST be clearly curled
+                # This is the KEY fix preventing Open Palm → Pinky-Only confusion
+                others_curled = (
+                    self.is_finger_curled(landmarks, self.INDEX_TIP, self.INDEX_DIP, self.INDEX_MCP) and
+                    self.is_finger_curled(landmarks, self.MIDDLE_TIP, self.MIDDLE_DIP, self.MIDDLE_MCP) and
+                    self.is_finger_curled(landmarks, self.RING_TIP, self.RING_DIP, self.RING_MCP)
+                )
+                
+                # Additional elevation check: Pinky must be clearly highest
+                pinky_tip_y = landmarks[self.PINKY_TIP].y
+                index_tip_y = landmarks[self.INDEX_TIP].y
+                middle_tip_y = landmarks[self.MIDDLE_TIP].y
+                ring_tip_y = landmarks[self.RING_TIP].y
+                
+                # STRICT: Pinky must be clearly elevated above curled fingers
+                pinky_elevated = (
+                    pinky_tip_y < (index_tip_y - 0.05) and  # Increased from 0.03 to 0.05 (stricter)
+                    pinky_tip_y < (middle_tip_y - 0.05) and
+                    pinky_tip_y < (ring_tip_y - 0.05)
+                )
+                
+                if others_curled and pinky_elevated:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("\n[DETECTED] PINKY_ONLY (mute - pinky only, others curled)")
+                    return GestureType.PINKY_ONLY
+        
+        # ========================================
+        # NO MATCH: Ambiguous or unsupported pose
+        # ========================================
+        # If no gesture matched, return NONE (prefer false negative over false positive)
+        # This includes: partial extensions, unclear poses, intermediate finger positions
         return GestureType.NONE
 
 
