@@ -124,6 +124,10 @@ class Config:
     BROWSER_NAV_DWELL_TIME = 0.5  # DELIBERATE - hold 0.5s (prevents accidental navigation)
     BROWSER_NAV_COOLDOWN = 0.8  # SAFE - 0.8s cooldown between nav actions
     
+    # CLOSE BROWSER: CRITICAL action - requires longer dwell time
+    CLOSE_BROWSER_DWELL_TIME = 1.5  # VERY DELIBERATE - hold 1.5s (prevents accidental close)
+    CLOSE_BROWSER_COOLDOWN = 2.0  # EXTRA SAFE - 2s cooldown
+    
     # Distance-based gestures
     ENABLE_ZOOM_GESTURES = False  # DISABLED BY DEFAULT - too easy to trigger accidentally
     PINCH_THRESHOLD = 0.04  # Max distance for pinch (VERY CLOSE - strict)
@@ -255,8 +259,11 @@ class GestureType(Enum):
     # Accessibility (1 gesture)
     PINKY_ONLY = 10      # Mute toggle (pinky extended)
     
-    # Copy/Paste (2 gestures)
-    ROCK_SIGN = 12       # Copy - index + pinky extended (rock on)
+    # System Control (2 gestures)
+    ROCK_SIGN = 12       # Exit program - index + pinky extended (rock on) - HOLD 1.5s
+    CALL_ME = 14         # Close browser - thumb + pinky ONLY (call me gesture) - HOLD 1.5s
+    
+    # Clipboard (1 gesture)
     OKAY_SIGN = 13       # Paste - thumb + index circle, others extended
     
     # === REMOVED/DISABLED GESTURES (not demo-ready) ===
@@ -507,6 +514,11 @@ class HandGestureRecognizer:
         self.browser_nav_gesture_start_time = 0.0  # Changed from None to 0.0
         self.browser_nav_last_gesture = GestureType.NONE  # Changed from None
         self.browser_nav_last_action_time = 0.0
+        
+        # Close browser safety timing (CRITICAL - requires long dwell)
+        self.close_browser_gesture_start_time = 0.0
+        self.close_browser_last_gesture = GestureType.NONE
+        self.close_browser_last_action_time = 0.0
         
         # REFINEMENT #3: Close tab safety timing
         self.close_tab_gesture_start_time = 0.0  # Changed from None to 0.0
@@ -1295,10 +1307,10 @@ class HandGestureRecognizer:
                     return GestureType.THREE_FINGERS
         
         # ========================================
-        # GESTURE 6: ROCK_SIGN (2 fingers: index + pinky - "rock on")
+        # GESTURE 6A: ROCK_SIGN (2 fingers: index + pinky - "rock on")
         # ========================================
         # DEFINITION: Index and pinky extended, middle and ring curled, thumb NOT extended
-        # WHY: Natural "rock on" hand shape for copy gesture
+        # WHY: Natural "rock on" hand shape - EXIT PROGRAM (critical action)
         # MUST COME BEFORE PINKY_ONLY to prevent conflict
         if count == 2:
             # Check if it's index + pinky (not peace sign which is index + middle)
@@ -1310,8 +1322,32 @@ class HandGestureRecognizer:
                 
                 if middle_curled and ring_curled and thumb_not_extended:
                     if Config.DEBUG_GESTURE_DETECTION:
-                        print("\n[DETECTED] ROCK_SIGN (copy - index + pinky extended)")
+                        print("\n[DETECTED] ROCK_SIGN (exit program - index + pinky extended)")
                     return GestureType.ROCK_SIGN
+        
+        # ========================================
+        # GESTURE 6B: CALL_ME (2 fingers: thumb + pinky - "call me" gesture)
+        # ========================================
+        # DEFINITION: Thumb and pinky extended, index/middle/ring curled
+        # WHY: Natural "call me" gesture - comfortable, unique, prevents accidental browser close
+        # CRITICAL: This is for closing browser (high-stakes action)
+        # Different from: Rock sign (index+pinky), Thumb up (thumb only), Pinky only (pinky only)
+        # MUST CHECK: count_with_thumb for accurate detection since thumb is involved
+        count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+        if count_with_thumb == 2:
+            # Check if it's thumb + pinky ONLY (index, middle, ring must be curled)
+            if fingers_with_thumb.get('thumb', False) and fingers_with_thumb.get('pinky', False):
+                # Verify index, middle, ring are NOT extended
+                if not fingers_with_thumb.get('index', False) and not fingers_with_thumb.get('middle', False) and not fingers_with_thumb.get('ring', False):
+                    # STRICT VERIFICATION: Index, middle, ring MUST be curled
+                    index_curled = self.is_finger_curled(landmarks, self.INDEX_TIP, self.INDEX_DIP, self.INDEX_MCP)
+                    middle_curled = self.is_finger_curled(landmarks, self.MIDDLE_TIP, self.MIDDLE_DIP, self.MIDDLE_MCP)
+                    ring_curled = self.is_finger_curled(landmarks, self.RING_TIP, self.RING_DIP, self.RING_MCP)
+                    
+                    if index_curled and middle_curled and ring_curled:
+                        if Config.DEBUG_GESTURE_DETECTION:
+                            print("\n[DETECTED] CALL_ME (close browser - thumb + pinky extended)")
+                        return GestureType.CALL_ME
         
         # ========================================
         # GESTURE 7: OKAY_SIGN (thumb + index circle, 3 others extended)
@@ -1877,6 +1913,10 @@ class BrowserController:
         """Paste clipboard content"""
         pyautogui.hotkey('ctrl', 'v')
     
+    def close_browser(self):
+        """Close entire browser window"""
+        pyautogui.hotkey('alt', 'f4')
+    
     def new_tab(self):
         """Open new browser tab"""
         pyautogui.hotkey('ctrl', 't')
@@ -2004,6 +2044,9 @@ class HandGestureControlSystem:
         self.frame_count = 0
         self.start_time = time.time()
         
+        # Program control
+        self.running = True  # Flag to control main loop (for rock sign exit)
+        
         print("[SUCCESS] System initialized successfully!")
         print("\n" + "="*70)
         print("GESTURE CONTROLS:")
@@ -2056,6 +2099,8 @@ class HandGestureControlSystem:
             self.recognizer.scroll_last_gesture = GestureType.NONE
             self.recognizer.browser_nav_gesture_start_time = 0.0
             self.recognizer.browser_nav_last_gesture = GestureType.NONE
+            self.recognizer.close_browser_gesture_start_time = 0.0
+            self.recognizer.close_browser_last_gesture = GestureType.NONE
             self.recognizer.mute_gesture_start_time = 0.0
             
             # Exit POINTER_MODE when no gesture
@@ -2134,17 +2179,63 @@ class HandGestureControlSystem:
                 self.controller.left_click()
                 print("[CLICK] ✌️ Peace sign → Left click")
             
-            # 8. COPY - Rock sign (index + pinky)
+            # 8. EXIT PROGRAM - Rock sign (CRITICAL: requires 1.5s hold)
             elif gesture == GestureType.ROCK_SIGN:
-                self.controller.copy()
-                print("[COPY] 🤘 Rock sign → Copy (Ctrl+C)")
+                # Check cooldown
+                if current_time - self.recognizer.close_browser_last_action_time < Config.CLOSE_BROWSER_COOLDOWN:
+                    return
+                
+                # Initialize dwell timer
+                if self.recognizer.close_browser_last_gesture != gesture:
+                    self.recognizer.close_browser_gesture_start_time = current_time
+                    self.recognizer.close_browser_last_gesture = gesture
+                    print("[EXIT PROGRAM] 🤘 Rock sign detected - HOLD for 1.5s to EXIT...")
+                    return
+                
+                # Check dwell time (1.5s hold required)
+                elapsed = current_time - self.recognizer.close_browser_gesture_start_time
+                if elapsed >= Config.CLOSE_BROWSER_DWELL_TIME:
+                    print(f"[EXIT PROGRAM] 🤘 Rock sign held {elapsed:.1f}s → Exiting program...")
+                    self.running = False  # Stop main loop
+                    return
+                else:
+                    # Show progress every 0.3s
+                    progress = int(elapsed / Config.CLOSE_BROWSER_DWELL_TIME * 100)
+                    if progress % 30 == 0 and progress > 0:
+                        print(f"[EXIT PROGRAM] 🤘 Hold... {progress}% ({elapsed:.1f}s / {Config.CLOSE_BROWSER_DWELL_TIME}s)")
             
-            # 9. PASTE - Okay sign (thumb+index circle)
+            # 9. CLOSE BROWSER - Call Me gesture (COMFORTABLE & UNIQUE: requires 1.5s hold)
+            elif gesture == GestureType.CALL_ME:
+                # Check cooldown
+                if current_time - self.recognizer.close_browser_last_action_time < Config.CLOSE_BROWSER_COOLDOWN:
+                    return
+                
+                # Initialize dwell timer
+                if self.recognizer.close_browser_last_gesture != gesture:
+                    self.recognizer.close_browser_gesture_start_time = current_time
+                    self.recognizer.close_browser_last_gesture = gesture
+                    print("[CLOSE BROWSER] 🤙 Call Me gesture detected - HOLD for 1.5s to CLOSE BROWSER...")
+                    return
+                
+                # Check dwell time (1.5s hold required)
+                elapsed = current_time - self.recognizer.close_browser_gesture_start_time
+                if elapsed >= Config.CLOSE_BROWSER_DWELL_TIME:
+                    self.controller.close_browser()
+                    print(f"[CLOSE BROWSER] 🤙 Call Me held {elapsed:.1f}s → Closing browser (Alt+F4)")
+                    self.recognizer.close_browser_last_action_time = current_time
+                    self.recognizer.close_browser_last_gesture = GestureType.NONE
+                else:
+                    # Show progress every 0.3s
+                    progress = int(elapsed / Config.CLOSE_BROWSER_DWELL_TIME * 100)
+                    if progress % 30 == 0 and progress > 0:
+                        print(f"[CLOSE BROWSER] 🤙 Hold... {progress}% ({elapsed:.1f}s / {Config.CLOSE_BROWSER_DWELL_TIME}s)")
+            
+            # 10. PASTE - Okay sign (thumb+index circle)
             elif gesture == GestureType.OKAY_SIGN:
                 self.controller.paste()
                 print("[PASTE] 👌 Okay sign → Paste (Ctrl+V)")
             
-            # 10. BROWSER BACK - Swipe left
+            # 11. BROWSER BACK - Swipe left
             elif gesture == GestureType.SWIPE_LEFT:
                 # Check cooldown
                 if current_time - self.recognizer.browser_nav_last_action_time < Config.BROWSER_NAV_COOLDOWN:
@@ -2336,7 +2427,7 @@ class HandGestureControlSystem:
         print("[STARTING] Starting video capture...\n")
         
         try:
-            while self.cap.isOpened():
+            while self.running and self.cap.isOpened():
                 success, frame = self.cap.read()
                 if not success:
                     print("WARNING: Failed to capture frame")
