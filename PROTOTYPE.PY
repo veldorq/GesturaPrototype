@@ -207,10 +207,10 @@ class Config:
 
 
 class GestureType(Enum):
-    """Enumeration of all recognized gestures - HACKATHON SIMPLIFIED (8 core gestures)"""
+    """Enumeration of all recognized gestures - HACKATHON SIMPLIFIED (9 core gestures)"""
     NONE = 0
     
-    # === ESSENTIAL BROWSER GESTURES (8 total) ===
+    # === ESSENTIAL BROWSER GESTURES (9 total) ===
     # Scrolling (2 gestures)
     OPEN_PALM = 1        # Scroll down - all 5 fingers spread
     CLOSED_FIST = 2      # Scroll up - all fingers folded
@@ -225,6 +225,9 @@ class GestureType(Enum):
     
     # Zoom (1 gesture - simple)
     THUMB_UP = 5         # Zoom in (thumb-up gesture)
+    
+    # Page Actions (1 gesture)
+    FOUR_FINGERS = 9     # Refresh page - 4 fingers without thumb
     
     # Accessibility (1 gesture)
     PINKY_ONLY = 10      # Mute toggle (pinky extended)
@@ -1145,23 +1148,54 @@ class HandGestureRecognizer:
                 return GestureType.CLOSED_FIST
         
         # ========================================
-        # GESTURE 2: OPEN_PALM (5 fingers extended)
+        # GESTURE 2: FOUR_FINGERS (4 fingers, thumb curled)
+        # ========================================
+        # DEFINITION: Exactly 4 fingers (index, middle, ring, pinky) extended + thumb NOT extended
+        # WHY FIRST: Check before OPEN_PALM to prevent conflict
+        # This must come BEFORE OPEN_PALM in priority
+        elif count == 4:
+            count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+            
+            # Debug output
+            if Config.DEBUG_GESTURE_DETECTION:
+                print(f"\n[DEBUG] 4 fingers detected: count_with_thumb={count_with_thumb}, thumb={fingers_with_thumb.get('thumb', False)}")
+            
+            # FOUR_FINGERS: Exactly 4 fingers extended, thumb NOT extended
+            if count_with_thumb == 4 and not fingers_with_thumb.get('thumb', False):
+                # STRICT VALIDATION: Verify exactly index, middle, ring, pinky extended
+                four_fingers_extended = (
+                    fingers_with_thumb.get('index', False) and
+                    fingers_with_thumb.get('middle', False) and
+                    fingers_with_thumb.get('ring', False) and
+                    fingers_with_thumb.get('pinky', False)
+                )
+                
+                if four_fingers_extended:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("\n[DETECTED] FOUR_FINGERS (refresh page - 4 fingers, thumb not extended)")
+                    return GestureType.FOUR_FINGERS
+            
+            # If we have 5 fingers including thumb, might be OPEN_PALM - continue checking
+            # Fall through to next gesture check
+        
+        # ========================================
+        # GESTURE 3: OPEN_PALM (5 fingers extended)
         # ========================================
         # DEFINITION: ALL 5 fingers (including thumb) must be CLEARLY extended
         # WHY STRICT: Prevents 4-finger poses or partial spreads from triggering scroll down
         # CONFLICT PREVENTION: Most common overlap was Open Palm vs Pinky-Only (partial extension)
-        elif True:  # Check regardless of count (more explicit validation)
+        if count == 4 or count == 5:  # Could be 4 fingers without thumb OR 5 fingers with thumb
             count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
             
             # STRICT VALIDATION: Require exactly 5 fingers AND explicit verification of each
             if count_with_thumb == 5:
                 # Verify ALL fingers are extended (no ambiguous states)
                 all_extended = (
-                    fingers_with_thumb['thumb'] and
-                    fingers_with_thumb['index'] and
-                    fingers_with_thumb['middle'] and
-                    fingers_with_thumb['ring'] and
-                    fingers_with_thumb['pinky']
+                    fingers_with_thumb.get('thumb', False) and
+                    fingers_with_thumb.get('index', False) and
+                    fingers_with_thumb.get('middle', False) and
+                    fingers_with_thumb.get('ring', False) and
+                    fingers_with_thumb.get('pinky', False)
                 )
                 
                 # Additional strictness: Verify fingers are NOT curled
@@ -1178,7 +1212,7 @@ class HandGestureRecognizer:
                     return GestureType.OPEN_PALM
         
         # ========================================  
-        # GESTURE 3: PEACE_SIGN (2 fingers: index + middle)
+        # GESTURE 4: PEACE_SIGN (2 fingers: index + middle)
         # ========================================
         # DEFINITION: ONLY index and middle extended, ring and pinky MUST be curled
         # WHY STRICT: Prevents 3-finger or partial poses from triggering click
@@ -1195,7 +1229,7 @@ class HandGestureRecognizer:
                     return GestureType.PEACE_SIGN
         
         # ========================================
-        # GESTURE 4: INDEX_ONLY (1 finger: index only)
+        # GESTURE 5: INDEX_ONLY (1 finger: index only)
         # ========================================
         # DEFINITION: ONLY index extended, ALL others curled
         # WHY STRICT: Prevents partial finger extension from triggering pointer mode
@@ -1216,7 +1250,7 @@ class HandGestureRecognizer:
                     return GestureType.INDEX_ONLY
         
         # ========================================
-        # GESTURE 5: PINKY_ONLY (1 finger: pinky only)
+        # GESTURE 6: PINKY_ONLY (1 finger: pinky only)
         # ========================================
         # DEFINITION: ONLY pinky extended, ALL others (including thumb) CURLED
         # WHY STRICT: Most conflict-prone gesture - overlapped with Open Palm when partial extension
@@ -1918,12 +1952,17 @@ class HandGestureControlSystem:
                 self.controller.left_click()
                 print("[CLICK] ✌️ Peace sign → Left click")
             
-            # 5. ZOOM IN - Thumb up
+            # 5. REFRESH PAGE - Four fingers (4 fingers, thumb curled)
+            elif gesture == GestureType.FOUR_FINGERS:
+                self.controller.refresh_page()
+                print("[REFRESH] 🖐️ Four fingers → Refresh page")
+            
+            # 6. ZOOM IN - Thumb up
             elif gesture == GestureType.THUMB_UP:
                 self.controller.zoom_in()
                 print("[ZOOM IN] 👍 Thumb up → Zoom in")
             
-            # 6. BROWSER BACK - Swipe left
+            # 7. BROWSER BACK - Swipe left
             elif gesture == GestureType.SWIPE_LEFT:
                 # Check cooldown
                 if current_time - self.recognizer.browser_nav_last_action_time < Config.BROWSER_NAV_COOLDOWN:
@@ -1942,7 +1981,7 @@ class HandGestureControlSystem:
                     self.recognizer.browser_nav_last_action_time = current_time
                     self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
-            # 7. BROWSER FORWARD - Swipe right
+            # 8. BROWSER FORWARD - Swipe right
             elif gesture == GestureType.SWIPE_RIGHT:
                 # Check cooldown
                 if current_time - self.recognizer.browser_nav_last_action_time < Config.BROWSER_NAV_COOLDOWN:
@@ -1961,7 +2000,7 @@ class HandGestureControlSystem:
                     self.recognizer.browser_nav_last_action_time = current_time
                     self.recognizer.browser_nav_last_gesture = GestureType.NONE
             
-            # 8. MUTE TOGGLE - Pinky only (accessibility feature)
+            # 9. MUTE TOGGLE - Pinky only (accessibility feature)
             elif gesture == GestureType.PINKY_ONLY:
                 # Check cooldown
                 if current_time - self.recognizer.mute_last_action_time < Config.MUTE_TOGGLE_COOLDOWN:
