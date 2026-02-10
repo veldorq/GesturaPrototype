@@ -1,0 +1,81 @@
+================================
+  HAND GESTURE CONTROL
+================================
+
+🚀 INSTANT START
+
+Double-click:
+  HandGestureControl.exe
+
+That's it! No installation needed.
+
+================================
+
+🎮 BASIC GESTURES
+
+Scrolling:
+  ✋ Open palm → Scroll down
+  ✊ Closed fist → Scroll up
+
+Mouse:
+  ☝️ Index finger → Move cursor
+  🖖 Three fingers → Click
+
+Exit:
+  Press Q on keyboard
+
+================================
+
+💡 FIRST TIME TIPS
+
+1. Keep hand visible in camera
+2. Plain background works best
+3. Good lighting helps
+4. Practice for 2 minutes
+5. Make clear gestures
+
+================================
+
+📋 WHAT YOU NEED
+
+✓ Windows 10 or 11
+✓ Any webcam
+✓ Nothing else!
+
+================================
+
+🐛 NOT WORKING?
+
+Camera issues:
+  - Allow camera in Windows settings
+  - Close other apps using camera
+  - Restart the app
+
+Gestures not detected:
+  - Improve lighting
+  - Move closer/farther from camera
+  - Make gestures more obvious
+
+Still stuck?
+  Try restarting your computer
+
+================================
+
+🎯 ADVANCED GESTURES
+
+Want more control?
+
+Four fingers → Refresh page
+Thumb up → Zoom in
+Peace sign ✌️ → Click
+Swipe left/right → Back/Forward
+Rock sign 🤘 (hold 1.5s) → Exit app
+
+The app shows these hints in
+the camera window!
+
+================================
+
+Enjoy hands-free control! 🎉
+
+================================
