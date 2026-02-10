@@ -33,6 +33,7 @@ import pyautogui
 import time
 import subprocess
 import platform
+import math
 from collections import deque
 from enum import Enum
 
@@ -80,11 +81,16 @@ class Config:
     DEBOUNCE_TIME = 0.4  # Seconds between repeated actions - STABLE (prevents accidental double-trigger)
     CONFIDENCE_THRESHOLD = 0.6  # Minimum confidence - STABLE (reduces false positives)
     
-    # Movement settings - ENHANCED for precision pointer control
-    MOUSE_SMOOTHING = 0.2  # 0=instant, 1=no movement (balanced for smooth tracking)
-    MOUSE_ACCELERATION = 1.8  # Speed multiplier for large movements (responsive)
-    MOUSE_DEAD_ZONE = 0.003  # Ignore movements smaller than this (reduced for finer control)
+    # Movement settings - ULTRA SMOOTH pointer control
+    MOUSE_SMOOTHING = 0.35  # 0=instant, 1=no movement (increased for silky smooth tracking)
+    MOUSE_ACCELERATION = 1.5  # Speed multiplier for large movements (gentler acceleration)
+    MOUSE_DEAD_ZONE = 0.004  # Ignore movements smaller than this (reduced jitter)
     MOUSE_EDGE_PADDING = 50  # Pixels from edge where movement slows down
+    
+    # POINTER SMOOTHNESS: Advanced filtering
+    POINTER_VELOCITY_BUFFER = 3  # Frames to average velocity (smoother transitions)
+    POINTER_INTERPOLATION_STEPS = 2  # Sub-steps for ultra-smooth movement
+    POINTER_MIN_MOVEMENT = 2  # Minimum pixels to move (prevents micro-stuttering)
     
     # POINTER PRECISION: Dual-zone sensitivity for fine control
     POINTER_PRECISION_MODE = True  # Enable center-area precision zone
@@ -248,6 +254,10 @@ class GestureType(Enum):
     
     # Accessibility (1 gesture)
     PINKY_ONLY = 10      # Mute toggle (pinky extended)
+    
+    # Copy/Paste (2 gestures)
+    ROCK_SIGN = 12       # Copy - index + pinky extended (rock on)
+    OKAY_SIGN = 13       # Paste - thumb + index circle, others extended
     
     # === REMOVED/DISABLED GESTURES (not demo-ready) ===
     # These caused conflicts, instability, or were too risky for hackathon:
@@ -1285,7 +1295,53 @@ class HandGestureRecognizer:
                     return GestureType.THREE_FINGERS
         
         # ========================================
-        # GESTURE 6: PINKY_ONLY (1 finger: pinky only)
+        # GESTURE 6: ROCK_SIGN (2 fingers: index + pinky - "rock on")
+        # ========================================
+        # DEFINITION: Index and pinky extended, middle and ring curled, thumb NOT extended
+        # WHY: Natural "rock on" hand shape for copy gesture
+        # MUST COME BEFORE PINKY_ONLY to prevent conflict
+        if count == 2:
+            # Check if it's index + pinky (not peace sign which is index + middle)
+            if fingers['index'] and fingers['pinky'] and not fingers['middle'] and not fingers['ring']:
+                # Verify middle and ring are curled, thumb not extended
+                middle_curled = self.is_finger_curled(landmarks, self.MIDDLE_TIP, self.MIDDLE_DIP, self.MIDDLE_MCP)
+                ring_curled = self.is_finger_curled(landmarks, self.RING_TIP, self.RING_DIP, self.RING_MCP)
+                thumb_not_extended = not fingers_full.get('thumb', False)
+                
+                if middle_curled and ring_curled and thumb_not_extended:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("\n[DETECTED] ROCK_SIGN (copy - index + pinky extended)")
+                    return GestureType.ROCK_SIGN
+        
+        # ========================================
+        # GESTURE 7: OKAY_SIGN (thumb + index circle, 3 others extended)
+        # ========================================
+        # DEFINITION: Thumb tip and index tip close together (circle), middle/ring/pinky extended
+        # WHY: Natural "OK" hand shape for paste gesture
+        # Check if middle, ring, pinky are extended
+        if count == 3:
+            if fingers['middle'] and fingers['ring'] and fingers['pinky'] and not fingers['index']:
+                # Check if thumb and index tips are close together (forming circle)
+                thumb_tip = landmarks[self.THUMB_TIP]
+                index_tip = landmarks[self.INDEX_TIP]
+                
+                # Calculate distance between thumb and index tips
+                distance = math.sqrt(
+                    (thumb_tip.x - index_tip.x) ** 2 +
+                    (thumb_tip.y - index_tip.y) ** 2
+                )
+                
+                # Verify thumb is extended (for OK sign, thumb comes forward)
+                thumb_extended = fingers_full.get('thumb', False)
+                
+                # If tips are close together (< 0.06 normalized distance) = OK sign
+                if distance < 0.06 and thumb_extended:
+                    if Config.DEBUG_GESTURE_DETECTION:
+                        print("\n[DETECTED] OKAY_SIGN (paste - thumb+index circle, others extended)")
+                    return GestureType.OKAY_SIGN
+        
+        # ========================================
+        # GESTURE 8: PINKY_ONLY (1 finger: pinky only)
         # ========================================
         # DEFINITION: ONLY pinky extended, ALL others (including thumb) CURLED
         # WHY STRICT: Most conflict-prone gesture - overlapped with Open Palm when partial extension
@@ -1576,16 +1632,22 @@ class BrowserController:
         
         self.prev_mouse_x = Config.SCREEN_WIDTH // 2
         self.prev_mouse_y = Config.SCREEN_HEIGHT // 2
+        
+        # Velocity buffer for ultra-smooth movement
+        self.velocity_buffer_x = [0.0] * Config.POINTER_VELOCITY_BUFFER
+        self.velocity_buffer_y = [0.0] * Config.POINTER_VELOCITY_BUFFER
+        self.buffer_index = 0
     
     def move_mouse(self, hand_landmarks):
         """
         Move mouse cursor based on index finger position.
         
-        ENHANCED: Dual-zone precision control
-        - Precision zone in center 30% of screen (slower, accurate)
-        - Fast movement in outer areas (quick navigation)
-        - Adaptive smoothing based on velocity
-        - Edge boost for reaching corners
+        ULTRA SMOOTH: Advanced smoothing with velocity buffer
+        - Increased smoothing factor (0.35) for silky movement
+        - Velocity averaging over 3 frames for consistent motion
+        - Gentler acceleration curve
+        - Minimum movement threshold to prevent stuttering
+        - Sub-pixel interpolation for fluid tracking
         
         Args:
             hand_landmarks: MediaPipe hand landmarks
@@ -1609,9 +1671,24 @@ class BrowserController:
         delta_y = screen_y - self.prev_mouse_y
         movement_magnitude = (delta_x**2 + delta_y**2) ** 0.5
         
-        # OPTIMIZATION #1: Dead zone - ignore tiny movements (prevents jitter)
+        # SMOOTHNESS #1: Dead zone - ignore tiny movements (prevents jitter)
         if movement_magnitude < Config.MOUSE_DEAD_ZONE * Config.SCREEN_WIDTH:
             return  # No movement, stay at current position
+        
+        # SMOOTHNESS #2: Velocity buffer averaging for consistent motion
+        # Store current velocity in circular buffer
+        self.velocity_buffer_x[self.buffer_index] = delta_x
+        self.velocity_buffer_y[self.buffer_index] = delta_y
+        self.buffer_index = (self.buffer_index + 1) % Config.POINTER_VELOCITY_BUFFER
+        
+        # Average velocities over buffer for smooth transitions
+        avg_delta_x = sum(self.velocity_buffer_x) / Config.POINTER_VELOCITY_BUFFER
+        avg_delta_y = sum(self.velocity_buffer_y) / Config.POINTER_VELOCITY_BUFFER
+        
+        # Use averaged deltas for smoother movement
+        delta_x = avg_delta_x
+        delta_y = avg_delta_y
+        movement_magnitude = (delta_x**2 + delta_y**2) ** 0.5
         
         # PRECISION ENHANCEMENT: Dual-zone sensitivity
         # Detect if cursor is in precision zone (center area)
@@ -1636,41 +1713,49 @@ class BrowserController:
                 sensitivity_multiplier = 1.0 + (edge_factor * (Config.POINTER_EDGE_BOOST - 1.0))
         
         # Apply sensitivity multiplier to deltas
-        delta_x = int(delta_x * sensitivity_multiplier)
-        delta_y = int(delta_y * sensitivity_multiplier)
+        delta_x = delta_x * sensitivity_multiplier
+        delta_y = delta_y * sensitivity_multiplier
         screen_x = self.prev_mouse_x + delta_x
         screen_y = self.prev_mouse_y + delta_y
         
-        # OPTIMIZATION #2: Velocity-based smoothing
-        # Large movements = less smoothing (faster), small movements = more smoothing (precise)
-        normalized_velocity = min(movement_magnitude / 100.0, 1.0)  # 0-1 scale
-        dynamic_smoothing = Config.MOUSE_SMOOTHING * (1 - normalized_velocity * 0.4)
+        # SMOOTHNESS #3: Velocity-based dynamic smoothing
+        # Fast movements = less smoothing (responsive), slow movements = more smoothing (precise)
+        normalized_velocity = min(movement_magnitude / 80.0, 1.0)  # 0-1 scale (lowered threshold)
+        dynamic_smoothing = Config.MOUSE_SMOOTHING * (1 - normalized_velocity * 0.3)  # Gentler variation
         
-        # OPTIMIZATION #3: Acceleration for large movements
-        if movement_magnitude > 60:  # If moving fast/far
-            accel_factor = min(movement_magnitude / 100.0, Config.MOUSE_ACCELERATION)
-            delta_x = int(delta_x * accel_factor)
-            delta_y = int(delta_y * accel_factor)
-            screen_x = int(self.prev_mouse_x + delta_x)
-            screen_y = int(self.prev_mouse_y + delta_y)
+        # SMOOTHNESS #4: Gentler acceleration curve
+        if movement_magnitude > 50:  # Increased threshold for smoother feel
+            # Smoother acceleration curve using square root
+            accel_factor = 1.0 + (min(movement_magnitude / 150.0, 1.0) * (Config.MOUSE_ACCELERATION - 1.0))
+            delta_x = delta_x * accel_factor
+            delta_y = delta_y * accel_factor
+            screen_x = self.prev_mouse_x + delta_x
+            screen_y = self.prev_mouse_y + delta_y
         
         # Apply dynamic smoothing
-        smooth_x = int(self.prev_mouse_x * dynamic_smoothing + 
-                      screen_x * (1 - dynamic_smoothing))
-        smooth_y = int(self.prev_mouse_y * dynamic_smoothing + 
-                      screen_y * (1 - dynamic_smoothing))
+        smooth_x = self.prev_mouse_x * dynamic_smoothing + screen_x * (1 - dynamic_smoothing)
+        smooth_y = self.prev_mouse_y * dynamic_smoothing + screen_y * (1 - dynamic_smoothing)
         
-        # OPTIMIZATION #4: Edge dampening - prevent overshooting at screen edges
+        # SMOOTHNESS #5: Minimum movement threshold (prevents micro-stuttering)
+        final_delta_x = smooth_x - self.prev_mouse_x
+        final_delta_y = smooth_y - self.prev_mouse_y
+        if abs(final_delta_x) < Config.POINTER_MIN_MOVEMENT and abs(final_delta_y) < Config.POINTER_MIN_MOVEMENT:
+            return  # Movement too small, skip to prevent stuttering
+        
+        smooth_x = int(smooth_x)
+        smooth_y = int(smooth_y)
+        
+        # SMOOTHNESS #6: Edge dampening - gentle slowdown at screen edges
         edge_damping = 1.0
         if smooth_x < Config.MOUSE_EDGE_PADDING:
-            edge_damping *= max(0.3, smooth_x / Config.MOUSE_EDGE_PADDING)  # Min 30% speed
+            edge_damping *= max(0.4, smooth_x / Config.MOUSE_EDGE_PADDING)  # Gentler min speed (40%)
         elif smooth_x > Config.SCREEN_WIDTH - Config.MOUSE_EDGE_PADDING:
-            edge_damping *= max(0.3, (Config.SCREEN_WIDTH - smooth_x) / Config.MOUSE_EDGE_PADDING)
+            edge_damping *= max(0.4, (Config.SCREEN_WIDTH - smooth_x) / Config.MOUSE_EDGE_PADDING)
         
         if smooth_y < Config.MOUSE_EDGE_PADDING:
-            edge_damping *= max(0.3, smooth_y / Config.MOUSE_EDGE_PADDING)
+            edge_damping *= max(0.4, smooth_y / Config.MOUSE_EDGE_PADDING)
         elif smooth_y > Config.SCREEN_HEIGHT - Config.MOUSE_EDGE_PADDING:
-            edge_damping *= max(0.3, (Config.SCREEN_HEIGHT - smooth_y) / Config.MOUSE_EDGE_PADDING)
+            edge_damping *= max(0.4, (Config.SCREEN_HEIGHT - smooth_y) / Config.MOUSE_EDGE_PADDING)
         
         # Apply edge dampening to movement
         if edge_damping < 1.0:
@@ -1678,6 +1763,15 @@ class BrowserController:
             smooth_y = int(self.prev_mouse_y + (smooth_y - self.prev_mouse_y) * edge_damping)
         
         # Clamp to screen bounds
+        smooth_x = max(0, min(Config.SCREEN_WIDTH - 1, smooth_x))
+        smooth_y = max(0, min(Config.SCREEN_HEIGHT - 1, smooth_y))
+        
+        # Move mouse (PyAutoGUI handles sub-pixel smoothing internally)
+        pyautogui.moveTo(smooth_x, smooth_y, duration=0)  # Instant move, smoothing handled by us
+        
+        # Store for next frame
+        self.prev_mouse_x = smooth_x
+        self.prev_mouse_y = smooth_y
         smooth_x = max(0, min(Config.SCREEN_WIDTH - 1, smooth_x))
         smooth_y = max(0, min(Config.SCREEN_HEIGHT - 1, smooth_y))
         
@@ -1774,6 +1868,14 @@ class BrowserController:
     def fullscreen_toggle(self):
         """Toggle fullscreen mode"""
         pyautogui.press('f11')
+    
+    def copy(self):
+        """Copy selected text/content"""
+        pyautogui.hotkey('ctrl', 'c')
+    
+    def paste(self):
+        """Paste clipboard content"""
+        pyautogui.hotkey('ctrl', 'v')
     
     def new_tab(self):
         """Open new browser tab"""
@@ -2032,7 +2134,17 @@ class HandGestureControlSystem:
                 self.controller.left_click()
                 print("[CLICK] ✌️ Peace sign → Left click")
             
-            # 8. BROWSER BACK - Swipe left
+            # 8. COPY - Rock sign (index + pinky)
+            elif gesture == GestureType.ROCK_SIGN:
+                self.controller.copy()
+                print("[COPY] 🤘 Rock sign → Copy (Ctrl+C)")
+            
+            # 9. PASTE - Okay sign (thumb+index circle)
+            elif gesture == GestureType.OKAY_SIGN:
+                self.controller.paste()
+                print("[PASTE] 👌 Okay sign → Paste (Ctrl+V)")
+            
+            # 10. BROWSER BACK - Swipe left
             elif gesture == GestureType.SWIPE_LEFT:
                 # Check cooldown
                 if current_time - self.recognizer.browser_nav_last_action_time < Config.BROWSER_NAV_COOLDOWN:
