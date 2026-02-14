@@ -174,7 +174,7 @@ class Config:
     BROWSER_LAUNCH_ENABLED = True  # Enable/disable keyboard shortcut feature
     
     # DEBUG MODE: Enable detailed gesture detection logging
-    DEBUG_GESTURE_DETECTION = True  # Print what gestures are being detected
+    DEBUG_GESTURE_DETECTION = False  # Print what gestures are being detected
     
     # ========================================================================
     # CNN GESTURE RECOGNITION (DataFlair-based integration)
@@ -428,8 +428,6 @@ class GestureStateMachine:
                 # Transition COOLDOWN → NONE
                 self.reset()
             return False, GestureType.NONE, False
-        
-        return False, GestureType.NONE, False
     
     def trigger_cooldown(self, current_time, duration=None):
         """Move to COOLDOWN after action execution"""
@@ -1021,11 +1019,7 @@ class HandGestureRecognizer:
         Extract hand ROI for CNN inference.
         
         CRITICAL: Must match collect_gesture_dataset.py preprocessing EXACTLY.
-        DataFlair consistency requirements:
-            - Same bounding box calculation (20% padding)
-            - Same grayscale conversion
-            - Same histogram equalization
-            - Same resize (64x64)
+        OPTIMIZED: Single-pass coordinate extraction, early validation checks
         
         Args:
             frame: Current video frame
@@ -1036,12 +1030,25 @@ class HandGestureRecognizer:
         """
         h, w = frame.shape[:2]
         
-        # Get bounding box of hand landmarks
-        x_coords = [lm.x * w for lm in landmarks]
-        y_coords = [lm.y * h for lm in landmarks]
+        # OPTIMIZATION: Single-pass min/max calculation (avoid list allocations)
+        x_min = y_min = float('inf')
+        x_max = y_max = float('-inf')
         
-        x_min, x_max = int(min(x_coords)), int(max(x_coords))
-        y_min, y_max = int(min(y_coords)), int(max(y_coords))
+        for lm in landmarks:
+            x = lm.x * w
+            y = lm.y * h
+            x_min = min(x_min, x)
+            x_max = max(x_max, x)
+            y_min = min(y_min, y)
+            y_max = max(y_max, y)
+        
+        # Convert to int
+        x_min, x_max = int(x_min), int(x_max)
+        y_min, y_max = int(y_min), int(y_max)
+        
+        # Early validation: Check if bounding box is valid
+        if x_max <= x_min or y_max <= y_min:
+            return None
         
         # Add padding (20%) - MUST match collector
         padding_x = int((x_max - x_min) * 0.2)
@@ -1053,14 +1060,13 @@ class HandGestureRecognizer:
         y_max = min(h, y_max + padding_y)
         
         # Extract ROI
-        if x_max <= x_min or y_max <= y_min:
-            return None
-        
         hand_roi = frame[y_min:y_max, x_min:x_max]
         
+        # Validate ROI size
         if hand_roi.size == 0:
             return None
         
+        # OPTIMIZATION: In-place conversion when possible
         # Convert to grayscale - MUST match collector
         if len(hand_roi.shape) == 3:
             hand_gray = cv2.cvtColor(hand_roi, cv2.COLOR_BGR2GRAY)
@@ -1071,7 +1077,8 @@ class HandGestureRecognizer:
         hand_normalized = cv2.equalizeHist(hand_gray)
         
         # Resize to target size (64x64) - MUST match collector
-        hand_resized = cv2.resize(hand_normalized, (64, 64))
+        # OPTIMIZATION: Use INTER_AREA for downsampling (faster than INTER_LINEAR)
+        hand_resized = cv2.resize(hand_normalized, (64, 64), interpolation=cv2.INTER_AREA)
         
         return hand_resized
     
@@ -1108,8 +1115,15 @@ class HandGestureRecognizer:
         
         landmarks = hand_landmarks.landmark
         
+        # OPTIMIZATION: Single finger count call - cache result for entire method
         # ISSUE #5 FIX: Count fingers with thumb-ignored mode applied
         count, fingers = self.count_extended_fingers(landmarks)
+        
+        # OPTIMIZATION: Initialize variables for lazy evaluation (prevents unbound errors)
+        count_with_thumb = None  # Will be computed when needed
+        fingers_with_thumb = None  # Will be computed when needed
+        count_full = None  # Will be computed when needed
+        fingers_full = None  # Will be computed when needed
         
         # Debug output for finger detection (only when advanced UI enabled)
         if Config.is_advanced_ui_enabled() and hasattr(self, '_debug_frame_counter'):
@@ -1170,8 +1184,10 @@ class HandGestureRecognizer:
         # DEFINITION: ALL fingers must be clearly curled (not extended)
         # WHY STRICT: Prevents partial fist from triggering scroll up
         if count == 0:
+            # OPTIMIZATION: Lazy compute count_with_thumb only when needed
             # STRICT VALIDATION: Verify ALL fingers are actually curled, not just "not extended"
-            count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+            if count_with_thumb is None:
+                count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
             
             # Double-check: Verify fingers are curled using explicit curl detection
             all_curled = (
@@ -1193,14 +1209,16 @@ class HandGestureRecognizer:
         # WHY FIRST: Check before OPEN_PALM to prevent conflict
         # This must come BEFORE OPEN_PALM in priority
         elif count == 4:
-            count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+            # OPTIMIZATION: Lazy compute count_with_thumb only when needed
+            if count_with_thumb is None:
+                count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
             
-            # Debug output
-            if Config.DEBUG_GESTURE_DETECTION:
+            # Debug output (fingers_with_thumb is now guaranteed to be initialized)
+            if Config.DEBUG_GESTURE_DETECTION and fingers_with_thumb is not None:
                 print(f"\n[DEBUG] 4 fingers detected: count_with_thumb={count_with_thumb}, thumb={fingers_with_thumb.get('thumb', False)}")
             
             # FOUR_FINGERS: Exactly 4 fingers extended, thumb NOT extended
-            if count_with_thumb == 4 and not fingers_with_thumb.get('thumb', False):
+            if fingers_with_thumb is not None and count_with_thumb == 4 and not fingers_with_thumb.get('thumb', False):
                 # STRICT VALIDATION: Verify exactly index, middle, ring, pinky extended
                 four_fingers_extended = (
                     fingers_with_thumb.get('index', False) and
@@ -1224,10 +1242,12 @@ class HandGestureRecognizer:
         # WHY STRICT: Prevents 4-finger poses or partial spreads from triggering scroll down
         # CONFLICT PREVENTION: Most common overlap was Open Palm vs Pinky-Only (partial extension)
         if count == 4 or count == 5:  # Could be 4 fingers without thumb OR 5 fingers with thumb
-            count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+            # OPTIMIZATION: Compute full count only when in this range
+            if count_with_thumb is None:
+                count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
             
             # STRICT VALIDATION: Require exactly 5 fingers AND explicit verification of each
-            if count_with_thumb == 5:
+            if fingers_with_thumb is not None and count_with_thumb == 5:
                 # Verify ALL fingers are extended (no ambiguous states)
                 all_extended = (
                     fingers_with_thumb.get('thumb', False) and
@@ -1272,8 +1292,10 @@ class HandGestureRecognizer:
         # ========================================
         # DEFINITION: ONLY index extended, ALL others curled
         # WHY STRICT: Prevents partial finger extension from triggering pointer mode
-        count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
-        if count_full == 1:
+        # OPTIMIZATION: Compute full count only when needed for this gesture
+        if count_full is None:
+            count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
+        if count_full == 1 and fingers_full is not None:
             # Verify ONLY index extended, all others NOT extended
             if fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['pinky'] and not fingers_full['thumb']:
                 # STRICT: Verify other fingers are actually curled
@@ -1297,9 +1319,12 @@ class HandGestureRecognizer:
         if count == 3:
             # Check if it's index, middle, ring (NOT including thumb or pinky)
             if fingers['index'] and fingers['middle'] and fingers['ring'] and not fingers['pinky']:
-                # Verify pinky is curled and thumb is not extended
+                # OPTIMIZATION: Compute full count only when needed
+                if count_full is None:
+                    count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
+                # Verify pinky is curled and thumb is not extended  
                 pinky_curled = self.is_finger_curled(landmarks, self.PINKY_TIP, self.PINKY_DIP, self.PINKY_MCP)
-                thumb_not_extended = not fingers_full.get('thumb', False)
+                thumb_not_extended = not fingers_full.get('thumb', False) if fingers_full is not None else True
                 
                 if pinky_curled and thumb_not_extended:
                     if Config.DEBUG_GESTURE_DETECTION:
@@ -1315,10 +1340,13 @@ class HandGestureRecognizer:
         if count == 2:
             # Check if it's index + pinky (not peace sign which is index + middle)
             if fingers['index'] and fingers['pinky'] and not fingers['middle'] and not fingers['ring']:
+                # OPTIMIZATION: Compute full count only when needed
+                if count_full is None:
+                    count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
                 # Verify middle and ring are curled, thumb not extended
                 middle_curled = self.is_finger_curled(landmarks, self.MIDDLE_TIP, self.MIDDLE_DIP, self.MIDDLE_MCP)
                 ring_curled = self.is_finger_curled(landmarks, self.RING_TIP, self.RING_DIP, self.RING_MCP)
-                thumb_not_extended = not fingers_full.get('thumb', False)
+                thumb_not_extended = not fingers_full.get('thumb', False) if fingers_full is not None else True
                 
                 if middle_curled and ring_curled and thumb_not_extended:
                     if Config.DEBUG_GESTURE_DETECTION:
@@ -1333,8 +1361,10 @@ class HandGestureRecognizer:
         # CRITICAL: This is for closing browser (high-stakes action)
         # Different from: Rock sign (index+pinky), Thumb up (thumb only), Pinky only (pinky only)
         # MUST CHECK: count_with_thumb for accurate detection since thumb is involved
-        count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
-        if count_with_thumb == 2:
+        # OPTIMIZATION: Compute with thumb only when needed for this gesture
+        if count_with_thumb is None:
+            count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+        if count_with_thumb == 2 and fingers_with_thumb is not None:
             # Check if it's thumb + pinky ONLY (index, middle, ring must be curled)
             if fingers_with_thumb.get('thumb', False) and fingers_with_thumb.get('pinky', False):
                 # Verify index, middle, ring are NOT extended
@@ -1357,6 +1387,10 @@ class HandGestureRecognizer:
         # Check if middle, ring, pinky are extended
         if count == 3:
             if fingers['middle'] and fingers['ring'] and fingers['pinky'] and not fingers['index']:
+                # OPTIMIZATION: Compute full count only when needed for thumb check
+                if count_full is None:
+                    count_full, fingers_full = self.count_extended_fingers(landmarks, ignore_thumb=False)
+                
                 # Check if thumb and index tips are close together (forming circle)
                 thumb_tip = landmarks[self.THUMB_TIP]
                 index_tip = landmarks[self.INDEX_TIP]
@@ -1368,7 +1402,7 @@ class HandGestureRecognizer:
                 )
                 
                 # Verify thumb is extended (for OK sign, thumb comes forward)
-                thumb_extended = fingers_full.get('thumb', False)
+                thumb_extended = fingers_full.get('thumb', False) if fingers_full is not None else False
                 
                 # If tips are close together (< 0.06 normalized distance) = OK sign
                 if distance < 0.06 and thumb_extended:
@@ -1382,9 +1416,13 @@ class HandGestureRecognizer:
         # DEFINITION: ONLY pinky extended, ALL others (including thumb) CURLED
         # WHY STRICT: Most conflict-prone gesture - overlapped with Open Palm when partial extension
         # CONFLICT PREVENTION: Strict curl detection prevents partial Open Palm from matching
-        if count_full == 1:
+        if count == 1 and fingers['pinky']:  # OPTIMIZATION: Use cached count first
+            # OPTIMIZATION: Lazy compute full count only when basic check passes
+            if count_with_thumb is None:
+                count_with_thumb, fingers_with_thumb = self.count_extended_fingers(landmarks, ignore_thumb=False)
+            
             # Verify ONLY pinky extended, all others NOT extended
-            if fingers_full['pinky'] and not fingers_full['index'] and not fingers_full['middle'] and not fingers_full['ring'] and not fingers_full['thumb']:
+            if fingers_with_thumb is not None and fingers_with_thumb['pinky'] and not fingers_with_thumb['index'] and not fingers_with_thumb['middle'] and not fingers_with_thumb['ring'] and not fingers_with_thumb['thumb']:
                 # STRICT CURL VERIFICATION: All other fingers MUST be clearly curled
                 # This is the KEY fix preventing Open Palm → Pinky-Only confusion
                 others_curled = (
@@ -1615,12 +1653,20 @@ class VisualEffects:
     
     def draw_trail(self, frame):
         """Draw gesture trail on frame"""
-        if len(self.trail_points) < 2:
+        # OPTIMIZATION: Early exit if trail too short
+        trail_len = len(self.trail_points)
+        if trail_len < 2:
             return
         
+        # OPTIMIZATION: Limit trail length to prevent performance degradation
+        max_trail = 50  # Keep last 50 points only (~1.5sec at 30fps)
+        if trail_len > max_trail:
+            self.trail_points = deque(list(self.trail_points)[-max_trail:], maxlen=max_trail)
+            trail_len = max_trail
+        
         # Draw trail with fading effect
-        for i in range(1, len(self.trail_points)):
-            alpha = i / len(self.trail_points)  # Fade older points
+        for i in range(1, trail_len):
+            alpha = i / trail_len  # Fade older points
             thickness = max(1, int(alpha * 3))
             cv2.line(frame, self.trail_points[i-1], self.trail_points[i],
                     (0, 255, 255), thickness)
@@ -1802,19 +1848,11 @@ class BrowserController:
         smooth_x = max(0, min(Config.SCREEN_WIDTH - 1, smooth_x))
         smooth_y = max(0, min(Config.SCREEN_HEIGHT - 1, smooth_y))
         
-        # Move mouse (PyAutoGUI handles sub-pixel smoothing internally)
-        pyautogui.moveTo(smooth_x, smooth_y, duration=0)  # Instant move, smoothing handled by us
+        # OPTIMIZATION: Single mouse movement (removed duplicate code block)
+        # Duration=0 for instant move, smoothing already handled by velocity buffer
+        pyautogui.moveTo(smooth_x, smooth_y, duration=0)
         
-        # Store for next frame
-        self.prev_mouse_x = smooth_x
-        self.prev_mouse_y = smooth_y
-        smooth_x = max(0, min(Config.SCREEN_WIDTH - 1, smooth_x))
-        smooth_y = max(0, min(Config.SCREEN_HEIGHT - 1, smooth_y))
-        
-        # Move mouse
-        pyautogui.moveTo(smooth_x, smooth_y)
-        
-        # Store for next frame
+        # Store for next frame (only once)
         self.prev_mouse_x = smooth_x
         self.prev_mouse_y = smooth_y
     
@@ -1823,15 +1861,21 @@ class BrowserController:
         Scroll webpage down.
         
         ENHANCED: Configurable sensitivity profiles (low/medium/high)
-        Uses profile-specific amount, multiplier, steps, and delay for optimal feel.
+        OPTIMIZED: Reduced loop overhead, single scroll call when possible
         """
         total_scroll = int(Config.SCROLL_BASE_AMOUNT * Config.SCROLL_SPEED_MULTIPLIER)
+        
+        # OPTIMIZATION: If smooth steps = 1, do single scroll (avoids loop overhead)
+        if Config.SCROLL_SMOOTH_STEPS == 1:
+            pyautogui.scroll(-total_scroll)
+            return
+        
         step = total_scroll // Config.SCROLL_SMOOTH_STEPS
         
         # Smooth scrolling in increments with profile-specific delay
         for i in range(Config.SCROLL_SMOOTH_STEPS):
             pyautogui.scroll(-step)
-            if i < Config.SCROLL_SMOOTH_STEPS - 1:
+            if i < Config.SCROLL_SMOOTH_STEPS - 1:  # Skip sleep on last iteration
                 time.sleep(Config.SCROLL_STEP_DELAY)
     
     def scroll_up(self):
@@ -1839,15 +1883,22 @@ class BrowserController:
         Scroll webpage up.
         
         ENHANCED: Configurable sensitivity profiles (low/medium/high)
-        Uses profile-specific amount, multiplier, steps, and delay for optimal feel.
+        OPTIMIZED: Reduced loop overhead, single scroll call when possible
         """
         total_scroll = int(Config.SCROLL_BASE_AMOUNT * Config.SCROLL_SPEED_MULTIPLIER)
+        
+        # OPTIMIZATION: If smooth steps = 1, do single scroll (avoids loop overhead)
+        if Config.SCROLL_SMOOTH_STEPS == 1:
+            pyautogui.scroll(total_scroll)
+            return
+        
         step = total_scroll // Config.SCROLL_SMOOTH_STEPS
         
         # Smooth scrolling in increments with profile-specific delay
-        for _ in range(Config.SCROLL_SMOOTH_STEPS):
+        for i in range(Config.SCROLL_SMOOTH_STEPS):
             pyautogui.scroll(step)
-            time.sleep(Config.SCROLL_STEP_DELAY)
+            if i < Config.SCROLL_SMOOTH_STEPS - 1:  # Skip sleep on last iteration
+                time.sleep(Config.SCROLL_STEP_DELAY)
     
     def left_click(self):
         """Perform left mouse click"""
@@ -1964,11 +2015,11 @@ class BrowserController:
                 if browser == 'chrome':
                     subprocess.Popen(['start', 'chrome'], shell=True)
                 elif browser == 'edge':
-                    subprocess.Popen(['start', 'microsoft-edge:'], shell=True)
+                    subprocess.Popen('start microsoft-edge:', shell=True)
                 elif browser == 'firefox':
-                    subprocess.Popen(['start', 'firefox'], shell=True)
+                    subprocess.Popen('start firefox', shell=True)
                 else:  # default browser
-                    subprocess.Popen(['start', 'http://'], shell=True)
+                    subprocess.Popen('start http://', shell=True)
             elif system == 'Darwin':  # macOS
                 if browser == 'chrome':
                     subprocess.Popen(['open', '-a', 'Google Chrome'])
@@ -2033,8 +2084,19 @@ class HandGestureControlSystem:
         self.history = GestureHistory() if Config.ENABLE_GESTURE_HISTORY else None
         self.visual_effects = VisualEffects() if Config.ENABLE_VISUAL_TRAILS else None
         
-        # Video capture
+        # Video capture with validation
         self.cap = cv2.VideoCapture(Config.CAMERA_INDEX)
+        
+        # SAFETY: Verify camera opened successfully
+        if not self.cap.isOpened():
+            raise RuntimeError(
+                f"Failed to open camera at index {Config.CAMERA_INDEX}. "
+                "Please check:\n"
+                "  1. Camera is connected and not in use by another application\n"
+                "  2. Camera permissions are enabled in Windows Settings\n"
+                "  3. Try changing CAMERA_INDEX (0, 1, 2...) if you have multiple cameras"
+            )
+        
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, Config.FRAME_WIDTH)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, Config.FRAME_HEIGHT)
         self.cap.set(cv2.CAP_PROP_FPS, Config.FPS_TARGET)
@@ -2043,6 +2105,15 @@ class HandGestureControlSystem:
         self.fps = 0
         self.frame_count = 0
         self.start_time = time.time()
+        
+        # OPTIMIZATION: Cache gesture names to avoid repeated string operations
+        self._gesture_name_cache = {}
+        for gesture_type in GestureType:
+            self._gesture_name_cache[gesture_type] = gesture_type.name.replace('_', ' ')
+        
+        # OPTIMIZATION: Frame rate limiting for CPU efficiency
+        self._target_frame_time = 1.0 / Config.FPS_TARGET  # ~33ms for 30 FPS
+        self._last_frame_time = time.time()
         
         # Program control
         self.running = True  # Flag to control main loop (for rock sign exit)
@@ -2279,8 +2350,8 @@ class HandGestureControlSystem:
                 if current_time - self.recognizer.mute_last_action_time < Config.MUTE_TOGGLE_COOLDOWN:
                     return
                 
-                # Initialize dwell timer
-                if self.recognizer.mute_gesture_start_time is None:
+                # BUGFIX: Initialize dwell timer (check for 0.0, not None - consistent with init)
+                if self.recognizer.mute_gesture_start_time == 0.0:
                     self.recognizer.mute_gesture_start_time = current_time
                     return
                 
@@ -2346,7 +2417,8 @@ class HandGestureControlSystem:
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, fps_color, 2)
         
         # Display current gesture with color
-        gesture_name = gesture.name.replace('_', ' ') if gesture != GestureType.NONE else "NONE"
+        # OPTIMIZATION: Use cached gesture name (avoid string operations on every frame)
+        gesture_name = self._gesture_name_cache.get(gesture, "NONE")
         gesture_color = self.visual_effects.color_map.get(gesture, (0, 255, 0)) if self.visual_effects else (0, 255, 0)
         cv2.putText(frame, f"Gesture: {gesture_name}", (20, 75),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, gesture_color, 2)
@@ -2426,12 +2498,24 @@ class HandGestureControlSystem:
         """
         print("[STARTING] Starting video capture...\n")
         
+        # STABILITY: Camera retry logic for robustness
+        max_retries = 3
+        retry_count = 0
+        
         try:
             while self.running and self.cap.isOpened():
                 success, frame = self.cap.read()
                 if not success:
-                    print("WARNING: Failed to capture frame")
+                    retry_count += 1
+                    if retry_count >= max_retries:
+                        print("ERROR: Failed to capture frame after retries. Check camera.")
+                        break
+                    print(f"WARNING: Frame capture failed (retry {retry_count}/{max_retries})")
+                    time.sleep(0.1)  # Brief pause before retry
                     continue
+                
+                # Reset retry counter on successful frame
+                retry_count = 0
                 
                 # Flip frame horizontally for mirror effect
                 frame = cv2.flip(frame, 1)
@@ -2491,6 +2575,14 @@ class HandGestureControlSystem:
                 
                 # Calculate FPS
                 self.calculate_fps()
+                
+                # OPTIMIZATION: Frame rate limiting to prevent CPU waste
+                # Target: 30 FPS = 33ms per frame. If frame processed faster, sleep briefly.
+                current_frame_time = time.time()
+                frame_elapsed = current_frame_time - self._last_frame_time
+                if frame_elapsed < self._target_frame_time:
+                    time.sleep(self._target_frame_time - frame_elapsed)
+                self._last_frame_time = time.time()
                 
                 # Display frame
                 cv2.imshow('Hand Gesture Control System', frame)
@@ -2564,10 +2656,16 @@ class HandGestureControlSystem:
     def cleanup(self):
         """Clean up resources safely"""
         print("[CLEANUP] Cleaning up resources...")
-        self.cap.release()
-        cv2.destroyAllWindows()
-        self.hands.close()
-        print("[SUCCESS] Cleanup complete. Goodbye!")
+        try:
+            if hasattr(self, 'cap') and self.cap is not None:
+                self.cap.release()
+            cv2.destroyAllWindows()
+            if hasattr(self, 'hands') and self.hands is not None:
+                self.hands.close()
+        except Exception as e:
+            print(f"[WARNING] Cleanup error (non-critical): {e}")
+        finally:
+            print("[SUCCESS] Cleanup complete. Goodbye!")
 
 
 # ============================================================================
@@ -2587,3 +2685,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
