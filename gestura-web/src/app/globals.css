@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --gestura-cyan: #00D9FF;
+    --gestura-purple: #7B61FF;
+    --gestura-navy-dark: #0A0E27;
+    --gestura-navy: #151B3D;
+  }
+  
+  body {
+    @apply bg-gestura-navy-dark text-gestura-text-primary font-inter antialiased;
+    scroll-behavior: smooth;
+  }
+  
+  ::selection {
+    @apply bg-gestura-cyan text-gestura-navy-dark;
+  }
+  
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gestura-navy-dark;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gestura-navy-light rounded-lg;
+    border: 2px solid var(--gestura-navy-dark);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gestura-purple;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-gestura-navy/40 backdrop-blur-xl border border-gestura-navy-light/50;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-gestura-cyan to-gestura-purple bg-clip-text text-transparent;
+  }
+  
+  .glow-cyan {
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+  }
+  
+  .glow-purple {
+    box-shadow: 0 0 30px rgba(123, 97, 255, 0.3);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+}
