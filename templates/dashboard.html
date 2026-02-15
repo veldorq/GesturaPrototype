@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestura - Hand Gesture Control Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --cyan-primary: #00D9FF;
+            --purple-primary: #7B61FF;
+            --navy-dark: #0A0E27;
+            --navy-medium: #151B3D;
+            --navy-light: #1E2749;
+        }
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, #0D1128 50%, var(--navy-medium) 100%);
+            color: #F1F5F9;
+        }
+        
+        /* Glassmorphism panels */
+        .glass-panel {
+            background: rgba(30, 39, 73, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(123, 97, 255, 0.2);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .glass-panel-strong {
+            background: rgba(21, 27, 61, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+        
+        /* Depth shadows */
+        .depth-shadow-sm {
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .depth-shadow-md {
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .depth-shadow-lg {
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.4),
+                0 4px 8px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Button micro-interactions */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan-primary), var(--purple-primary));
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover:before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 24px rgba(0, 217, 255, 0.4),
+                0 4px 8px rgba(123, 97, 255, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 217, 255, 0.3);
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--cyan-primary), var(--purple-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Pulse animations */
+        @keyframes pulse-cyan {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 217, 255, 0.7); }
+            50% { box-shadow: 0 0 0 12px rgba(0, 217, 255, 0); }
+        }
+        
+        @keyframes pulse-purple {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(123, 97, 255, 0.7); }
+            50% { box-shadow: 0 0 0 12px rgba(123, 97, 255, 0); }
+        }
+        
+        .pulse-cyan {
+            animation: pulse-cyan 1.5s infinite;
+        }
+        
+        .pulse-purple {
+            animation: pulse-purple 0.6s;
+        }
+        
+        /* Gesture flash effect */
+        .gesture-flash {
+            animation: flash 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes flash {
+            0% { transform: scale(1); opacity: 1; }
+            50% { 
+                transform: scale(1.05); 
+                opacity: 0.9;
+                box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+            }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Status indicator with glow */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px currentColor;
+        }
+        
+        /* Enhanced camera feed */
+        .camera-feed {
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            box-shadow: 
+                0 0 30px rgba(0, 217, 255, 0.2),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+        }
+        
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--navy-medium);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--cyan-primary), var(--purple-primary));
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cyan-primary);
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <!-- Navigation Header -->
+    <header class="glass-panel-strong border-b border-cyan-500/20 px-6 py-5 sticky top-0 z-50 depth-shadow-md">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <span class="text-4xl">🖐️</span>
+                <div>
+                    <h1 class="text-3xl font-bold gradient-text tracking-tight">Gestura</h1>
+                    <p class="text-sm text-cyan-300/70 font-light">Hands speak. System listens.</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-3 px-4 py-2 glass-panel rounded-full">
+                    <span class="status-indicator pulse-cyan" id="connection-status" style="background: #00D9FF;"></span>
+                    <span class="text-sm font-medium" id="connection-text">Connecting...</span>
+                </div>
+                
+                <button id="start-btn" class="btn-primary px-8 py-3 rounded-xl font-semibold text-white depth-shadow-md relative overflow-hidden">
+                    Start System
+                </button>
+                
+                <button id="stop-btn" class="px-8 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 rounded-xl font-semibold text-red-300 transition-all duration-300 hidden depth-shadow-sm">
+                    Stop System
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        
+        <!-- Status Banner -->
+        <div id="status-banner" class="mb-6 p-4 rounded-lg hidden">
+            <p id="status-message" class="font-medium"></p>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Camera Feed -->
+            <div class="lg:col-span-2">
+                <div class="glass-panel rounded-2xl p-8 depth-shadow-lg">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <span class="mr-3 text-3xl">📹</span>
+                        <span class="gradient-text">Live Camera Feed</span>
+                    </h2>
+                    
+                    <div class="camera-feed bg-navy-dark/50 rounded-xl p-6 flex items-center justify-center min-h-[480px] relative overflow-hidden">
+                        <div id="camera-placeholder" class="text-center z-10">
+                            <div class="text-7xl mb-6">📷</div>
+                            <p class="text-cyan-200/80 text-lg font-medium">Camera feed will appear here</p>
+                            <p class="text-sm text-cyan-300/50 mt-3">Click "Start System" to begin</p>
+                        </div>
+                        
+                        <img id="camera-feed" class="hidden w-full h-auto rounded-lg" alt="Camera Feed" style="image-rendering: -webkit-optimize-contrast;">
+                        
+                        <!-- Ambient glow effect -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none"></div>
+                    </div>
+                    
+                    <!-- Current Gesture Display -->
+                    <div class="mt-6 p-6 glass-panel-strong rounded-xl depth-shadow-md">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-cyan-300/60 font-medium mb-1">Current Gesture</p>
+                                <p id="current-gesture" class="text-3xl font-bold text-cyan-400">NONE</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-purple-300/60 font-medium mb-1">Last Action</p>
+                                <p id="last-action" class="text-xl font-semibold text-purple-400">—</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Stats & Controls -->
+            <div class="space-y-8">
+                
+                <!-- System Metrics -->
+                <div class="glass-panel rounded-2xl p-6 depth-shadow-md">
+                    <h2 class="text-xl font-bold mb-6 flex items-center">
+                        <span class="mr-3 text-2xl">📊</span>
+                        <span class="gradient-text">System Metrics</span>
+                    </h2>
+                    
+                    <div class="space-y-5">
+                        <div class="flex justify-between items-center p-4 glass-panel-strong rounded-xl">
+                            <span class="text-cyan-200/70 font-medium">FPS</span>
+                            <span id="fps-display" class="text-3xl font-bold text-cyan-400">0</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-4 glass-panel-strong rounded-xl">
+                            <span class="text-purple-200/70 font-medium">Gestures Detected</span>
+                            <span id="gesture-count" class="text-3xl font-bold text-purple-400">0</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-4 glass-panel-strong rounded-xl">
+                            <span class="text-cyan-200/70 font-medium">System Status</span>
+                            <span id="system-status" class="text-sm font-semibold text-yellow-400 px-3 py-1 bg-yellow-400/10 rounded-full border border-yellow-400/30">Offline</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gesture History -->
+                <div class="glass-panel rounded-2xl p-6 depth-shadow-md">
+                    <h2 class="text-xl font-bold mb-6 flex items-center">
+                        <span class="mr-3 text-2xl">📜</span>
+                        <span class="gradient-text">Recent Actions</span>
+                    </h2>
+                    
+                    <div id="gesture-history" class="space-y-3 max-h-72 overflow-y-auto pr-2">
+                        <p class="text-sm text-cyan-300/50 text-center py-6 font-light">No actions yet</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Guide -->
+                <div class="glass-panel rounded-2xl p-6 depth-shadow-md">
+                    <h2 class="text-xl font-bold mb-6 flex items-center">
+                        <span class="mr-3 text-2xl">🎯</span>
+                        <span class="gradient-text">Gesture Guide</span>
+                    </h2>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-cyan-500/5 transition-all duration-300">
+                            <span class="text-xl">✋</span>
+                            <span class="text-cyan-100/80">Open Palm → Scroll Down</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-purple-500/5 transition-all duration-300">
+                            <span class="text-xl">✊</span>
+                            <span class="text-purple-100/80">Closed Fist → Scroll Up</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-cyan-500/5 transition-all duration-300">
+                            <span class="text-xl">☝️</span>
+                            <span class="text-cyan-100/80">Index Finger → Move Mouse</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-purple-500/5 transition-all duration-300">
+                            <span class="text-xl">✌️</span>
+                            <span class="text-purple-100/80">Peace Sign → Click</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-cyan-500/5 transition-all duration-300">
+                            <span class="text-xl">👈</span>
+                            <span class="text-cyan-100/80">Swipe Left → Back</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-purple-500/5 transition-all duration-300">
+                            <span class="text-xl">👉</span>
+                            <span class="text-purple-100/80">Swipe Right → Forward</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="mt-16 glass-panel-strong border-t border-cyan-500/20 px-6 py-8">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-cyan-300/60 text-sm font-light">Gestura • Hands speak. System listens.</p>
+            <p class="text-cyan-400/40 text-xs mt-2">Privacy-first gesture control powered by local AI</p>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

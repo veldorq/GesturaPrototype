@@ -1,0 +1,19 @@
+# Gestura Web Dashboard Dependencies
+# Install with: pip install -r requirements_web.txt
+
+# Web Framework
+Flask==3.0.0
+Flask-SocketIO==5.3.5
+Flask-CORS==4.0.0
+
+# WebSocket Support
+python-socketio==5.10.0
+python-engineio==4.8.0
+
+# ASGI/WSGI Servers
+eventlet==0.33.3
+gevent==23.9.1
+gevent-websocket==0.10.1
+
+# Utilities
+werkzeug==3.0.1

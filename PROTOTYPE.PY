@@ -428,6 +428,9 @@ class GestureStateMachine:
                 # Transition COOLDOWN → NONE
                 self.reset()
             return False, GestureType.NONE, False
+        
+        # Safety fallback: Should never reach here, but ensures method always returns tuple
+        return False, GestureType.NONE, False
     
     def trigger_cooldown(self, current_time, duration=None):
         """Move to COOLDOWN after action execution"""
@@ -2062,9 +2065,17 @@ class HandGestureControlSystem:
         - Browser control
     """
     
-    def __init__(self):
-        """Initialize all system components"""
+    def __init__(self, socketio=None):
+        """Initialize all system components
+        
+        Args:
+            socketio: Optional Flask-SocketIO instance for web dashboard integration
+        """
         print("🚀 Initializing Hand Gesture Control System...")
+        
+        # Web integration (optional)
+        self.socketio = socketio
+        self.web_frame_counter = 0  # Throttle frame emission
         
         # Initialize MediaPipe Hands
         self.mp_hands = mp.solutions.hands  # type: ignore
@@ -2213,6 +2224,14 @@ class HandGestureControlSystem:
                 print("[SCROLL DOWN] ✋ Open palm → Scrolling down")
                 self.recognizer.scroll_last_action_time = current_time
                 self.recognizer.scroll_last_gesture = gesture
+                
+                # Web: Emit gesture event
+                if self.socketio:
+                    self.socketio.emit('gesture_detected', {
+                        'gesture': 'OPEN_PALM',
+                        'action': 'Scroll Down',
+                        'timestamp': current_time
+                    })
             
             # 2. SCROLL UP - Closed fist (0 fingers)
             elif gesture == GestureType.CLOSED_FIST:
@@ -2223,6 +2242,14 @@ class HandGestureControlSystem:
                 print("[SCROLL UP] ✊ Closed fist → Scrolling up")
                 self.recognizer.scroll_last_action_time = current_time
                 self.recognizer.scroll_last_gesture = gesture
+                
+                # Web: Emit gesture event
+                if self.socketio:
+                    self.socketio.emit('gesture_detected', {
+                        'gesture': 'CLOSED_FIST',
+                        'action': 'Scroll Up',
+                        'timestamp': current_time
+                    })
             
             # 3. POINTER MODE - Index finger only (continuous)
             elif gesture == GestureType.INDEX_ONLY:
@@ -2234,6 +2261,14 @@ class HandGestureControlSystem:
             elif gesture == GestureType.THREE_FINGERS:
                 self.controller.left_click()
                 print("[CLICK] 🖖 Three fingers → Left click")
+                
+                # Web: Emit gesture event
+                if self.socketio:
+                    self.socketio.emit('gesture_detected', {
+                        'gesture': 'THREE_FINGERS',
+                        'action': 'Left Click',
+                        'timestamp': current_time
+                    })
             
             # 5. REFRESH PAGE - Four fingers (4 fingers, thumb curled)
             elif gesture == GestureType.FOUR_FINGERS:
@@ -2249,6 +2284,14 @@ class HandGestureControlSystem:
             elif gesture == GestureType.PEACE_SIGN:
                 self.controller.left_click()
                 print("[CLICK] ✌️ Peace sign → Left click")
+                
+                # Web: Emit gesture event
+                if self.socketio:
+                    self.socketio.emit('gesture_detected', {
+                        'gesture': 'PEACE_SIGN',
+                        'action': 'Left Click',
+                        'timestamp': current_time
+                    })
             
             # 8. EXIT PROGRAM - Rock sign (CRITICAL: requires 1.5s hold)
             elif gesture == GestureType.ROCK_SIGN:
@@ -2575,6 +2618,23 @@ class HandGestureControlSystem:
                 
                 # Calculate FPS
                 self.calculate_fps()
+                
+                # Web: Emit frame and metrics (throttled)
+                self.web_frame_counter += 1
+                if self.socketio and self.web_frame_counter % 10 == 0:  # Every 10th frame
+                    # Emit metrics
+                    self.socketio.emit('metrics_update', {
+                        'fps': self.fps,
+                        'gesture_count': 0,  # Can track this if needed
+                        'timestamp': time.time()
+                    })
+                    
+                    # Emit frame (optimized: every 90th frame for smooth web performance)
+                    if self.web_frame_counter % 90 == 0:  # ~0.33 FPS for minimal latency
+                        import base64
+                        _, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 55])
+                        frame_b64 = base64.b64encode(buffer.tobytes()).decode('utf-8')
+                        self.socketio.emit('frame_update', {'image': frame_b64})
                 
                 # OPTIMIZATION: Frame rate limiting to prevent CPU waste
                 # Target: 30 FPS = 33ms per frame. If frame processed faster, sleep briefly.
