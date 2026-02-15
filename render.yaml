@@ -4,7 +4,7 @@ services:
     env: python
     runtime: python
     buildCommand: pip install -r requirements-web.txt
-    startCommand: gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT app_web:app
+    startCommand: gunicorn --worker-class gevent -w 1 --bind 0.0.0.0:$PORT app_web:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0

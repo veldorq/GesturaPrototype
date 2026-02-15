@@ -19,7 +19,7 @@ app.config['DEBUG'] = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # CORS configuration
 ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', '*')
-socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS, async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS, async_mode='gevent')
 
 # Deployment info
 DEPLOYMENT_MODE = os.environ.get('DEPLOYMENT_MODE', 'demo')
