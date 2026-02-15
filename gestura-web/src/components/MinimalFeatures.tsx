@@ -5,13 +5,13 @@ import { gestureFeatures } from '../data/features';
 
 export default function MinimalFeatures() {
   return (
-    <section className="relative py-32 px-6 overflow-hidden">
+    <section id="features" className="relative py-32 px-6 overflow-hidden scroll-mt-20">
       {/* Japanese character - background */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 0.03 }}
         viewport={{ once: true }}
-        className="absolute left-10 top-20 text-[15rem] font-jp font-bold text-white pointer-events-none hidden lg:block"
+        className="absolute left-10 top-20 text-[10rem] font-jp font-bold text-white pointer-events-none hidden lg:block"
         style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
       >
         制御
@@ -24,9 +24,9 @@ export default function MinimalFeatures() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mb-20"
+          className="mb-16"
         >
-          <h2 className="text-5xl md:text-7xl font-light leading-tight mb-6">
+          <h2 className="text-3xl md:text-4xl font-light leading-tight mb-4">
             <span className="block overflow-hidden">
               <motion.span
                 initial={{ y: '100%' }}
@@ -56,7 +56,7 @@ export default function MinimalFeatures() {
                 ease: [0.16, 1, 0.3, 1],
               }}
               whileHover={{ y: -5 }}
-              className="group relative glass-panel p-8 overflow-hidden"
+              className="group relative glass-panel p-8 overflow-hidden rounded-lg"
             >
               {/* Gradient overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-gestura-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -70,7 +70,7 @@ export default function MinimalFeatures() {
               <div className="relative text-4xl mb-4">{feature.icon}</div>
 
               {/* Title */}
-              <h3 className="relative text-2xl font-light mb-3 group-hover:text-gestura-cyan transition-colors duration-300">
+              <h3 className="relative text-xl font-light mb-3 group-hover:text-gestura-cyan transition-colors duration-300">
                 {feature.name}
               </h3>
 

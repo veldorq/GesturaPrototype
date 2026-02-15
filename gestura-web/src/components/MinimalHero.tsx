@@ -33,7 +33,7 @@ export default function MinimalHero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.05 }}
         transition={{ delay: 0.5, duration: 1.5 }}
-        className="absolute right-20 top-20 text-[20rem] font-jp font-bold text-white pointer-events-none hidden lg:block"
+        className="absolute right-20 top-20 text-[12rem] font-jp font-bold text-white pointer-events-none hidden lg:block"
         style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
       >
         手
@@ -42,7 +42,7 @@ export default function MinimalHero() {
       {/* Hero Content */}
       <div className="relative z-10 text-center px-4 max-w-7xl mx-auto">
         {/* Main Title */}
-        <motion.h1 className="text-[clamp(3rem,10vw,8rem)] font-light leading-none mb-8 tracking-tight">
+        <motion.h1 className="text-[clamp(2rem,6vw,4rem)] font-light leading-tight mb-6 tracking-tight">
           {title.split('').map((char, i) => (
             <motion.span
               key={i}
@@ -81,7 +81,7 @@ export default function MinimalHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 1 }}
-          className="text-xl text-[#737373] font-light mb-12"
+          className="text-base md:text-lg text-neutral-400 font-light mb-12 max-w-2xl mx-auto"
         >
           Control with Elegance, Not Effort.
         </motion.p>
@@ -91,7 +91,7 @@ export default function MinimalHero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.8, duration: 1 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-4"
         >
           <motion.button
             onClick={() => setIsModalOpen(true)}

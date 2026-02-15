@@ -6,6 +6,8 @@ import MinimalNav from '@/components/MinimalNav';
 import ScrollProgressBar from '@/components/ScrollProgressBar';
 import MinimalHero from '@/components/MinimalHero';
 import MinimalFeatures from '@/components/MinimalFeatures';
+import HowItWorks from '@/components/HowItWorks';
+import TechStack from '@/components/TechStack';
 import ParallaxSection from '@/components/ParallaxSection';
 import ProblemSolution from '@/components/ProblemSolution';
 import MinimalCTA from '@/components/MinimalCTA';
@@ -36,25 +38,34 @@ export default function Home() {
         <MinimalHero />
 
         {/* Spacer for breathing room */}
-        <div className="h-[20vh]" />
+        <div className="h-[10vh] md:h-[15vh]" />
 
         {/* Features Grid */}
         <MinimalFeatures />
 
         {/* Spacer */}
-        <div className="h-[20vh]" />
+        <div className="h-[10vh] md:h-[15vh]" />
+
+        {/* How It Works - Detailed Technical Explanation */}
+        <HowItWorks />
+
+        {/* Tech Stack */}
+        <TechStack />
+
+        {/* Spacer */}
+        <div className="h-[10vh] md:h-[15vh]" />
 
         {/* Parallax Philosophy */}
         <ParallaxSection />
 
         {/* Spacer */}
-        <div className="h-[20vh]" />
+        <div className="h-[10vh] md:h-[15vh]" />
 
         {/* Problem-Solution */}
         <ProblemSolution />
 
         {/* Spacer */}
-        <div className="h-[20vh]" />
+        <div className="h-[10vh] md:h-[15vh]" />
 
         {/* Final CTA */}
         <MinimalCTA />

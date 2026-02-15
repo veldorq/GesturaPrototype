@@ -1,6 +1,7 @@
 services:
+  # Flask Backend API
   - type: web
-    name: gestura
+    name: gestura-api
     env: python
     runtime: python
     buildCommand: pip install -r requirements-web.txt
@@ -8,3 +9,15 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+
+  # Next.js Frontend
+  - type: web
+    name: gestura-web
+    env: node
+    runtime: node
+    rootDir: gestura-web
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0

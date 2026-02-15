@@ -60,7 +60,7 @@ export default function DemoChoiceModal({ isOpen, onClose }: DemoChoiceModalProp
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="text-3xl md:text-5xl font-space font-semibold gradient-text mb-4"
+                  className="text-2xl md:text-3xl font-space font-semibold gradient-text mb-4"
                 >
                   How would you like to see Gestura?
                 </motion.h2>
@@ -69,7 +69,7 @@ export default function DemoChoiceModal({ isOpen, onClose }: DemoChoiceModalProp
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="text-gestura-text-secondary font-inter text-lg max-w-2xl mx-auto"
+                  className="text-gestura-text-secondary font-inter text-base md:text-lg max-w-2xl mx-auto"
                 >
                   Watch a quick demo or try it yourself with your webcam
                 </motion.p>
@@ -109,10 +109,10 @@ export default function DemoChoiceModal({ isOpen, onClose }: DemoChoiceModalProp
 
                   {/* Content */}
                   <div className="relative text-center">
-                    <h3 className="text-2xl font-space font-semibold text-white mb-3">
+                    <h3 className="text-xl md:text-2xl font-space font-semibold text-white mb-3">
                       Watch Demo
                     </h3>
-                    <p className="text-gestura-text-secondary font-inter mb-6 leading-relaxed">
+                    <p className="text-gestura-text-secondary font-inter mb-6 leading-relaxed text-sm md:text-base">
                       See Gestura in action with a
                       <br />
                       <span className="text-white font-medium">2-minute guided video</span>
@@ -193,10 +193,10 @@ export default function DemoChoiceModal({ isOpen, onClose }: DemoChoiceModalProp
 
                   {/* Content */}
                   <div className="relative text-center">
-                    <h3 className="text-2xl font-space font-semibold text-white mb-3">
+                    <h3 className="text-xl md:text-2xl font-space font-semibold text-white mb-3">
                       Try Live Demo
                     </h3>
-                    <p className="text-gestura-text-secondary font-inter mb-6 leading-relaxed">
+                    <p className="text-gestura-text-secondary font-inter mb-6 leading-relaxed text-sm md:text-base">
                       Experience real-time control with
                       <br />
                       <span className="text-white font-medium">your own webcam</span>

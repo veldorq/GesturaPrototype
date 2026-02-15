@@ -11,7 +11,7 @@ export default function MinimalCTA() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-6xl font-light leading-tight mb-12"
+          className="text-3xl md:text-4xl font-light leading-tight mb-10"
         >
           Code With <span className="gradient-text">Clarity</span>
         </motion.h2>
@@ -22,22 +22,22 @@ export default function MinimalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-12 md:gap-20 mb-16"
+          className="flex flex-wrap justify-center gap-16 mb-16"
         >
           {[
             { value: '<30ms', label: 'Response Time' },
-            { value: '5,000+', label: 'Active Users'  },
+            { value: '99%', label: 'Accuracy Rate'  },
             { value: '100%', label: 'Privacy First' },
           ].map((stat, i) => (
             <motion.div
               key={i}
               whileHover={{ scale: 1.1 }}
-              className="text-center cursor-pointer"
+              className="text-center cursor-pointer group"
             >
-              <div className="text-4xl font-light gradient-text mb-2">
+              <div className="text-2xl md:text-3xl font-light gradient-text mb-2 transition-transform group-hover:scale-110">
                 {stat.value}
               </div>
-              <div className="text-xs text-neutral-500 uppercase tracking-[0.2em]">
+              <div className="text-xs text-neutral-500 uppercase tracking-widest">
                 {stat.label}
               </div>
             </motion.div>

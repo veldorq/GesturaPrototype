@@ -22,7 +22,11 @@
   }
   
   body {
-    @apply bg-gestura-navy-dark text-gestura-text-primary font-inter antialiased;
+    background-color: var(--gestura-navy-dark);
+    color: var(--color-text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     cursor: none;
     overflow-x: hidden;
   }
@@ -34,7 +38,8 @@
   }
   
   ::selection {
-    @apply bg-gestura-cyan text-gestura-navy-dark;
+    background-color: var(--gestura-cyan);
+    color: var(--gestura-navy-dark);
   }
   
   /* Minimal Scrollbar */
@@ -43,7 +48,7 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-gestura-navy-dark;
+    background: var(--gestura-navy-dark);
   }
   
   ::-webkit-scrollbar-thumb {

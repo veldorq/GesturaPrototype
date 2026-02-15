@@ -6,13 +6,13 @@ export default function MinimalFooter() {
   return (
     <footer className="relative py-16 px-6 border-t border-white/5">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-2xl font-light tracking-tight"
+            className="text-lg md:text-xl font-light tracking-tight"
           >
             Gestura
           </motion.div>
@@ -25,14 +25,31 @@ export default function MinimalFooter() {
             transition={{ delay: 0.1 }}
             className="flex gap-8 text-sm text-neutral-500"
           >
-            <a href="/download" className="hover:text-white transition-colors">
+            <a href="/download" className="hover:text-white transition-colors cursor-pointer">
               Download
             </a>
-            <a href="/dashboard" className="hover:text-white transition-colors">
+            <a href="/dashboard" className="hover:text-white transition-colors cursor-pointer">
               Demo
             </a>
-            <a href="#features" className="hover:text-white transition-colors">
+            <a 
+              href="#features" 
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
               Features
+            </a>
+            <a 
+              href="#how-it-works" 
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              How It Works
             </a>
           </motion.div>
 

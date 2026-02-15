@@ -36,10 +36,10 @@ export default function ProblemSolution() {
   const { ref, opacity, translateY } = useScrollReveal();
 
   return (
-    <section className="relative py-32 bg-gestura-navy overflow-hidden">
+    <section className="relative py-24 md:py-32 bg-gestura-navy overflow-hidden">
       {/* Background Gradient Orbs */}
-      <div className="absolute top-20 left-10 w-96 h-96 bg-gestura-cyan/10 rounded-full blur-[128px] animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-gestura-purple/10 rounded-full blur-[128px] animate-pulse" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-20 left-10 w-64 h-64 md:w-96 md:h-96 bg-gestura-cyan/10 rounded-full blur-[128px] animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-64 h-64 md:w-96 md:h-96 bg-gestura-purple/10 rounded-full blur-[128px] animate-pulse" style={{ animationDelay: '2s' }} />
 
       <div ref={ref} className="relative max-w-7xl mx-auto px-6">
         {/* Section Header */}
@@ -59,11 +59,11 @@ export default function ProblemSolution() {
             </span>
           </motion.div>
 
-          <h2 className="text-4xl md:text-5xl font-space font-semibold mb-6">
+          <h2 className="text-3xl md:text-4xl font-space font-semibold mb-6">
             From <span className="text-red-400">Frustration</span> to{' '}
             <span className="gradient-text">Freedom</span>
           </h2>
-          <p className="text-lg md:text-xl text-gestura-text-secondary font-inter max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-gestura-text-secondary font-inter max-w-3xl mx-auto leading-relaxed">
             See how Gestura solves the challenges you face
             <span className="text-white font-medium"> every single day</span>
           </p>

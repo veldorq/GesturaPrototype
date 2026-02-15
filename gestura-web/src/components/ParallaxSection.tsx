@@ -28,13 +28,13 @@ export default function ParallaxSection() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-8"
           >
-            <h2 className="text-4xl md:text-6xl font-light leading-tight">
+            <h2 className="text-3xl md:text-4xl font-light leading-tight">
               To master the gesture is to master the interface.
             </h2>
             
             <div className="w-24 h-px bg-gestura-purple" />
             
-            <p className="text-xl text-neutral-400 leading-relaxed font-light">
+            <p className="text-base text-neutral-400 leading-relaxed font-light">
               Every movement carries intention. Every intention becomes action.
             </p>
 
@@ -47,7 +47,7 @@ export default function ParallaxSection() {
           {/* Parallax Image */}
           <motion.div
             style={{ y, opacity }}
-            className="relative h-[500px] overflow-hidden rounded-lg"
+            className="relative h-[400px] md:h-[500px] overflow-hidden rounded-lg shadow-2xl"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-gestura-cyan/20 to-gestura-purple/20 mix-blend-overlay z-10" />
             <img
