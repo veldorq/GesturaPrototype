@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import CustomCursor from '@/components/CustomCursor';
 import MinimalNav from '@/components/MinimalNav';
 import ScrollProgressBar from '@/components/ScrollProgressBar';
+import ScrollToTop from '@/components/ScrollToTop';
 import MinimalHero from '@/components/MinimalHero';
 import MinimalFeatures from '@/components/MinimalFeatures';
 import HowItWorks from '@/components/HowItWorks';
@@ -29,6 +30,9 @@ export default function Home() {
 
       {/* Scroll Progress Indicator */}
       <ScrollProgressBar />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
 
       {/* Navigation */}
       <MinimalNav />

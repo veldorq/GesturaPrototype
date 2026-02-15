@@ -2071,7 +2071,10 @@ class HandGestureControlSystem:
         Args:
             socketio: Optional Flask-SocketIO instance for web dashboard integration
         """
-        print("🚀 Initializing Hand Gesture Control System...")
+        print("\n" + "="*70)
+        print("🚀 GESTURA - Hand Gesture Control System")
+        print("="*70)
+        print("Initializing components...")
         
         # Web integration (optional)
         self.socketio = socketio
@@ -2098,15 +2101,24 @@ class HandGestureControlSystem:
         # Video capture with validation
         self.cap = cv2.VideoCapture(Config.CAMERA_INDEX)
         
-        # SAFETY: Verify camera opened successfully
+        # SAFETY: Verify camera opened successfully with detailed error handling
         if not self.cap.isOpened():
-            raise RuntimeError(
-                f"Failed to open camera at index {Config.CAMERA_INDEX}. "
-                "Please check:\n"
-                "  1. Camera is connected and not in use by another application\n"
-                "  2. Camera permissions are enabled in Windows Settings\n"
-                "  3. Try changing CAMERA_INDEX (0, 1, 2...) if you have multiple cameras"
+            error_msg = (
+                f"\n{'='*70}\n"
+                f"❌ CAMERA INITIALIZATION FAILED\n"
+                f"{'='*70}\n\n"
+                f"Failed to open camera at index {Config.CAMERA_INDEX}.\n\n"
+                f"Common solutions:\n"
+                f"  1. ���️ Check camera connection - Ensure webcam is plugged in\n"
+                f"  2. 🔒 Grant camera permissions - Check Windows Privacy Settings\n"
+                f"  3. ❌ Close conflicting apps - Zoom, Teams, or other webcam apps may be using camera\n"
+                f"  4. 🔄 Try different camera index - Change Config.CAMERA_INDEX (0, 1, 2...)\n"
+                f"  5. 🔌 Replug your webcam and restart the application\n\n"
+                f"💡 Quick Fix: Open Windows Settings → Privacy → Camera → Allow apps to access camera\n"
+                f"\n{'='*70}\n"
             )
+            print(error_msg)
+            raise RuntimeError(error_msg)
         
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, Config.FRAME_WIDTH)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, Config.FRAME_HEIGHT)
@@ -2129,7 +2141,23 @@ class HandGestureControlSystem:
         # Program control
         self.running = True  # Flag to control main loop (for rock sign exit)
         
-        print("[SUCCESS] System initialized successfully!")
+        # Verify all components initialized
+        components_status = [
+            ("✅ Camera", self.cap.isOpened()),
+            ("✅ Hand Detection (MediaPipe)", self.hands is not None),
+            ("✅ Gesture Recognizer", self.recognizer is not None),
+            ("✅ Stabilizer", self.stabilizer is not None),
+            ("✅ Controller", self.controller is not None),
+        ]
+        
+        print("\n📋 Component Status:")
+        for component, status in components_status:
+            status_icon = "✅" if status else "❌"
+            print(f"   {status_icon} {component.split(' ', 1)[1]}")
+        
+        print("\n✅ System initialized successfully!")
+        print(f"📹 Camera Resolution: {Config.FRAME_WIDTH}x{Config.FRAME_HEIGHT} @ {Config.FPS_TARGET} FPS")
+        print(f"🖥️  Screen Resolution: {Config.SCREEN_WIDTH}x{Config.SCREEN_HEIGHT}")
         print("\n" + "="*70)
         print("GESTURE CONTROLS:")
         print("="*70)
@@ -2454,9 +2482,10 @@ class HandGestureControlSystem:
         cv2.rectangle(frame, (10, 10), (450, info_height), (0, 0, 0), -1)
         cv2.rectangle(frame, (10, 10), (450, info_height), (0, 255, 0), 2)
         
-        # Display FPS with color coding
-        fps_color = (0, 255, 0) if self.fps >= 25 else (0, 255, 255) if self.fps >= 20 else (0, 0, 255)
-        cv2.putText(frame, f"FPS: {self.fps:.1f}", (20, 40),
+        # Display FPS with color coding and performance indicator
+        fps_color = (0, 255, 0) if self.fps >= 27 else (0, 255, 255) if self.fps >= 20 else (0, 0, 255)
+        fps_status = "⭐ Optimal" if self.fps >= 27 else "⚠️ Low" if self.fps >= 20 else "❌ Poor"
+        cv2.putText(frame, f"FPS: {self.fps:.1f} {fps_status}", (20, 40),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, fps_color, 2)
         
         # Display current gesture with color
@@ -2714,18 +2743,40 @@ class HandGestureControlSystem:
         print("="*60 + "\n")
     
     def cleanup(self):
-        """Clean up resources safely"""
-        print("[CLEANUP] Cleaning up resources...")
+        """Clean up resources safely with detailed feedback"""
+        print("\n" + "="*70)
+        print("🧹 CLEANUP & SHUTDOWN")
+        print("="*70)
+        
         try:
+            # Release camera
             if hasattr(self, 'cap') and self.cap is not None:
                 self.cap.release()
+                print("✅ Camera released successfully")
+            
+            # Close windows
             cv2.destroyAllWindows()
+            print("✅ Display windows closed")
+            
+            # Close MediaPipe
             if hasattr(self, 'hands') and self.hands is not None:
                 self.hands.close()
+                print("✅ MediaPipe hands module closed")
+            
+            # Print session summary
+            if self.frame_count > 0:
+                duration = time.time() - self.start_time
+                avg_fps = self.frame_count / duration if duration > 0 else 0
+                print(f"\n📊 Session Statistics:")
+                print(f"   Total Frames: {self.frame_count}")
+                print(f"   Duration: {duration:.1f}s")
+                print(f"   Average FPS: {avg_fps:.1f}")
+            
         except Exception as e:
-            print(f"[WARNING] Cleanup error (non-critical): {e}")
+            print(f"⚠️ Cleanup warning (non-critical): {e}")
         finally:
-            print("[SUCCESS] Cleanup complete. Goodbye!")
+            print("\n✅ Cleanup complete. Thank you for using Gestura!")
+            print("="*70 + "\n")
 
 
 # ============================================================================

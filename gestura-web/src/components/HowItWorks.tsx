@@ -131,9 +131,14 @@ export default function HowItWorks() {
                 <div className="hidden md:block absolute top-20 left-full w-8 h-px bg-gradient-to-r from-gestura-cyan/50 to-transparent" />
               )}
 
-              <div className="glass-panel p-8 rounded-lg group hover:border-gestura-cyan/50 transition-all duration-500">
+              <div className="glass-panel p-8 rounded-lg group hover:border-gestura-cyan/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gestura-cyan/20">
                 {/* Number */}
-                <div className="text-gestura-cyan text-sm font-mono mb-4">{step.number}</div>
+                <motion.div 
+                  className="text-gestura-cyan text-sm font-mono mb-4"
+                  whileHover={{ scale: 1.2, rotate: 5 }}
+                >
+                  {step.number}
+                </motion.div>
 
                 {/* Title & Subtitle */}
                 <h3 className="text-2xl font-light mb-2 group-hover:text-gestura-cyan transition-colors">
