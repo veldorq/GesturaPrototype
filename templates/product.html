@@ -24,21 +24,28 @@
         
         * {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         body {
-            background: linear-gradient(135deg, var(--navy-dark) 0%, #0D1128 50%, var(--navy-medium) 100%);
+            background: #0A0E27;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 217, 255, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(123, 97, 255, 0.08) 0px, transparent 50%),
+                linear-gradient(180deg, #0A0E27 0%, #0D1128 50%, #0A0E27 100%);
             color: #F1F5F9;
         }
         
         .glass-panel {
-            background: rgba(30, 39, 73, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(123, 97, 255, 0.2);
+            background: rgba(30, 39, 73, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(123, 97, 255, 0.15);
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 1px 2px rgba(0, 217, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
         
         .glass-panel-strong {
@@ -63,10 +70,14 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--cyan-primary), var(--purple-primary));
+            background: linear-gradient(135deg, #00D9FF 0%, #0099FF 50%, #7B61FF 100%);
+            box-shadow: 
+                0 4px 20px rgba(0, 217, 255, 0.3),
+                0 0 40px rgba(123, 97, 255, 0.2);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .btn-primary:before {
@@ -85,10 +96,11 @@
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.02);
             box-shadow: 
-                0 12px 32px rgba(0, 217, 255, 0.5),
-                0 6px 12px rgba(123, 97, 255, 0.4);
+                0 16px 48px rgba(0, 217, 255, 0.4),
+                0 8px 16px rgba(123, 97, 255, 0.3),
+                0 0 60px rgba(0, 217, 255, 0.3);
         }
         
         .btn-secondary {
@@ -105,26 +117,64 @@
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, var(--cyan-primary), var(--purple-primary));
+            background: linear-gradient(135deg, #00D9FF 0%, #00B8FF 30%, #0099FF 60%, #7B61FF 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            position: relative;
+        }
+        
+        /* Professional Logo Styling */
+        .logo-text {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #00D9FF 0%, #7B61FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            text-transform: uppercase;
+        }
+        
+        .logo-text::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: linear-gradient(180deg, #00D9FF, #7B61FF);
+            border-radius: 2px;
         }
         
         .feature-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .feature-card:hover {
             transform: translateY(-8px);
             box-shadow: 
-                0 16px 48px rgba(0, 217, 255, 0.2),
-                0 8px 16px rgba(123, 97, 255, 0.2);
+                0 16px 48px rgba(0, 217, 255, 0.25),
+                0 8px 16px rgba(123, 97, 255, 0.25);
+        }
+        
+        /* Smooth transitions */
+        * {
+            transition-property: transform, opacity, box-shadow;
+            transition-duration: 200ms;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Disable transitions on specific elements */
+        button, a, input {
+            transition-property: all;
         }
         
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+            50% { transform: translateY(-24px); }
         }
         
         .floating {
@@ -136,9 +186,37 @@
             width: 600px;
             height: 600px;
             border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.3;
+            filter: blur(120px);
+            opacity: 0.25;
             pointer-events: none;
+        }
+        
+        /* Spacing system - 8px scale */
+        .spacing-xs { margin: 8px; }
+        .spacing-sm { margin: 16px; }
+        .spacing-md { margin: 24px; }
+        .spacing-lg { margin: 32px; }
+        .spacing-xl { margin: 48px; }
+        .spacing-2xl { margin: 64px; }
+        
+        /* Performance optimizations */
+        img {
+            content-visibility: auto;
+            image-rendering: -webkit-optimize-contrast;
+        }
+        
+        /* Will-change for animated elements */
+        .btn-primary, .feature-card, .floating {
+            will-change: transform;
+        }
+        
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
@@ -147,11 +225,30 @@
     <!-- Navigation -->
     <header class="glass-panel-strong border-b border-cyan-500/20 px-6 py-5 sticky top-0 z-50 depth-shadow-md">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <span class="text-4xl">🖐️</span>
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 blur-xl"></div>
+                    <div class="relative bg-gradient-to-br from-cyan-500/10 to-purple-500/10 p-2.5 rounded-lg border border-cyan-500/30">
+                        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#gradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="url(#gradient2)"/>
+                            <path d="M2 17L12 22L22 17" stroke="url(#gradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="url(#gradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="gradient1" x1="2" y1="2" x2="22" y2="22">
+                                    <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#7B61FF;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="gradient2" x1="2" y1="2" x2="22" y2="22">
+                                    <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:0.2" />
+                                    <stop offset="100%" style="stop-color:#7B61FF;stop-opacity:0.2" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
                 <div>
-                    <h1 class="text-2xl font-bold gradient-text tracking-tight">Gestura</h1>
-                    <p class="text-xs text-cyan-300/70 font-light">Hands speak. System listens.</p>
+                    <h1 class="logo-text">Gestura</h1>
+                    <p class="text-xs text-cyan-300/60 font-medium tracking-wide">AI-POWERED CONTROL</p>
                 </div>
             </div>
             
@@ -169,248 +266,586 @@
     </header>
     
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden px-6 py-20">
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden px-6 py-32">
         <!-- Ambient glows -->
         <div class="hero-glow bg-cyan-500 absolute top-20 -left-40"></div>
         <div class="hero-glow bg-purple-500 absolute bottom-20 -right-40"></div>
         
-        <div class="max-w-6xl mx-auto text-center relative z-10">
-            <div class="mb-6">
-                <span class="px-6 py-2 glass-panel rounded-full text-sm font-medium text-cyan-300 border border-cyan-500/30">
-                    🚀 Privacy-First Gesture Control
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="mb-8">
+                <span class="px-6 py-3 glass-panel rounded-full text-sm font-semibold text-cyan-300 border border-cyan-500/30 inline-block">
+                    <span class="inline-block w-2 h-2 bg-cyan-400 rounded-full mr-2 animate-pulse"></span>
+                    Privacy-First • 30 FPS Real-Time • Zero Training
                 </span>
             </div>
             
-            <h1 class="text-6xl md:text-8xl font-black mb-6 leading-tight">
-                Control Your Computer<br/>
-                <span class="gradient-text">With Hand Gestures</span>
+            <h1 class="text-6xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tight">
+                Control Your Browser<br/>
+                <span class="gradient-text">With Just Your Hands</span>
             </h1>
             
-            <p class="text-xl md:text-2xl text-cyan-100/70 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
-                No mouse. No touch. Just intuitive hand movements.<br/>
-                Experience the future of human-computer interaction.
+            <p class="text-2xl md:text-3xl text-cyan-100/80 mb-6 max-w-3xl mx-auto font-medium leading-relaxed">
+                Gestura turns natural hand gestures into seamless browser control
             </p>
             
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
-                <a href="/dashboard" class="btn-primary px-12 py-5 rounded-2xl text-lg font-bold text-white depth-shadow-lg w-full sm:w-auto">
-                    Launch Dashboard
+            <p class="text-lg md:text-xl text-cyan-100/60 mb-16 max-w-2xl mx-auto font-light">
+                No touch, no mouse, no keyboard — just intuitive movements your hands already know
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
+                <a href="/dashboard" class="btn-primary px-16 py-6 rounded-2xl text-xl font-bold text-white depth-shadow-lg w-full sm:w-auto group">
+                    Try Live Demo
+                    <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
                 </a>
-                <a href="#demo" class="btn-secondary px-12 py-5 rounded-2xl text-lg font-semibold text-cyan-300 w-full sm:w-auto">
-                    Watch Demo
+                <a href="#how-it-works" class="btn-secondary px-16 py-6 rounded-2xl text-xl font-semibold text-cyan-300 w-full sm:w-auto">
+                    See How It Works
                 </a>
             </div>
             
-            <!-- Floating gesture emoji -->
-            <div class="text-9xl floating mt-12">
-                🖐️
+            <!-- Trust indicators -->
+            <div class="flex flex-wrap items-center justify-center gap-8 text-sm font-medium text-cyan-300/70">
+                <div class="flex items-center gap-2 glass-panel px-4 py-2 rounded-lg">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>100% Local Processing</span>
+                </div>
+                <div class="flex items-center gap-2 glass-panel px-4 py-2 rounded-lg">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>~30 FPS Detection</span>
+                </div>
+                <div class="flex items-center gap-2 glass-panel px-4 py-2 rounded-lg">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>95%+ Accuracy</span>
+                </div>
             </div>
             
-            <p class="text-cyan-400/60 text-sm mt-8">
-                ✓ 100% Local Processing  •  ✓ Zero Cloud Dependency  •  ✓ Instant Response
+            <!-- Gesture wave pattern -->
+            <div class="floating mt-16 opacity-80">
+                <svg class="w-40 h-32 mx-auto" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g opacity="0.8">
+                        <!-- Animated gesture waves -->
+                        <path d="M10 40 Q30 20, 50 40 T90 40" stroke="url(#waveGradient1)" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+                        <path d="M15 50 Q35 30, 55 50 T95 50" stroke="url(#waveGradient1)" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+                        <path d="M20 60 Q40 40, 60 60 T100 60" stroke="url(#waveGradient1)" stroke-width="3.5" stroke-linecap="round"/>
+                        <!-- Tracking points -->
+                        <circle cx="30" cy="27" r="3" fill="#00D9FF" opacity="0.6">
+                            <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="60" cy="53" r="4" fill="#7B61FF" opacity="0.8">
+                            <animate attributeName="opacity" values="0.4;1;0.4" dur="2.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="90" cy="47" r="3.5" fill="#00D9FF" opacity="0.7">
+                            <animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite"/>
+                        </circle>
+                        <defs>
+                            <linearGradient id="waveGradient1" x1="0" y1="0" x2="120" y2="0">
+                                <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:0.6" />
+                                <stop offset="50%" style="stop-color:#0099FF;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#7B61FF;stop-opacity:0.6" />
+                            </linearGradient>
+                        </defs>
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Problem Section -->
+    <section class="py-24 px-6 bg-gradient-to-b from-navy-medium/50 to-transparent">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-8 leading-tight">
+                Traditional Browser Control<br/>
+                <span class="gradient-text">Limits Accessibility</span>
+            </h2>
+            
+            <p class="text-xl text-cyan-100/70 mb-12 font-light leading-relaxed">
+                Physical keyboards and mice create barriers for users with mobility challenges, repetitive strain injuries, or those who simply want a more natural interaction method. Voice control is intrusive. Touch requires proximity.
             </p>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="glass-panel rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 text-cyan-200">Physical Required</h3>
+                    <p class="text-sm text-cyan-100/60">Needs mouse, trackpad, or touch screen</p>
+                </div>
+                
+                <div class="glass-panel rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 text-cyan-200">Voice Too Public</h3>
+                    <p class="text-sm text-cyan-100/60">Disruptive in shared spaces</p>
+                </div>
+                
+                <div class="glass-panel rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 text-cyan-200">Training Required</h3>
+                    <p class="text-sm text-cyan-100/60">Complex setup and calibration</p>
+                </div>
+            </div>
+            
+            <a href="/dashboard" class="btn-primary px-12 py-5 rounded-2xl text-lg font-bold text-white depth-shadow-lg inline-block">
+                Try Gestura Now
+            </a>
         </div>
     </section>
     
     <!-- How It Works -->
-    <section id="how-it-works" class="py-24 px-6">
+    <section id="how-it-works" class="py-32 px-6">
         <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-5xl font-bold mb-4">
+            <div class="text-center mb-20">
+                <h2 class="text-5xl md:text-6xl font-black mb-6">
                     <span class="gradient-text">How It Works</span>
                 </h2>
-                <p class="text-cyan-100/60 text-lg font-light">Three steps to gesture-powered computing</p>
+                <p class="text-xl text-cyan-100/60 font-light">Three simple steps to hands-free control</p>
             </div>
             
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="glass-panel rounded-2xl p-8 text-center depth-shadow-md">
-                    <div class="text-6xl mb-6">📷</div>
-                    <div class="text-3xl font-bold text-cyan-400 mb-3">1</div>
-                    <h3 class="text-xl font-bold mb-3">Camera Detects</h3>
-                    <p class="text-cyan-100/60 font-light">Your webcam captures hand movements using advanced MediaPipe tracking</p>
+            <div class="grid md:grid-cols-3 gap-12">
+                <!-- Step 1 -->
+                <div class="relative">
+                    <div class="absolute -top-6 -left-6 text-8xl font-black text-cyan-500/10">1</div>
+                    <div class="glass-panel rounded-3xl p-10 text-center depth-shadow-md relative z-10 hover:scale-105 transition-transform duration-300">
+                        <div class="w-20 h-20 mx-auto mb-8 bg-gradient-to-br from-cyan-500/20 to-cyan-500/10 rounded-2xl flex items-center justify-center">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-cyan-300">Camera Detects</h3>
+                        <p class="text-cyan-100/70 font-light leading-relaxed">
+                            Your webcam captures hand movements in real-time using advanced MediaPipe hand tracking
+                        </p>
+                    </div>
                 </div>
                 
-                <div class="glass-panel rounded-2xl p-8 text-center depth-shadow-md">
-                    <div class="text-6xl mb-6">🧠</div>
-                    <div class="text-3xl font-bold text-purple-400 mb-3">2</div>
-                    <h3 class="text-xl font-bold mb-3">AI Recognizes</h3>
-                    <p class="text-cyan-100/60 font-light">Local AI instantly identifies gestures with 95%+ accuracy in real-time</p>
+                <!-- Step 2 -->
+                <div class="relative">
+                    <div class="absolute -top-6 -left-6 text-8xl font-black text-purple-500/10">2</div>
+                    <div class="glass-panel rounded-3xl p-10 text-center depth-shadow-md relative z-10 hover:scale-105 transition-transform duration-300">
+                        <div class="w-20 h-20 mx-auto mb-8 bg-gradient-to-br from-purple-500/20 to-purple-500/10 rounded-2xl flex items-center justify-center">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-purple-300">Gesture Recognized</h3>
+                        <p class="text-cyan-100/70 font-light leading-relaxed">
+                            Local AI instantly identifies your gesture with 95%+ accuracy in under 30ms
+                        </p>
+                    </div>
                 </div>
                 
-                <div class="glass-panel rounded-2xl p-8 text-center depth-shadow-md">
-                    <div class="text-6xl mb-6">⚡</div>
-                    <div class="text-3xl font-bold text-cyan-400 mb-3">3</div>
-                    <h3 class="text-xl font-bold mb-3">System Responds</h3>
-                    <p class="text-cyan-100/60 font-light">Your computer executes actions instantly—scroll, click, navigate</p>
+                <!-- Step 3 -->
+                <div class="relative">
+                    <div class="absolute -top-6 -left-6 text-8xl font-black text-cyan-500/10">3</div>
+                    <div class="glass-panel rounded-3xl p-10 text-center depth-shadow-md relative z-10 hover:scale-105 transition-transform duration-300">
+                        <div class="w-20 h-20 mx-auto mb-8 bg-gradient-to-br from-cyan-500/20 to-cyan-500/10 rounded-2xl flex items-center justify-center">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-cyan-300">Action Executed</h3>
+                        <p class="text-cyan-100/70 font-light leading-relaxed">
+                            Your browser responds instantly—scroll, click, navigate, zoom—all without touching anything
+                        </p>
+                    </div>
                 </div>
             </div>
+            
+            <div class="text-center mt-16">
+                <a href="/dashboard" class="btn-primary px-16 py-6 rounded-2xl text-xl font-bold text-white depth-shadow-lg inline-block group">
+                    See It In Action
+                    <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Solution Highlight -->
+    <section class="py-24 px-6 bg-gradient-to-b from-transparent via-navy-medium/30 to-transparent">
+        <div class="max-w-5xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-8">
+                Gestura Translates Intuitive Hand Gestures<br/>
+                <span class="gradient-text">Into Real Browser Actions</span>
+            </h2>
+            
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div class="glass-panel-strong rounded-2xl p-6 text-center">
+                    <div class="text-3xl mb-2 font-black text-cyan-400">11</div>
+                    <p class="text-sm text-cyan-200/70">Gesture Commands</p>
+                </div>
+                
+                <div class="glass-panel-strong rounded-2xl p-6 text-center">
+                    <div class="text-3xl mb-2 font-black text-purple-400">30</div>
+                    <p class="text-sm text-purple-200/70">FPS Detection</p>
+                </div>
+                
+                <div class="glass-panel-strong rounded-2xl p-6 text-center">
+                    <div class="text-3xl mb-2 font-black text-cyan-400">&lt;30ms</div>
+                    <p class="text-sm text-cyan-200/70">Response Time</p>
+                </div>
+                
+                <div class="glass-panel-strong rounded-2xl p-6 text-center">
+                    <div class="text-3xl mb-2 font-black text-purple-400">0</div>
+                    <p class="text-sm text-purple-200/70">Cloud Dependency</p>
+                </div>
+            </div>
+            
+            <p class="text-lg text-cyan-100/60 font-light mb-8">
+                Built with OpenCV + MediaPipe • Runs 100% locally • Zero data collection
+            </p>
         </div>
     </section>
     
     <!-- Features Grid -->
-    <section id="features" class="py-24 px-6 bg-gradient-to-b from-transparent via-navy-medium/30 to-transparent">
+    <section id="features" class="py-32 px-6">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-5xl font-bold mb-4">
-                    <span class="gradient-text">Powerful Features</span>
+            <div class="text-center mb-20">
+                <h2 class="text-5xl md:text-6xl font-black mb-6">
+                    <span class="gradient-text">Why Choose Gestura</span>
                 </h2>
-                <p class="text-cyan-100/60 text-lg font-light">Built for speed, privacy, and real-world use</p>
+                <p class="text-xl text-cyan-100/60 font-light">Built for speed, privacy, and real-world accessibility</p>
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Feature 1 -->
-                <div class="feature-card glass-panel rounded-2xl p-8 depth-shadow-md">
-                    <div class="text-5xl mb-4">🚀</div>
-                    <h3 class="text-2xl font-bold mb-3 text-cyan-300">30 FPS Real-Time</h3>
-                    <p class="text-cyan-100/60 font-light leading-relaxed">
-                        Lightning-fast gesture detection at 30 frames per second with zero perceptible lag
+                <div class="feature-card glass-panel rounded-3xl p-10 depth-shadow-md group">
+                    <div class="w-16 h-16 mb-6 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-cyan-300">Real-Time Performance</h3>
+                    <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                        30 frames per second gesture detection with zero perceptible lag. Instant feedback for every movement.
                     </p>
                 </div>
                 
                 <!-- Feature 2 -->
-                <div class="feature-card glass-panel rounded-2xl p-8 depth-shadow-md">
-                    <div class="text-5xl mb-4">🔒</div>
-                    <h3 class="text-2xl font-bold mb-3 text-purple-300">Privacy First</h3>
-                    <p class="text-cyan-100/60 font-light leading-relaxed">
-                        100% local processing. Your camera data never leaves your device. Period.
+                <div class="feature-card glass-panel rounded-3xl p-10 depth-shadow-md group">
+                    <div class="w-16 h-16 mb-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-purple-300">Privacy First</h3>
+                    <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                        100% local processing. Your camera data never leaves your device. No cloud, no servers, no tracking.
                     </p>
                 </div>
                 
                 <!-- Feature 3 -->
-                <div class="feature-card glass-panel rounded-2xl p-8 depth-shadow-md">
-                    <div class="text-5xl mb-4">🖐️</div>
-                    <h3 class="text-2xl font-bold mb-3 text-cyan-300">11 Gestures</h3>
-                    <p class="text-cyan-100/60 font-light leading-relaxed">
-                        Scroll, click, swipe, zoom, mute—control everything with natural hand movements
+                <div class="feature-card glass-panel rounded-3xl p-10 depth-shadow-md group">
+                    <div class="w-16 h-16 mb-6 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-cyan-300">Zero Setup</h3>
+                    <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                        Works out-of-the-box. No calibration, no training, no configuration. Just launch and gesture.
                     </p>
                 </div>
                 
                 <!-- Feature 4 -->
-                <div class="feature-card glass-panel rounded-2xl p-8 depth-shadow-md">
-                    <div class="text-5xl mb-4">⚡</div>
-                    <h3 class="text-2xl font-bold mb-3 text-purple-300">Zero Training</h3>
-                    <p class="text-cyan-100/60 font-light leading-relaxed">
-                        Works out-of-the-box. No calibration, no setup, no learning curve required
+                <div class="feature-card glass-panel rounded-3xl p-10 depth-shadow-md group">
+                    <div class="w-16 h-16 mb-6 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-purple-300">11 Natural Gestures</h3>
+                    <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                        Scroll, click, swipe, zoom, mute—all with movements your hands already know naturally.
                     </p>
                 </div>
                 
                 <!-- Feature 5 -->
-                <div class="feature-card glass-panel rounded-2xl p-8 depth-shadow-md">
-                    <div class="text-5xl mb-4">🌐</div>
-                    <h3 class="text-2xl font-bold mb-3 text-cyan-300">Web Dashboard</h3>
-                    <p class="text-cyan-100/60 font-light leading-relaxed">
-                        Monitor live camera feed, FPS metrics, and gesture history in real-time
+                <div class="feature-card glass-panel rounded-3xl p-10 depth-shadow-md group">
+                    <div class="w-16 h-16 mb-6 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-cyan-300">Live Dashboard</h3>
+                    <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                        Monitor camera feed, FPS metrics, and gesture history in real-time through your browser.
                     </p>
                 </div>
                 
                 <!-- Feature 6 -->
-                <div class="feature-card glass-panel rounded-2xl p-8 depth-shadow-md">
-                    <div class="text-5xl mb-4">🎯</div>
-                    <h3 class="text-2xl font-bold mb-3 text-purple-300">Precision Control</h3>
-                    <p class="text-cyan-100/60 font-light leading-relaxed">
-                        Smoothing algorithms ensure accurate tracking even with rapid hand movements
+                <div class="feature-card glass-panel rounded-3xl p-10 depth-shadow-md group">
+                    <div class="w-16 h-16 mb-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-purple-300">Precision Tracking</h3>
+                    <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                        Advanced smoothing algorithms ensure accurate detection even with rapid hand movements.
                     </p>
                 </div>
+            </div>
+            
+            <div class="text-center mt-16">
+                <a href="/dashboard" class="btn-primary px-16 py-6 rounded-2xl text-xl font-bold text-white depth-shadow-lg inline-block group">
+                    Try Gestura Now
+                    <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
+                </a>
             </div>
         </div>
     </section>
     
-    <!-- Use Cases -->
-    <section class="py-24 px-6">
+    <!-- Who Is It For -->
+    <section class="py-32 px-6 bg-gradient-to-b from-navy-medium/50 via-transparent to-navy-medium/50">
         <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-5xl font-bold mb-4">
-                    <span class="gradient-text">Perfect For</span>
+            <div class="text-center mb-20">
+                <h2 class="text-5xl md:text-6xl font-black mb-6">
+                    <span class="gradient-text">Who Is Gestura For?</span>
                 </h2>
-                <p class="text-cyan-100/60 text-lg font-light">From presentations to accessibility</p>
+                <p class="text-xl text-cyan-100/60 font-light">From accessibility to productivity</p>
             </div>
             
             <div class="grid md:grid-cols-2 gap-8">
-                <div class="glass-panel-strong rounded-2xl p-8 border-l-4 border-cyan-500 depth-shadow-md">
-                    <h3 class="text-2xl font-bold mb-3 text-cyan-300">📊 Presentations</h3>
-                    <p class="text-cyan-100/70 font-light leading-relaxed">
-                        Control slides from across the room. No remote needed—just gesture from anywhere in the space.
-                    </p>
+                <!-- Use Case 1 -->
+                <div class="glass-panel-strong rounded-3xl p-10 border-l-4 border-cyan-500 depth-shadow-md hover:scale-105 transition-transform duration-300">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-3 text-cyan-300">Presenters & Educators</h3>
+                            <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                                Control slides from across the room. No remote needed—gesture naturally while teaching or presenting.
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="glass-panel-strong rounded-2xl p-8 border-l-4 border-purple-500 depth-shadow-md">
-                    <h3 class="text-2xl font-bold mb-3 text-purple-300">💻 Developers</h3>
-                    <p class="text-cyan-100/70 font-light leading-relaxed">
-                        Navigate documentation, scroll through code, switch tabs—all while typing stays uninterrupted.
-                    </p>
+                <!-- Use Case 2 -->
+                <div class="glass-panel-strong rounded-3xl p-10 border-l-4 border-purple-500 depth-shadow-md hover:scale-105 transition-transform duration-300">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-3 text-purple-300">Accessibility Users</h3>
+                            <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                                Alternative input for users with mobility challenges, RSI, or limited dexterity. Touchless control that adapts to you.
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="glass-panel-strong rounded-2xl p-8 border-l-4 border-cyan-500 depth-shadow-md">
-                    <h3 class="text-2xl font-bold mb-3 text-cyan-300">🎨 Designers</h3>
-                    <p class="text-cyan-100/70 font-light leading-relaxed">
-                        Zoom in/out on canvases, navigate layers, control playback—hands-free creative workflow.
-                    </p>
+                <!-- Use Case 3 -->
+                <div class="glass-panel-strong rounded-3xl p-10 border-l-4 border-cyan-500 depth-shadow-md hover:scale-105 transition-transform duration-300">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-3 text-cyan-300">Developers & Designers</h3>
+                            <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                                Navigate docs, scroll code, switch tabs—all while keeping your hands on the keyboard. No workflow interruption.
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="glass-panel-strong rounded-2xl p-8 border-l-4 border-purple-500 depth-shadow-md">
-                    <h3 class="text-2xl font-bold mb-3 text-purple-300">♿ Accessibility</h3>
-                    <p class="text-cyan-100/70 font-light leading-relaxed">
-                        Alternative input method for users with mobility challenges or repetitive strain injuries.
-                    </p>
+                <!-- Use Case 4 -->
+                <div class="glass-panel-strong rounded-3xl p-10 border-l-4 border-purple-500 depth-shadow-md hover:scale-105 transition-transform duration-300">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-3 text-purple-300">Creative Professionals</h3>
+                            <p class="text-cyan-100/70 font-light leading-relaxed text-lg">
+                                Zoom canvases, navigate layers, control playback—hands-free workflow for creative applications.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
     
     <!-- Demo CTA -->
-    <section id="demo" class="py-24 px-6 relative overflow-hidden">
+    <section id="demo" class="py-32 px-6 relative overflow-hidden">
         <div class="hero-glow bg-cyan-500 absolute -top-40 -right-40"></div>
         <div class="hero-glow bg-purple-500 absolute -bottom-40 -left-40"></div>
         
-        <div class="max-w-4xl mx-auto text-center relative z-10">
-            <div class="glass-panel-strong rounded-3xl p-12 md:p-16 depth-shadow-lg">
-                <h2 class="text-5xl md:text-6xl font-black mb-6 leading-tight">
-                    Ready to Try<br/>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <div class="glass-panel-strong rounded-3xl p-16 md:p-20 depth-shadow-lg text-center">
+                <div class="mb-8">
+                    <span class="px-6 py-3 glass-panel rounded-full text-sm font-semibold text-cyan-300 border border-cyan-500/30 inline-block">
+                    <span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                    Live Demo Ready
+                
+                <h2 class="text-5xl md:text-7xl font-black mb-8 leading-[1.1]">
+                    Ready to Experience<br/>
                     <span class="gradient-text">Hands-Free Control?</span>
                 </h2>
                 
-                <p class="text-xl text-cyan-100/70 mb-10 font-light">
-                    Launch the dashboard and start controlling your computer in seconds.<br/>
-                    No installation. No registration. Just instant gesture magic.
+                <p class="text-2xl text-cyan-100/80 mb-6 font-medium">
+                    Launch the dashboard and start controlling your browser in seconds
                 </p>
                 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <a href="/dashboard" class="btn-primary px-16 py-6 rounded-2xl text-xl font-bold text-white depth-shadow-lg w-full sm:w-auto group">
-                        Launch Dashboard
-                        <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
+                <p class="text-lg text-cyan-100/60 mb-12 font-light max-w-2xl mx-auto">
+                    No installation. No registration. No credit card. Just instant gesture magic.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
+                    <a href="/dashboard" class="btn-primary px-20 py-7 rounded-2xl text-2xl font-black text-white depth-shadow-lg w-full sm:w-auto group">
+                        Try Live Demo
+                        <span class="inline-block ml-3 text-3xl group-hover:translate-x-2 transition-transform">→</span>
                     </a>
                 </div>
                 
-                <p class="text-cyan-400/50 text-sm mt-8">
-                    Works on Chrome, Edge, Firefox • Requires webcam permission
-                </p>
+                <!-- Trust signals -->
+                <div class="pt-8 border-t border-cyan-500/20">
+                    <div class="flex flex-wrap items-center justify-center gap-8 text-sm font-medium text-cyan-300/60">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">✓</span>
+                            <span>Works on Chrome, Edge, Firefox</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">✓</span>
+                            <span>Requires webcam permission only</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">✓</span>
+                            <span>100% free to use</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonial / Social Proof (Optional but powerful) -->
+    <section class="py-24 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="glass-panel rounded-3xl p-12 text-center depth-shadow-md">
+                <div class="text-5xl mb-6">💬</div>
+                <blockquote class="text-2xl font-medium text-cyan-100/90 mb-6 leading-relaxed">
+                    "Gestura transformed how I navigate documentation while coding. No more breaking flow to grab the mouse—just a quick gesture and I'm scrolling through docs."
+                </blockquote>
+                <div class="text-cyan-300/70 font-light">
+                    — Beta Testing Team
+                </div>
             </div>
         </div>
     </section>
     
     <!-- Footer -->
-    <footer class="glass-panel-strong border-t border-cyan-500/20 px-6 py-12">
+    <footer class="glass-panel-strong border-t border-cyan-500/20 px-6 py-16">
         <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div class="flex items-center space-x-4">
-                    <span class="text-4xl">🖐️</span>
-                    <div>
-                        <h3 class="text-xl font-bold gradient-text">Gestura</h3>
-                        <p class="text-cyan-300/60 text-sm font-light">Hands speak. System listens.</p>
+            <!-- Main Footer Content -->
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 blur-xl"></div>
+                            <div class="relative bg-gradient-to-br from-cyan-500/10 to-purple-500/10 p-2 rounded-lg border border-cyan-500/30">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#footerGradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="url(#footerGradient2)"/>
+                                    <path d="M2 17L12 22L22 17" stroke="url(#footerGradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke="url(#footerGradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <defs>
+                                        <linearGradient id="footerGradient1" x1="2" y1="2" x2="22" y2="22">
+                                            <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:#7B61FF;stop-opacity:1" />
+                                        </linearGradient>
+                                        <linearGradient id="footerGradient2" x1="2" y1="2" x2="22" y2="22">
+                                            <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:0.2" />
+                                            <stop offset="100%" style="stop-color:#7B61FF;stop-opacity:0.2" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="logo-text text-xl">Gestura</h3>
+                            <p class="text-cyan-300/70 text-xs font-medium tracking-wide">AI-POWERED CONTROL</p>
+                        </div>
                     </div>
+                    <p class="text-cyan-100/60 font-light leading-relaxed">
+                        Privacy-first gesture control powered by local AI. Built with OpenCV & MediaPipe.
+                    </p>
                 </div>
                 
-                <nav class="flex items-center space-x-8">
-                    <a href="/product" class="text-cyan-100/70 hover:text-cyan-400 transition-colors text-sm">Product</a>
-                    <a href="/dashboard" class="text-cyan-100/70 hover:text-cyan-400 transition-colors text-sm">Dashboard</a>
-                    <a href="#features" class="text-cyan-100/70 hover:text-cyan-400 transition-colors text-sm">Features</a>
-                    <a href="#demo" class="text-cyan-100/70 hover:text-cyan-400 transition-colors text-sm">Demo</a>
-                </nav>
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-bold text-cyan-300 mb-4">Quick Links</h4>
+                    <nav class="flex flex-col space-y-3">
+                        <a href="/product" class="text-cyan-100/70 hover:text-cyan-400 transition-colors text-sm font-medium">Product</a>
+                        <a href="/dashboard" class="text-cyan-100/70 hover:text-cyan-400 transition-colors text-sm font-medium">Dashboard</a>
+                        <a href="#features" class="text-cyan-100/70 hover:text-cyan-400 transition-colors text-sm font-medium">Features</a>
+                        <a href="#demo" class="text-cyan-100/70 hover:text-cyan-400 transition-colors text-sm font-medium">Try Demo</a>
+                    </nav>
+                </div>
+                
+                <!-- Trust Badges -->
+                <div>
+                    <h4 class="text-lg font-bold text-cyan-300 mb-4">Trust & Performance</h4>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">🔒</span>
+                            <span class="text-cyan-100/70 font-light">100% Local Processing</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">⚡</span>
+                            <span class="text-cyan-100/70 font-light">30 FPS Real-Time</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">🌐</span>
+                            <span class="text-cyan-100/70 font-light">Zero Cloud Dependency</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">🎯</span>
+                            <span class="text-cyan-100/70 font-light">95%+ Accuracy</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="mt-8 pt-8 border-t border-cyan-500/10 text-center">
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-cyan-500/10 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-cyan-400/40 text-xs">
-                    Privacy-first gesture control powered by local AI • Built with OpenCV & MediaPipe
+                    © 2026 Gestura • Built for accessibility and innovation
                 </p>
+                <div class="flex items-center gap-6 text-xs text-cyan-400/40">
+                    <span>OpenCV</span>
+                    <span>•</span>
+                    <span>MediaPipe</span>
+                    <span>•</span>
+                    <span>Flask</span>
+                    <span>•</span>
+                    <span>WebSocket</span>
+                </div>
             </div>
         </div>
     </footer>

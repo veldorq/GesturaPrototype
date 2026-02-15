@@ -117,6 +117,31 @@
             background-clip: text;
         }
         
+        /* Logo text styling */
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.025em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #00D9FF 0%, #7B61FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .logo-text::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #00D9FF 0%, #7B61FF 100%);
+            border-radius: 2px;
+        }
+        
         /* Pulse animations */
         @keyframes pulse-cyan {
             0%, 100% { box-shadow: 0 0 0 0 rgba(0, 217, 255, 0.7); }
@@ -195,7 +220,26 @@
     <header class="glass-panel-strong border-b border-cyan-500/20 px-6 py-5 sticky top-0 z-50 depth-shadow-md">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-4">
-                <span class="text-4xl">🖐️</span>
+                <div class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 blur-xl"></div>
+                    <div class="relative bg-gradient-to-br from-cyan-500/10 to-purple-500/10 p-2.5 rounded-lg border border-cyan-500/30">
+                        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#headerGradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="url(#headerGradient2)"/>
+                            <path d="M2 17L12 22L22 17" stroke="url(#headerGradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="url(#headerGradient1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="headerGradient1" x1="2" y1="2" x2="22" y2="22">
+                                    <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#7B61FF;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="headerGradient2" x1="2" y1="2" x2="22" y2="22">
+                                    <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:0.2" />
+                                    <stop offset="100%" style="stop-color:#7B61FF;stop-opacity:0.2" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
                 <div>
                     <h1 class="text-3xl font-bold gradient-text tracking-tight">Gestura</h1>
                     <p class="text-sm text-cyan-300/70 font-light">Hands speak. System listens.</p>
@@ -234,13 +278,22 @@
             <div class="lg:col-span-2">
                 <div class="glass-panel rounded-2xl p-8 depth-shadow-lg">
                     <h2 class="text-2xl font-bold mb-6 flex items-center">
-                        <span class="mr-3 text-3xl">📹</span>
+                        <div class="w-10 h-10 mr-3 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
                         <span class="gradient-text">Live Camera Feed</span>
                     </h2>
                     
                     <div class="camera-feed bg-navy-dark/50 rounded-xl p-6 flex items-center justify-center min-h-[480px] relative overflow-hidden">
                         <div id="camera-placeholder" class="text-center z-10">
-                            <div class="text-7xl mb-6">📷</div>
+                            <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center">
+                                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
                             <p class="text-cyan-200/80 text-lg font-medium">Camera feed will appear here</p>
                             <p class="text-sm text-cyan-300/50 mt-3">Click "Start System" to begin</p>
                         </div>
@@ -273,7 +326,11 @@
                 <!-- System Metrics -->
                 <div class="glass-panel rounded-2xl p-6 depth-shadow-md">
                     <h2 class="text-xl font-bold mb-6 flex items-center">
-                        <span class="mr-3 text-2xl">📊</span>
+                        <div class="w-9 h-9 mr-3 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
                         <span class="gradient-text">System Metrics</span>
                     </h2>
                     
@@ -298,7 +355,11 @@
                 <!-- Gesture History -->
                 <div class="glass-panel rounded-2xl p-6 depth-shadow-md">
                     <h2 class="text-xl font-bold mb-6 flex items-center">
-                        <span class="mr-3 text-2xl">📜</span>
+                        <div class="w-9 h-9 mr-3 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
                         <span class="gradient-text">Recent Actions</span>
                     </h2>
                     
@@ -310,33 +371,61 @@
                 <!-- Quick Guide -->
                 <div class="glass-panel rounded-2xl p-6 depth-shadow-md">
                     <h2 class="text-xl font-bold mb-6 flex items-center">
-                        <span class="mr-3 text-2xl">🎯</span>
+                        <div class="w-9 h-9 mr-3 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                            </svg>
+                        </div>
                         <span class="gradient-text">Gesture Guide</span>
                     </h2>
                     
                     <div class="space-y-3 text-sm">
                         <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-cyan-500/5 transition-all duration-300">
-                            <span class="text-xl">✋</span>
+                            <div class="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                </svg>
+                            </div>
                             <span class="text-cyan-100/80">Open Palm → Scroll Down</span>
                         </div>
                         <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-purple-500/5 transition-all duration-300">
-                            <span class="text-xl">✊</span>
+                            <div class="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                </svg>
+                            </div>
                             <span class="text-purple-100/80">Closed Fist → Scroll Up</span>
                         </div>
                         <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-cyan-500/5 transition-all duration-300">
-                            <span class="text-xl">☝️</span>
+                            <div class="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+                                </svg>
+                            </div>
                             <span class="text-cyan-100/80">Index Finger → Move Mouse</span>
                         </div>
                         <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-purple-500/5 transition-all duration-300">
-                            <span class="text-xl">✌️</span>
+                            <div class="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+                                </svg>
+                            </div>
                             <span class="text-purple-100/80">Peace Sign → Click</span>
                         </div>
                         <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-cyan-500/5 transition-all duration-300">
-                            <span class="text-xl">👈</span>
+                            <div class="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                </svg>
+                            </div>
                             <span class="text-cyan-100/80">Swipe Left → Back</span>
                         </div>
                         <div class="flex items-center space-x-3 p-3 glass-panel-strong rounded-lg hover:bg-purple-500/5 transition-all duration-300">
-                            <span class="text-xl">👉</span>
+                            <div class="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </div>
                             <span class="text-purple-100/80">Swipe Right → Forward</span>
                         </div>
                     </div>
