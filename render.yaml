@@ -17,7 +17,7 @@ services:
     runtime: node
     rootDir: gestura-web
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    startCommand: npx next start -p $PORT
     envVars:
       - key: NODE_VERSION
         value: 18.17.0
