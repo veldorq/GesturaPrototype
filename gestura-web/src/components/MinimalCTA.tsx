@@ -53,21 +53,27 @@ export default function MinimalCTA() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <motion.a
-            href="/download"
+            href="#features"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+            }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 bg-white text-black hover:bg-gestura-cyan transition-all duration-300 rounded-full font-medium"
+            className="px-10 py-4 bg-white text-black hover:bg-gestura-cyan transition-all duration-300 rounded-full font-medium cursor-pointer"
           >
-            Download Now
+            Get Started
           </motion.a>
 
           <motion.a
-            href="/dashboard"
+            href="https://github.com/veldorq/GesturaPrototype/releases"
+            target="_blank"
+            rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-10 py-4 border border-white/20 text-white hover:border-white transition-all duration-300 rounded-full font-light"
           >
-            Try Demo
+            Download Now
           </motion.a>
         </motion.div>
 

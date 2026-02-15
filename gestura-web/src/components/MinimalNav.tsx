@@ -46,8 +46,8 @@ export default function MinimalNav() {
           <span>How It Works</span>
           <span className="absolute bottom-0 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
         </a>
-        <a href="/dashboard" className="relative group cursor-pointer">
-          <span>Demo</span>
+        <a href="https://github.com/veldorq/GesturaPrototype/releases" target="_blank" rel="noopener noreferrer" className="relative group cursor-pointer">
+          <span>Download</span>
           <span className="absolute bottom-0 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
         </a>
       </motion.div>

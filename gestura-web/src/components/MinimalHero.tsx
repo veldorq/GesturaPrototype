@@ -1,11 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import DemoChoiceModal from './DemoChoiceModal';
 
 export default function MinimalHero() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Split text animation
   const title = "HANDS SPEAK.";
@@ -93,22 +90,28 @@ export default function MinimalHero() {
           transition={{ delay: 1.8, duration: 1 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-4"
         >
-          <motion.button
-            onClick={() => setIsModalOpen(true)}
+          <motion.a
+            href="#features"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+            }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide"
+            className="px-10 py-4 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer"
           >
-            Experience Demo
-          </motion.button>
+            Get Started
+          </motion.a>
           
           <motion.a
-            href="/download"
+            href="https://github.com/veldorq/GesturaPrototype/releases"
+            target="_blank"
+            rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-10 py-4 text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide"
           >
-            Download
+            Download Now
           </motion.a>
         </motion.div>
       </div>
@@ -127,9 +130,6 @@ export default function MinimalHero() {
           className="w-px h-16 bg-gradient-to-b from-transparent via-white/50 to-transparent"
         />
       </motion.div>
-
-      {/* Demo Modal */}
-      <DemoChoiceModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </section>
   );
 }
