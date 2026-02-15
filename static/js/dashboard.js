@@ -3,6 +3,21 @@
  * Handles WebSocket communication and UI updates with RAF batching
  */
 
+// Check if we're in demo mode
+let isDemoMode = false;
+fetch('/api/status')
+    .then(res => res.json())
+    .then(data => {
+        if (data.mode === 'demo' || data.deployment === 'production') {
+            isDemoMode = true;
+            initDemoMode();
+        }
+    })
+    .catch(() => {
+        // If API fails, assume local mode
+        isDemoMode = false;
+    });
+
 // Socket.IO connection
 const socket = io();
 
@@ -47,6 +62,25 @@ function flushUpdates() {
     for (const key in updates) {
         updates[key]();
     }
+}
+
+// Demo Mode Handler
+function initDemoMode() {
+    // Disable start button
+    startBtn.disabled = true;
+    startBtn.textContent = 'Demo Mode - Download to Use';
+    startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    
+    // Update connection status
+    connectionText.textContent = 'Demo Mode';
+    connectionStatus.style.background = '#FFA500';
+    
+    // Show demo message
+    showStatus('This is a preview. Download Gestura to use gesture control on your computer.', 'info');
+    
+    // Update system status
+    systemStatus.textContent = 'Demo Only';
+    systemStatus.className = 'text-sm font-semibold text-orange-400 px-3 py-1 bg-orange-400/10 rounded-full border border-orange-400/30';
 }
 
 // ============================================================================
@@ -175,6 +209,11 @@ socket.on('metrics_update', (data) => {
 // ============================================================================
 
 startBtn.addEventListener('click', () => {
+    if (isDemoMode) {
+        showStatus('Download Gestura to enable gesture control on your local machine', 'info');
+        return;
+    }
+    
     console.log('[CLIENT] Starting system...');
     startBtn.disabled = true;
     startBtn.textContent = 'Starting...';
@@ -182,6 +221,10 @@ startBtn.addEventListener('click', () => {
 });
 
 stopBtn.addEventListener('click', () => {
+    if (isDemoMode) {
+        return;
+    }
+    
     console.log('[CLIENT] Stopping system...');
     stopBtn.disabled = true;
     stopBtn.textContent = 'Stopping...';
