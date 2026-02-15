@@ -153,7 +153,7 @@ export default function FAQ() {
             Still have questions?
           </p>
           <a
-            href="https://github.com/your-username/gestura/issues"
+            href="https://github.com/veldorq/GesturaPrototype/issues"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all duration-300"
