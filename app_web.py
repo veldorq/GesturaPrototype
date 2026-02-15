@@ -11,6 +11,9 @@ from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 import os
 
+# Import download handler
+from download_handler import register_download_routes
+
 # Configuration from environment variables
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gestura-default-secret-2026')
@@ -67,6 +70,10 @@ def get_status():
 def health():
     """Health check endpoint for hosting platform"""
     return jsonify({'status': 'healthy'}), 200
+
+
+# Register download routes
+register_download_routes(app)
 
 
 if __name__ == '__main__':

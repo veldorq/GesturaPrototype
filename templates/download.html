@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Gestura - Hand Gesture Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #0A0E27 0%, #0D1128 50%, #151B3D 100%); }
+        .glass-panel {
+            background: rgba(30, 39, 73, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(123, 97, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-6 py-12">
+    
+    <div class="max-w-2xl w-full">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-black mb-4" style="background: linear-gradient(135deg, #00D9FF, #7B61FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Download Gestura
+            </h1>
+            <p class="text-xl text-cyan-100/70 font-light">
+                Get instant access to hands-free browser control
+            </p>
+        </div>
+        
+        <!-- Download Form -->
+        <div class="glass-panel rounded-3xl p-10 shadow-2xl">
+            <form id="download-form" class="space-y-6">
+                
+                <!-- Name Field -->
+                <div>
+                    <label class="block text-sm font-semibold text-cyan-300 mb-2">Your Name</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        required
+                        placeholder="John Doe"
+                        class="w-full px-5 py-4 bg-navy-dark/50 border border-cyan-500/30 rounded-xl text-cyan-100 placeholder-cyan-300/30 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                    >
+                </div>
+                
+                <!-- Email Field -->
+                <div>
+                    <label class="block text-sm font-semibold text-cyan-300 mb-2">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        required
+                        placeholder="you@example.com"
+                        class="w-full px-5 py-4 bg-navy-dark/50 border border-cyan-500/30 rounded-xl text-cyan-100 placeholder-cyan-300/30 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                    >
+                    <p class="text-xs text-cyan-300/50 mt-2">📧 Download link will be sent to this email</p>
+                </div>
+                
+                <!-- Use Case -->
+                <div>
+                    <label class="block text-sm font-semibold text-cyan-300 mb-2">How will you use Gestura?</label>
+                    <select 
+                        id="use_case" 
+                        required
+                        class="w-full px-5 py-4 bg-navy-dark/50 border border-cyan-500/30 rounded-xl text-cyan-100 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                    >
+                        <option value="">Select your use case...</option>
+                        <option value="personal">Personal Use</option>
+                        <option value="development">Software Development</option>
+                        <option value="presentation">Presentations & Teaching</option>
+                        <option value="accessibility">Accessibility Needs</option>
+                        <option value="creative">Creative Work</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <!-- Terms -->
+                <div class="flex items-start gap-3">
+                    <input 
+                        type="checkbox" 
+                        id="terms" 
+                        required
+                        class="mt-1 w-5 h-5 rounded border-cyan-500/30 bg-navy-dark/50 text-cyan-500 focus:ring-cyan-500/20"
+                    >
+                    <label for="terms" class="text-sm text-cyan-100/70">
+                        I agree to the <a href="#" class="text-cyan-400 underline">License Agreement</a> and understand this is for personal, non-commercial use only
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    id="submit-btn"
+                    class="w-full py-5 rounded-xl font-bold text-lg text-white transition-all duration-300 relative overflow-hidden"
+                    style="background: linear-gradient(135deg, #00D9FF 0%, #0099FF 50%, #7B61FF 100%);"
+                >
+                    <span id="btn-text">Get Download Link</span>
+                    <span id="btn-loading" class="hidden">Processing...</span>
+                </button>
+                
+                <!-- Success Message -->
+                <div id="success-message" class="hidden p-6 bg-green-500/10 border border-green-500/30 rounded-xl">
+                    <p class="text-green-400 font-semibold mb-2">✅ Success!</p>
+                    <p class="text-cyan-100/70 text-sm">Check your email for download instructions. The link expires in 24 hours.</p>
+                </div>
+                
+                <!-- Error Message -->
+                <div id="error-message" class="hidden p-6 bg-red-500/10 border border-red-500/30 rounded-xl">
+                    <p class="text-red-400 font-semibold mb-2">❌ Error</p>
+                    <p class="text-cyan-100/70 text-sm" id="error-text"></p>
+                </div>
+                
+            </form>
+        </div>
+        
+        <!-- Footer Info -->
+        <div class="mt-8 text-center">
+            <p class="text-cyan-300/50 text-sm">
+                🔒 Your data is secure and never shared with third parties
+            </p>
+            <p class="text-cyan-300/40 text-xs mt-2">
+                Free for personal use • Commercial licenses available
+            </p>
+        </div>
+        
+    </div>
+    
+    <script>
+        const form = document.getElementById('download-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnLoading = document.getElementById('btn-loading');
+        const successMsg = document.getElementById('success-message');
+        const errorMsg = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Disable button
+            submitBtn.disabled = true;
+            btnText.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
+            
+            // Hide previous messages
+            successMsg.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+            
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                use_case: document.getElementById('use_case').value
+            };
+            
+            try {
+                const response = await fetch('/api/request-download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    successMsg.classList.remove('hidden');
+                    form.reset();
+                    
+                    // In production: email would be sent
+                    // For demo: redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/get-download/' + data.download_token;
+                    }, 2000);
+                } else {
+                    errorText.textContent = data.error || 'Something went wrong';
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorText.textContent = 'Network error. Please try again.';
+                errorMsg.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
