@@ -34,7 +34,7 @@ export default function FeatureHighlights() {
               >
                 {feature.metric && (
                   <div className="mb-4">
-                    <span className="text-5xl font-playfair font-bold gradient-text">
+                    <span className="text-5xl font-space font-bold gradient-text">
                       {feature.metric}
                     </span>
                     <span className="text-sm text-gestura-text-secondary ml-2 uppercase tracking-wider">
@@ -42,7 +42,7 @@ export default function FeatureHighlights() {
                     </span>
                   </div>
                 )}
-                <h3 className="text-3xl font-playfair font-semibold text-gestura-text-primary mb-4 group-hover:gradient-text transition-all">
+                <h3 className="text-3xl font-space font-bold text-gestura-text-primary mb-4 group-hover:gradient-text transition-all">
                   {feature.title}
                 </h3>
                 <p className="text-sm text-gestura-text-secondary font-inter leading-relaxed">
@@ -138,7 +138,7 @@ export default function FeatureHighlights() {
               >
                 {feature.metric && (
                   <div className="mb-4">
-                    <span className="text-5xl font-playfair font-bold gradient-text">
+                    <span className="text-5xl font-space font-bold gradient-text">
                       {feature.metric}
                     </span>
                     <span className="text-sm text-gestura-text-secondary ml-2 uppercase tracking-wider">
@@ -146,7 +146,7 @@ export default function FeatureHighlights() {
                     </span>
                   </div>
                 )}
-                <h3 className="text-3xl font-playfair font-semibold text-gestura-text-primary mb-4 group-hover:gradient-text transition-all">
+                <h3 className="text-3xl font-space font-bold text-gestura-text-primary mb-4 group-hover:gradient-text transition-all">
                   {feature.title}
                 </h3>
                 <p className="text-sm text-gestura-text-secondary font-inter leading-relaxed">

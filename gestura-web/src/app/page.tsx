@@ -1,44 +1,67 @@
 'use client';
 
 import { useEffect } from 'react';
-import HeroCanvasAnimation from '@/components/HeroCanvasAnimation';
-import GestureShowcase from '@/components/GestureShowcase';
-import FeatureHighlights from '@/components/FeatureHighlights';
-import UseCases from '@/components/UseCases';
-import FinalCTA from '@/components/FinalCTA';
+import CustomCursor from '@/components/CustomCursor';
+import MinimalNav from '@/components/MinimalNav';
+import ScrollProgressBar from '@/components/ScrollProgressBar';
+import MinimalHero from '@/components/MinimalHero';
+import MinimalFeatures from '@/components/MinimalFeatures';
+import ParallaxSection from '@/components/ParallaxSection';
+import ProblemSolution from '@/components/ProblemSolution';
+import MinimalCTA from '@/components/MinimalCTA';
+import MinimalFooter from '@/components/MinimalFooter';
 
 export default function Home() {
   useEffect(() => {
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
     
-    // Prevent FOUC (Flash of Unstyled Content)
+    // Prevent FOUC
     document.body.classList.add('loaded');
   }, []);
 
   return (
-    <main className="bg-gestura-navy-dark min-h-screen overflow-x-hidden">
-      {/* Hero: Scroll-Triggered Canvas Animation */}
-      <HeroCanvasAnimation />
+    <>
+      {/* Custom Cursor */}
+      <CustomCursor />
 
-      {/* Gesture Features Showcase */}
-      <GestureShowcase />
+      {/* Scroll Progress Indicator */}
+      <ScrollProgressBar />
 
-      {/* Feature Highlights with Center Visual */}
-      <FeatureHighlights />
+      {/* Navigation */}
+      <MinimalNav />
 
-      {/* Use Cases Section */}
-      <UseCases />
+      <main className="bg-[#0a0a0a] min-h-screen overflow-x-hidden">
+        {/* Hero Section */}
+        <MinimalHero />
 
-      {/* Final Call-to-Action */}
-      <FinalCTA />
+        {/* Spacer for breathing room */}
+        <div className="h-[20vh]" />
 
-      {/* Footer */}
-      <footer className="py-8 px-4 border-t border-gestura-navy-light/30 text-center">
-        <p className="text-gestura-text-secondary font-inter text-sm">
-          © 2026 Gestura. All rights reserved. | <span className="gradient-text font-semibold">Hands Speak. System Listens.</span>
-        </p>
-      </footer>
-    </main>
+        {/* Features Grid */}
+        <MinimalFeatures />
+
+        {/* Spacer */}
+        <div className="h-[20vh]" />
+
+        {/* Parallax Philosophy */}
+        <ParallaxSection />
+
+        {/* Spacer */}
+        <div className="h-[20vh]" />
+
+        {/* Problem-Solution */}
+        <ProblemSolution />
+
+        {/* Spacer */}
+        <div className="h-[20vh]" />
+
+        {/* Final CTA */}
+        <MinimalCTA />
+
+        {/* Footer */}
+        <MinimalFooter />
+      </main>
+    </>
   );
 }

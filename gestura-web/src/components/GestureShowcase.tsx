@@ -6,110 +6,122 @@ import { gestureFeatures } from '@/data/features';
 
 export default function GestureShowcase() {
   return (
-    <section id="features" className="py-32 px-4 md:px-8 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gestura-navy-dark via-gestura-navy to-gestura-navy-dark opacity-80" />
-      
-      {/* Floating Hand Icons */}
-      {['✋', '👆', '✊', '🤏', '👈', '👉'].map((emoji, i) => (
-        <motion.div
-          key={i}
-          initial={{ y: 0, opacity: 0.1 }}
-          animate={{
-            y: [0, -30, 0],
-            opacity: [0.1, 0.2, 0.1],
-            rotate: [0, 10, -10, 0]
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 5 + i,
-            delay: i * 0.5
-          }}
-          className="absolute text-7xl pointer-events-none"
-          style={{
-            left: `${10 + i * 15}%`,
-            top: `${20 + Math.random() * 60}%`
-          }}
-        >
-          {emoji}
-        </motion.div>
-      ))}
+    <section id="features" className="relative py-32 px-4 md:px-8 overflow-hidden">
+      {/* Enhanced Background with depth */}
+      <div className="absolute inset-0">
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-gestura-navy-dark via-transparent to-gestura-navy-dark" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gestura-cyan/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gestura-purple/10 rounded-full blur-3xl" />
+      </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section Header */}
+        {/* Section Header - Enhanced */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-24"
         >
-          <motion.span
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-2 bg-gestura-cyan/10 border border-gestura-cyan/30 rounded-full text-gestura-cyan text-sm font-semibold uppercase tracking-wider mb-6"
+            className="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-gestura-cyan/10 backdrop-blur-sm border border-gestura-cyan/30 rounded-full"
           >
-            11 Powerful Gestures
-          </motion.span>
+            <div className="w-2 h-2 bg-gestura-cyan rounded-full animate-pulse" />
+            <span className="text-gestura-cyan text-sm font-semibold uppercase tracking-wider">
+              Powerful Gestures
+            </span>
+          </motion.div>
           
-          <h2 className="text-6xl md:text-8xl font-playfair font-bold gradient-text mb-6">
-            Control Everything
+          <h2 className="text-4xl md:text-5xl font-space font-semibold mb-6">
+            <span className="gradient-text">Control Everything</span>
           </h2>
-          <p className="text-xl md:text-2xl text-gestura-text-secondary font-inter max-w-3xl mx-auto">
-            From navigation to media control, discover gestures that transform how you interact with your computer
+          <p className="text-lg md:text-xl text-gestura-text-secondary font-inter max-w-3xl mx-auto leading-relaxed">
+            From navigation to media control, discover gestures that transform  
+            <span className="text-white font-medium"> how you interact</span> with your computer
           </p>
         </motion.div>
 
-        {/* Gesture Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {/* Gesture Cards Grid - Better spacing and layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
           {gestureFeatures.map((feature, index) => (
             <GestureCard key={feature.id} feature={feature} index={index} />
           ))}
         </div>
 
-        {/* Stats Banner */}
+        {/* Enhanced Stats Banner */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="glass-panel rounded-3xl p-12"
+          className="relative overflow-hidden rounded-3xl p-1"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
+          {/* Gradient border effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-gestura-cyan via-gestura-purple to-gestura-cyan opacity-50 blur-xl" />
+          
+          <div className="relative bg-gestura-navy-dark/90 backdrop-blur-2xl rounded-3xl p-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ type: 'spring', stiffness: 200 }}
-                className="text-6xl md:text-7xl font-playfair font-bold gradient-text mb-3"
+                className="group"
               >
-                &lt;30ms
+                <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
+                  <span className="bg-gradient-to-r from-gestura-cyan to-blue-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
+                    &lt;30ms
+                  </span>
+                </div>
+                <p className="text-gestura-text-secondary font-inter font-medium">
+                  Response Time
+                </p>
+                <p className="text-gestura-text-secondary/60 font-inter text-sm mt-2">
+                  Faster than human perception
+                </p>
               </motion.div>
-              <p className="text-gestura-text-secondary font-inter text-lg">Response Time</p>
-            </div>
-            <div>
+
               <motion.div
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
-                className="text-6xl md:text-7xl font-playfair font-bold gradient-text mb-3"
+                className="group"
               >
-                99%
+                <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
+                  <span className="bg-gradient-to-r from-gestura-purple to-pink-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
+                    99%
+                  </span>
+                </div>
+                <p className="text-gestura-text-secondary font-inter font-medium">
+                  Accuracy Rate
+                </p>
+                <p className="text-gestura-text-secondary/60 font-inter text-sm mt-2">
+                  Reliable gesture recognition
+                </p>
               </motion.div>
-              <p className="text-gestura-text-secondary font-inter text-lg">Accuracy Rate</p>
-            </div>
-            <div>
+
               <motion.div
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-                className="text-6xl md:text-7xl font-playfair font-bold gradient-text mb-3"
+                className="group"
               >
-                30FPS
+                <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
+                  <span className="bg-gradient-to-r from-gestura-cyan to-gestura-purple bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
+                    30FPS
+                  </span>
+                </div>
+                <p className="text-gestura-text-secondary font-inter font-medium">
+                  Real-Time Tracking
+                </p>
+                <p className="text-gestura-text-secondary/60 font-inter text-sm mt-2">
+                  Smooth, responsive control
+                </p>
               </motion.div>
-              <p className="text-gestura-text-secondary font-inter text-lg">Real-Time Tracking</p>
             </div>
           </div>
         </motion.div>

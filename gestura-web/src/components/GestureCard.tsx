@@ -39,7 +39,7 @@ export default function GestureCard({ feature, index }: GestureCardProps) {
       </div>
 
       {/* Title & Description */}
-      <h3 className="text-3xl font-playfair font-bold text-gestura-text-primary mb-3 group-hover:gradient-text transition-all duration-300">
+      <h3 className="text-2xl font-space font-semibold text-gestura-text-primary mb-3 group-hover:gradient-text transition-all duration-300">
         {feature.name}
       </h3>
       <p className="text-sm text-gestura-text-secondary font-inter mb-6 leading-relaxed">

@@ -32,7 +32,7 @@ export default function FinalCTA() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-6xl md:text-8xl lg:text-9xl font-playfair font-bold gradient-text mb-8 leading-tight"
+          className="text-4xl md:text-6xl lg:text-7xl font-space font-semibold gradient-text mb-6 leading-tight"
         >
           Ready to Experience Gestura?
         </motion.h2>
@@ -43,9 +43,11 @@ export default function FinalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="text-xl md:text-2xl text-gestura-text-secondary mb-16 font-inter"
+          className="text-lg md:text-xl text-gestura-text-secondary mb-12 font-inter leading-relaxed"
         >
-          Join thousands empowering their workflow with gesture control
+          Join thousands empowering their workflow with
+          <br className="hidden md:block" />
+          <span className="text-white font-medium">  natural gesture control</span>
         </motion.p>
 
         {/* CTA Buttons */}
@@ -58,24 +60,27 @@ export default function FinalCTA() {
         >
           <motion.a
             href="/download"
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="group px-12 py-6 bg-gradient-to-r from-gestura-cyan to-gestura-purple text-white text-xl font-semibold font-inter rounded-full shadow-2xl glow-cyan hover:glow-purple transition-all flex items-center gap-3"
+            className="group relative px-10 py-4 bg-gradient-to-r from-gestura-cyan to-gestura-purple text-white font-semibold font-inter rounded-full shadow-2xl overflow-hidden"
           >
-            Download Now
-            <motion.span
-              animate={{ x: [0, 5, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-            >
-              →
-            </motion.span>
+            <span className="relative z-10 flex items-center gap-3">
+              Download Now
+              <motion.span
+                animate={{ x: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              >
+                →
+              </motion.span>
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-gestura-purple to-gestura-cyan opacity-0 group-hover:opacity-100 transition-opacity" />
           </motion.a>
 
           <motion.a
             href="/dashboard"
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="px-12 py-6 glass-panel border-2 border-gestura-cyan/50 text-gestura-text-primary text-xl font-semibold font-inter rounded-full hover:border-gestura-cyan transition-all"
+            className="px-10 py-4 glass-panel border-2 border-gestura-cyan/50 text-gestura-text-primary font-semibold font-inter rounded-full hover:border-gestura-cyan hover:bg-gestura-cyan/5 transition-all"
           >
             Try Demo
           </motion.a>
@@ -94,28 +99,37 @@ export default function FinalCTA() {
             { value: '100%', label: 'Privacy Protected' },
             { value: '2 Min', label: 'Setup Time' }
           ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-4xl font-playfair font-bold gradient-text mb-2">
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.1 }}
+              className="text-center group cursor-pointer"
+            >
+              <div className="text-3xl font-space font-semibold gradient-text mb-2 group-hover:scale-110 transition-transform inline-block">
                 {stat.value}
               </div>
               <div className="text-sm text-gestura-text-secondary font-inter uppercase tracking-wider">
                 {stat.label}
               </div>
-            </div>
+            </motion.div>
           ))}
         </motion.div>
 
-        {/* Decorative Sparkle */}
-        <motion.div
-          animate={{
-            rotate: [0, 360],
-            scale: [1, 1.3, 1]
-          }}
-          transition={{ repeat: Infinity, duration: 6 }}
-          className="mt-16 text-gestura-cyan text-5xl"
-        >
-          ✦
-        </motion.div>
+        {/* Decorative Sparkles */}
+        <div className="mt-16 flex items-center justify-center gap-6">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              animate={{
+                rotate: i % 2 === 0 ? [0, 360] : [360, 0],
+                scale: [1, 1.3, 1]
+              }}
+              transition={{ repeat: Infinity, duration: 6, delay: i * 2 }}
+              className="text-gestura-cyan text-3xl opacity-50"
+            >
+              ✦
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

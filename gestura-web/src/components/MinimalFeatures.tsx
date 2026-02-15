@@ -1,0 +1,87 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { gestureFeatures } from '../data/features';
+
+export default function MinimalFeatures() {
+  return (
+    <section className="relative py-32 px-6 overflow-hidden">
+      {/* Japanese character - background */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 0.03 }}
+        viewport={{ once: true }}
+        className="absolute left-10 top-20 text-[15rem] font-jp font-bold text-white pointer-events-none hidden lg:block"
+        style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
+      >
+        制御
+      </motion.div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Section Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="mb-20"
+        >
+          <h2 className="text-5xl md:text-7xl font-light leading-tight mb-6">
+            <span className="block overflow-hidden">
+              <motion.span
+                initial={{ y: '100%' }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                className="block"
+              >
+                Flow Control
+              </motion.span>
+            </span>
+          </h2>
+          <div className="w-24 h-px bg-gestura-cyan" />
+        </motion.div>
+
+        {/* Feature Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {gestureFeatures.slice(0, 6).map((feature, index) => (
+            <motion.div
+              key={feature.id}
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.6,
+                delay: index * 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              whileHover={{ y: -5 }}
+              className="group relative glass-panel p-8 overflow-hidden"
+            >
+              {/* Gradient overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gestura-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Number */}
+              <div className="relative text-gestura-cyan text-sm font-mono mb-4">
+                {String(index + 1).padStart(2, '0')}
+              </div>
+
+              {/* Icon */}
+              <div className="relative text-4xl mb-4">{feature.icon}</div>
+
+              {/* Title */}
+              <h3 className="relative text-2xl font-light mb-3 group-hover:text-gestura-cyan transition-colors duration-300">
+                {feature.name}
+              </h3>
+
+              {/* Description */}
+              <p className="relative text-neutral-400 text-sm leading-relaxed">
+                {feature.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
