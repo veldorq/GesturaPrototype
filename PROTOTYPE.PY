@@ -57,6 +57,69 @@ except ImportError:
 
 
 # ============================================================================
+# CAMERA INITIALIZATION WITH RETRY
+# ============================================================================
+
+class CameraInitializationError(Exception):
+    """Custom exception for camera initialization failures"""
+    pass
+
+
+def initialize_camera_with_retry(camera_index=0, max_attempts=3, retry_delay=2.0):
+    """
+    Initialize camera with exponential backoff retry logic.
+    
+    Args:
+        camera_index (int): Camera device index (0, 1, 2, etc.)
+        max_attempts (int): Maximum number of initialization attempts
+        retry_delay (float): Base delay in seconds between attempts (doubles each retry)
+    
+    Returns:
+        cv2.VideoCapture: Successfully opened camera capture object
+    
+    Raises:
+        CameraInitializationError: If camera fails to open after all retry attempts
+    """
+    for attempt in range(1, max_attempts + 1):
+        print(f"\n🎥 Attempting to initialize camera (Attempt {attempt}/{max_attempts})...")
+        
+        cap = cv2.VideoCapture(camera_index)
+        
+        if cap.isOpened():
+            print(f"✅ Camera initialized successfully on attempt {attempt}")
+            return cap
+        
+        # Release failed capture object
+        cap.release()
+        
+        if attempt < max_attempts:
+            wait_time = retry_delay * (2 ** (attempt - 1))  # Exponential backoff: 2s, 4s, 8s...
+            print(f"⏳ Camera not available. Retrying in {wait_time:.1f} seconds...")
+            time.sleep(wait_time)
+        else:
+            # Final attempt failed - raise detailed error
+            error_msg = (
+                f"\n{'='*70}\n"
+                f"❌ CAMERA INITIALIZATION FAILED AFTER {max_attempts} ATTEMPTS\n"
+                f"{'='*70}\n\n"
+                f"Failed to open camera at index {camera_index}.\n\n"
+                f"Common solutions:\n"
+                f"  1. 📷️ Check camera connection - Ensure webcam is plugged in\n"
+                f"  2. 🔒 Grant camera permissions - Check Windows Privacy Settings\n"
+                f"  3. ❌ Close conflicting apps - Zoom, Teams, or other webcam apps may be using camera\n"
+                f"  4. 🔄 Try different camera index - Change Config.CAMERA_INDEX (0, 1, 2...)\n"
+                f"  5. 🔌 Replug your webcam and restart the application\n"
+                f"  6. 💻 Restart your computer if camera appears stuck\n\n"
+                f"💡 Quick Fix: Open Windows Settings → Privacy → Camera → Allow apps to access camera\n"
+                f"\n{'='*70}\n"
+            )
+            raise CameraInitializationError(error_msg)
+    
+    # Should never reach here, but added for type checking
+    raise CameraInitializationError("Unexpected error in camera initialization")
+
+
+# ============================================================================
 # CONFIGURATION & CONSTANTS
 # ============================================================================
 
@@ -2098,27 +2161,16 @@ class HandGestureControlSystem:
         self.history = GestureHistory() if Config.ENABLE_GESTURE_HISTORY else None
         self.visual_effects = VisualEffects() if Config.ENABLE_VISUAL_TRAILS else None
         
-        # Video capture with validation
-        self.cap = cv2.VideoCapture(Config.CAMERA_INDEX)
-        
-        # SAFETY: Verify camera opened successfully with detailed error handling
-        if not self.cap.isOpened():
-            error_msg = (
-                f"\n{'='*70}\n"
-                f"❌ CAMERA INITIALIZATION FAILED\n"
-                f"{'='*70}\n\n"
-                f"Failed to open camera at index {Config.CAMERA_INDEX}.\n\n"
-                f"Common solutions:\n"
-                f"  1. ���️ Check camera connection - Ensure webcam is plugged in\n"
-                f"  2. 🔒 Grant camera permissions - Check Windows Privacy Settings\n"
-                f"  3. ❌ Close conflicting apps - Zoom, Teams, or other webcam apps may be using camera\n"
-                f"  4. 🔄 Try different camera index - Change Config.CAMERA_INDEX (0, 1, 2...)\n"
-                f"  5. 🔌 Replug your webcam and restart the application\n\n"
-                f"💡 Quick Fix: Open Windows Settings → Privacy → Camera → Allow apps to access camera\n"
-                f"\n{'='*70}\n"
+        # Video capture with retry logic for reliability
+        try:
+            self.cap = initialize_camera_with_retry(
+                camera_index=Config.CAMERA_INDEX,
+                max_attempts=3,
+                retry_delay=2.0
             )
-            print(error_msg)
-            raise RuntimeError(error_msg)
+        except CameraInitializationError as e:
+            print(str(e))
+            raise RuntimeError(str(e))
         
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, Config.FRAME_WIDTH)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, Config.FRAME_HEIGHT)

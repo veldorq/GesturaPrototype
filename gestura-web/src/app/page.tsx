@@ -11,6 +11,7 @@ import HowItWorks from '@/components/HowItWorks';
 import TechStack from '@/components/TechStack';
 import ParallaxSection from '@/components/ParallaxSection';
 import ProblemSolution from '@/components/ProblemSolution';
+import FAQ from '@/components/FAQ';
 import MinimalCTA from '@/components/MinimalCTA';
 import MinimalFooter from '@/components/MinimalFooter';
 
@@ -67,6 +68,9 @@ export default function Home() {
 
         {/* Problem-Solution */}
         <ProblemSolution />
+
+        {/* FAQ Section */}
+        <FAQ />
 
         {/* Spacer */}
         <div className="h-[10vh] md:h-[15vh]" />

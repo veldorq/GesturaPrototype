@@ -18,8 +18,19 @@ fetch('/api/status')
         isDemoMode = false;
     });
 
-// Socket.IO connection
-const socket = io();
+// Socket.IO connection with enhanced reconnection
+const socket = io({
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    reconnectionAttempts: 5,
+    timeout: 20000
+});
+
+// Reconnection tracking
+let reconnectAttempts = 0;
+let lastHeartbeat = Date.now();
+let heartbeatInterval = null;
 
 // UI Elements
 const startBtn = document.getElementById('start-btn');
@@ -238,17 +249,62 @@ function stopDemoSimulation() {
 
 socket.on('connect', () => {
     console.log('[CLIENT] Connected to server');
+    reconnectAttempts = 0;
+    lastHeartbeat = Date.now();
     updateConnectionStatus(true);
+    
+    if (reconnectAttempts > 0) {
+        showStatus('Reconnected to server successfully', 'success');
+    }
+    
+    // Start heartbeat monitoring
+    if (heartbeatInterval) clearInterval(heartbeatInterval);
+    heartbeatInterval = setInterval(() => {
+        const elapsed = Date.now() - lastHeartbeat;
+        if (elapsed > 30000) { // 30 seconds stale
+            console.warn('[CLIENT] Connection appears stale, reconnecting...');
+            socket.disconnect();
+            socket.connect();
+        }
+    }, 10000); // Check every 10 seconds
 });
 
-socket.on('disconnect', () => {
-    console.log('[CLIENT] Disconnected from server');
+socket.on('disconnect', (reason) => {
+    console.log('[CLIENT] Disconnected from server:', reason);
     updateConnectionStatus(false);
-    showStatus('Connection lost. Refresh page to reconnect.', 'error');
+    
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+    }
+    
+    if (reason === 'io server disconnect') {
+        showStatus('Server closed connection. Click refresh to reconnect.', 'error');
+    } else if (reason === 'transport close') {
+        showStatus('Connection lost. Attempting to reconnect...', 'warning');
+    } else {
+        showStatus('Connection lost. Reconnecting automatically...', 'warning');
+    }
+});
+
+socket.on('reconnect_attempt', (attempt) => {
+    reconnectAttempts = attempt;
+    console.log(`[CLIENT] Reconnection attempt ${attempt}/5`);
+    showStatus(`Reconnecting... (Attempt ${attempt}/5)`, 'info');
+});
+
+socket.on('reconnect_error', (error) => {
+    console.error('[CLIENT] Reconnection error:', error);
+});
+
+socket.on('reconnect_failed', () => {
+    console.error('[CLIENT] Reconnection failed after 5 attempts');
+    showStatus('Unable to reconnect. Please refresh the page.', 'error');
 });
 
 socket.on('connection_status', (data) => {
     console.log('[CLIENT] Connection status:', data);
+    lastHeartbeat = Date.now(); // Update heartbeat
     if (data.running) {
         updateSystemRunning(true);
     }
@@ -256,6 +312,7 @@ socket.on('connection_status', (data) => {
 
 socket.on('status_update', (data) => {
     console.log('[CLIENT] Status update:', data);
+    lastHeartbeat = Date.now(); // Update heartbeat
     
     if (data.status === 'running') {
         updateSystemRunning(true);
@@ -270,12 +327,14 @@ socket.on('status_update', (data) => {
 
 socket.on('error', (data) => {
     console.error('[CLIENT] Error:', data);
+    lastHeartbeat = Date.now(); // Update heartbeat
     showStatus(data.message, 'error');
     updateSystemRunning(false);
 });
 
 socket.on('frame_update', (data) => {
     // Update camera feed with RAF batching and image decode hint
+    lastHeartbeat = Date.now(); // Update heartbeat
     if (data.image) {
         scheduleUpdate('frame', () => {
             const img = new Image();
@@ -303,6 +362,7 @@ socket.on('frame_update', (data) => {
 
 socket.on('gesture_detected', (data) => {
     console.log('[CLIENT] Gesture detected:', data);
+    lastHeartbeat = Date.now(); // Update heartbeat
     
     // Batch gesture updates with RAF
     scheduleUpdate('gesture', () => {
@@ -329,6 +389,7 @@ socket.on('gesture_detected', (data) => {
 });
 
 socket.on('metrics_update', (data) => {
+    lastHeartbeat = Date.now(); // Update heartbeat
     // Batch metrics updates with RAF
     scheduleUpdate('fps', () => {
         // Update FPS display
