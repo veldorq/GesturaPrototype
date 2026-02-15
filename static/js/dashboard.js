@@ -66,21 +66,170 @@ function flushUpdates() {
 
 // Demo Mode Handler
 function initDemoMode() {
-    // Disable start button
-    startBtn.disabled = true;
-    startBtn.textContent = 'Demo Mode - Download to Use';
-    startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    console.log('[DEMO] Initializing demo mode...');
+    
+    // Update button to show it's demo
+    startBtn.textContent = 'Start Demo';
+    startBtn.disabled = false;
+    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
     
     // Update connection status
     connectionText.textContent = 'Demo Mode';
-    connectionStatus.style.background = '#FFA500';
-    
-    // Show demo message
-    showStatus('This is a preview. Download Gestura to use gesture control on your computer.', 'info');
+    connectionStatus.style.background = '#00D9FF';
+    connectionStatus.classList.add('pulse-cyan');
     
     // Update system status
-    systemStatus.textContent = 'Demo Only';
-    systemStatus.className = 'text-sm font-semibold text-orange-400 px-3 py-1 bg-orange-400/10 rounded-full border border-orange-400/30';
+    systemStatus.textContent = 'Demo Ready';
+    systemStatus.className = 'text-sm font-semibold text-cyan-400 px-3 py-1 bg-cyan-400/10 rounded-full border border-cyan-400/30';
+    
+    // Override start button to run demo
+    startBtn.onclick = startDemoSimulation;
+}
+
+// Demo simulation data
+const demoGestures = [
+    { gesture: 'OPEN_PALM', action: 'Scroll Down', icon: '✋', color: 'cyan' },
+    { gesture: 'CLOSED_FIST', action: 'Scroll Up', icon: '✊', color: 'purple' },
+    { gesture: 'INDEX_FINGER', action: 'Mouse Move', icon: '☝️', color: 'cyan' },
+    { gesture: 'PEACE_SIGN', action: 'Click', icon: '✌️', color: 'purple' },
+    { gesture: 'SWIPE_LEFT', action: 'Previous Tab', icon: '👈', color: 'cyan' },
+    { gesture: 'SWIPE_RIGHT', action: 'Next Tab', icon: '👉', color: 'purple' },
+    { gesture: 'PINCH_ZOOM', action: 'Zoom In/Out', icon: '🤏', color: 'cyan' },
+    { gesture: 'THUMB_DOWN', action: 'Mute/Unmute', icon: '👎', color: 'purple' }
+];
+
+let demoInterval = null;
+let demoRunning = false;
+let demoIndex = 0;
+let demoFPS = 30;
+
+function startDemoSimulation() {
+    if (demoRunning) return;
+    
+    demoRunning = true;
+    startBtn.disabled = true;
+    startBtn.textContent = 'Demo Running...';
+    stopBtn.classList.remove('hidden');
+    stopBtn.disabled = false;
+    
+    // Show demo camera placeholder
+    cameraPlaceholder.innerHTML = `
+        <div class="text-center">
+            <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-full flex items-center justify-center relative overflow-hidden demo-pulse">
+                <div id="demo-hand" class="text-8xl transition-all duration-500">✋</div>
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 animate-pulse"></div>
+            </div>
+            <p class="text-cyan-200/80 text-lg font-medium mb-2">Demo Simulation Running</p>
+            <p class="text-sm text-cyan-300/50">Showing all 11 gestures</p>
+        </div>
+    `;
+    
+    cameraPlaceholder.classList.remove('hidden');
+    cameraFeed.classList.add('hidden');
+    
+    showStatus('Demo started! Watch the gestures cycle through automatically', 'success');
+    
+    systemStatus.textContent = 'Running';
+    systemStatus.className = 'text-sm font-semibold text-green-400 px-3 py-1 bg-green-400/10 rounded-full border border-green-400/30';
+    
+    // Simulate FPS
+    demoFPS = 30;
+    updateDemoMetrics();
+    
+    // Start gesture cycling
+    demoIndex = 0;
+    cycleNextGesture();
+    demoInterval = setInterval(cycleNextGesture, 2500);
+    
+    // Override stop button
+    stopBtn.onclick = stopDemoSimulation;
+}
+
+function cycleNextGesture() {
+    const gesture = demoGestures[demoIndex];
+    
+    // Update hand icon
+    const handIcon = document.getElementById('demo-hand');
+    if (handIcon) {
+        handIcon.textContent = gesture.icon;
+        handIcon.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            handIcon.style.transform = 'scale(1)';
+        }, 200);
+    }
+    
+    // Trigger gesture detection animation
+    currentGesture.textContent = gesture.gesture;
+    currentGesture.classList.add('gesture-flash');
+    setTimeout(() => currentGesture.classList.remove('gesture-flash'), 400);
+    
+    // Update action
+    lastAction.textContent = gesture.action;
+    lastAction.classList.add('pulse-purple');
+    setTimeout(() => lastAction.classList.remove('pulse-purple'), 600);
+    
+    // Increment counter
+    gestureCounter++;
+    gestureCount.textContent = gestureCounter;
+    
+    // Add to history
+    addHistoryItem({
+        gesture: gesture.gesture,
+        action: gesture.action,
+        timestamp: new Date().toISOString()
+    });
+    
+    // Move to next gesture
+    demoIndex = (demoIndex + 1) % demoGestures.length;
+    
+    // Vary FPS slightly for realism
+    demoFPS = 28 + Math.floor(Math.random() * 5);
+    fpsDisplay.textContent = demoFPS;
+}
+
+function updateDemoMetrics() {
+    if (!demoRunning) return;
+    
+    fpsDisplay.textContent = demoFPS;
+    fpsDisplay.className = 'text-3xl font-bold text-green-400';
+    
+    setTimeout(updateDemoMetrics, 100);
+}
+
+function stopDemoSimulation() {
+    demoRunning = false;
+    
+    if (demoInterval) {
+        clearInterval(demoInterval);
+        demoInterval = null;
+    }
+    
+    startBtn.disabled = false;
+    startBtn.textContent = 'Start Demo';
+    stopBtn.classList.add('hidden');
+    
+    // Reset display
+    cameraPlaceholder.innerHTML = `
+        <div class="text-center">
+            <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center">
+                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+            <p class="text-cyan-200/80 text-lg font-medium">Click "Start Demo" to see gestures</p>
+            <p class="text-sm text-cyan-300/50 mt-3">Demo cycles through all 11 gestures</p>
+        </div>
+    `;
+    
+    currentGesture.textContent = 'NONE';
+    lastAction.textContent = '—';
+    fpsDisplay.textContent = '0';
+    
+    systemStatus.textContent = 'Demo Ready';
+    systemStatus.className = 'text-sm font-semibold text-cyan-400 px-3 py-1 bg-cyan-400/10 rounded-full border border-cyan-400/30';
+    
+    showStatus('Demo stopped. Click "Start Demo" to run again', 'info');
 }
 
 // ============================================================================
@@ -210,7 +359,7 @@ socket.on('metrics_update', (data) => {
 
 startBtn.addEventListener('click', () => {
     if (isDemoMode) {
-        showStatus('Download Gestura to enable gesture control on your local machine', 'info');
+        startDemoSimulation();
         return;
     }
     
@@ -222,6 +371,7 @@ startBtn.addEventListener('click', () => {
 
 stopBtn.addEventListener('click', () => {
     if (isDemoMode) {
+        stopDemoSimulation();
         return;
     }
     
