@@ -11,9 +11,19 @@ from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 import os
 
+# Configuration from environment variables
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gestura-secret-key-2026')
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gestura-default-secret-2026')
+app.config['ENV'] = os.environ.get('FLASK_ENV', 'production')
+app.config['DEBUG'] = os.environ.get('DEBUG', 'False').lower() == 'true'
+
+# CORS configuration
+ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', '*')
+socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS, async_mode='eventlet')
+
+# Deployment info
+DEPLOYMENT_MODE = os.environ.get('DEPLOYMENT_MODE', 'demo')
+GITHUB_REPO = os.environ.get('GITHUB_REPO', 'https://github.com/veldorq/GesturaPrototype')
 
 
 @app.route('/')
@@ -39,8 +49,10 @@ def get_status():
     """Get deployment status"""
     return jsonify({
         'deployment': 'production',
-        'mode': 'demo',
+        'mode': DEPLOYMENT_MODE,
+        'environment': app.config['ENV'],
         'message': 'Download for full gesture control functionality',
+        'github_repo': GITHUB_REPO,
         'gestures_available': 11,
         'features': {
             'real_time_tracking': True,
