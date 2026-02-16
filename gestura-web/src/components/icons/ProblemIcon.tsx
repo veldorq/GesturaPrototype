@@ -29,33 +29,41 @@ export default function ProblemIcon({
             xmlns="http://www.w3.org/2000/svg"
             className={`relative z-10 transition-all duration-300 ease-out ${className}`}
           >
-            {/* Broken chain/connection */}
+            {/* Broken link/connection with arrows showing interruption */}
             <path
-              d="M10 13L14 17M14 7L10 11"
+              d="M8 16L4 12L8 8"
               stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M16 8L20 12L16 16"
+              stroke="url(#problem-gradient)"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M9 12H11"
+              stroke="url(#problem-gradient)"
+              strokeWidth="1.8"
               strokeLinecap="round"
             />
             <path
-              d="M9 7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7"
+              d="M13 12H15"
               stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
+              strokeWidth="1.8"
               strokeLinecap="round"
             />
-            <path
-              d="M15 17C15 18.6569 13.6569 20 12 20C10.3431 20 9 18.6569 9 17"
+            <line
+              x1="11.5"
+              y1="11.5"
+              x2="12.5"
+              y2="12.5"
               stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
+              strokeWidth="2"
               strokeLinecap="round"
-            />
-            <circle
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              opacity="0.3"
             />
             <defs>
               <linearGradient id="problem-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -77,16 +85,24 @@ export default function ProblemIcon({
             xmlns="http://www.w3.org/2000/svg"
             className={`relative z-10 transition-all duration-300 ease-out ${className}`}
           >
-            {/* Lightning bolt with X - representing strain/damage */}
+            {/* Hand with pain/strain indicator */}
             <path
-              d="M13 3L8 12H12L11 21L16 12H12L13 3Z"
+              d="M13 5V10M16 5V10M19 8V15C19 18.31 16.31 21 13 21H12C9.79 21 7.96 19.5 7.37 17.45"
               stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
+              strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <path
-              d="M17 7L19 9M19 7L17 9"
+              d="M10 5V11M7 8V16"
+              stroke="url(#problem-gradient)"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Pain indicator lines */}
+            <path
+              d="M4 16L3 18M6 16L5 18"
               stroke="url(#problem-gradient)"
               strokeWidth="1.5"
               strokeLinecap="round"
@@ -111,19 +127,25 @@ export default function ProblemIcon({
             xmlns="http://www.w3.org/2000/svg"
             className={`relative z-10 transition-all duration-300 ease-out ${className}`}
           >
-            {/* Block/barrier symbol */}
+            {/* Lock with person silhouette - accessibility barrier */}
             <circle
               cx="12"
-              cy="12"
-              r="10"
+              cy="8"
+              r="3"
               stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
+              strokeWidth="1.8"
             />
             <path
-              d="M6 6L18 18"
+              d="M7 20V18C7 15.7909 8.79086 14 11 14H13C15.2091 14 17 15.7909 17 18V20"
               stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M6 14L18 20M18 14L6 20"
+              stroke="url(#problem-gradient)"
+              strokeWidth="1.8"
               strokeLinecap="round"
             />
             <defs>
@@ -147,20 +169,26 @@ export default function ProblemIcon({
             xmlns="http://www.w3.org/2000/svg"
             className={`relative z-10 transition-all duration-300 ease-out ${className}`}
           >
-            {/* Premium triangle alert */}
-            <path
-              d="M12 9V13M12 17H12.01"
+            {/* Anchor/chain - being tied down */}
+            <circle
+              cx="12"
+              cy="13"
+              r="4"
               stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
+              strokeWidth="1.8"
+            />
+            <path
+              d="M12 3V9M9 6H15"
+              stroke="url(#problem-gradient)"
+              strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <path
-              d="M10.29 3.86L1.82 18C1.64537 18.3024 1.55296 18.6453 1.55199 18.9945C1.55101 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5467 2.53773 20.7239C2.83871 20.901 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.901 21.4623 20.7239C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98585 12.3437 2.89725 12 2.89725C11.6563 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z"
+              d="M16 16.5L19 19.5M8 16.5L5 19.5"
               stroke="url(#problem-gradient)"
-              strokeWidth="1.5"
+              strokeWidth="1.8"
               strokeLinecap="round"
-              strokeLinejoin="round"
             />
             <defs>
               <linearGradient id="problem-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
