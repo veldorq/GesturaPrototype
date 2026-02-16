@@ -2,6 +2,13 @@
 
 import { motion } from 'framer-motion';
 
+const techBadges = [
+  { name: 'Python 3.11', url: 'https://www.python.org' },
+  { name: 'MediaPipe 0.10', url: 'https://developers.google.com/mediapipe' },
+  { name: 'TensorFlow 2.x', url: 'https://www.tensorflow.org' },
+  { name: 'OpenCV 4.x', url: 'https://opencv.org' },
+];
+
 const technologies = [
   {
     category: 'Computer Vision',
@@ -91,13 +98,16 @@ export default function TechStack() {
             Built with open-source technologies, designed for privacy
           </p>
           <div className="flex justify-center gap-4 flex-wrap">
-            {['Python 3.11', 'MediaPipe 0.10', 'TensorFlow 2.x', 'OpenCV 4.x'].map((tech, i) => (
-              <span
+            {techBadges.map((tech, i) => (
+              <a
                 key={i}
-                className="px-4 py-2 text-xs bg-white/5 border border-white/10 rounded-full text-neutral-400"
+                href={tech.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group px-4 py-2 text-xs bg-white/5 border border-white/10 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 hover:border-gestura-cyan/50 hover:shadow-lg hover:shadow-gestura-cyan/10 transition-all duration-200 cursor-pointer"
               >
-                {tech}
-              </span>
+                {tech.name}
+              </a>
             ))}
           </div>
         </motion.div>
