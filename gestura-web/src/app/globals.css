@@ -116,6 +116,22 @@
   .glow-purple {
     box-shadow: 0 0 40px rgba(123, 97, 255, 0.15);
   }
+  
+  /* Performance: GPU acceleration for animated elements */
+  [class*="motion-"] {
+    will-change: transform, opacity;
+  }
+  
+  /* Performance: Content visibility for off-screen sections */
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+  
+  /* Hero section should always be visible (above fold) */
+  section:first-of-type {
+    content-visibility: visible;
+  }
 }
 
 @keyframes float-subtle {

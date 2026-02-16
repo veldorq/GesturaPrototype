@@ -3,11 +3,6 @@
 import { motion } from 'framer-motion';
 
 export default function MinimalHero() {
-
-  // Split text animation
-  const title = "HANDS SPEAK.";
-  const subtitle = "SYSTEM LISTENS.";
-
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Background with subtle gradient */}
@@ -25,11 +20,11 @@ export default function MinimalHero() {
         }}
       />
 
-      {/* Japanese character - decorative */}
+      {/* Japanese character - decorative - load after initial paint */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.05 }}
-        transition={{ delay: 0.5, duration: 1.5 }}
+        transition={{ delay: 1.5, duration: 2 }}
         className="absolute right-20 top-20 text-[12rem] font-jp font-bold text-white pointer-events-none hidden lg:block"
         style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
       >
@@ -38,46 +33,26 @@ export default function MinimalHero() {
 
       {/* Hero Content */}
       <div className="relative z-10 text-center px-4 max-w-7xl mx-auto">
-        {/* Main Title */}
-        <motion.h1 className="text-[clamp(2rem,6vw,4rem)] font-light leading-tight mb-6 tracking-tight">
-          {title.split('').map((char, i) => (
-            <motion.span
-              key={i}
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.8,
-                delay: 0.3 + i * 0.05,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="inline-block"
-            >
-              {char === ' ' ? '\u00A0' : char}
-            </motion.span>
-          ))}
+        {/* Main Title - Simplified animation for faster Speed Index */}
+        <motion.h1 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.6,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className="text-[clamp(2rem,6vw,4rem)] font-light leading-tight mb-6 tracking-tight"
+        >
+          HANDS SPEAK.
           <br />
-          {subtitle.split('').map((char, i) => (
-            <motion.span
-              key={i}
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.8,
-                delay: 0.8 + i * 0.05,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="inline-block"
-            >
-              {char === ' ' ? '\u00A0' : char}
-            </motion.span>
-          ))}
+          SYSTEM LISTENS.
         </motion.h1>
 
         {/* Subtitle */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5, duration: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
           className="text-base md:text-lg text-neutral-400 font-light mb-8 max-w-2xl mx-auto"
         >
           No hardware. No setup. Just your webcam and 30 seconds.
@@ -85,9 +60,9 @@ export default function MinimalHero() {
 
         {/* Trust Signals */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.7, duration: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
           className="flex flex-wrap justify-center gap-6 mb-12 max-w-3xl mx-auto"
         >
           <div className="flex items-center gap-2 text-sm text-neutral-500">
@@ -114,7 +89,7 @@ export default function MinimalHero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 1 }}
+          transition={{ delay: 0.7, duration: 0.6 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-4"
         >
           <motion.a
