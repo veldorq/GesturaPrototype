@@ -5,36 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestura - Hand Gesture Control for Your Computer</title>
     
-    <!-- Google Fonts -->
+    <!-- Resource Hints for Performance -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <!-- Critical CSS Inline -->
     <style>
-        :root {
-            --cyan-primary: #00D9FF;
-            --purple-primary: #7B61FF;
-            --navy-dark: #0A0E27;
-            --navy-medium: #151B3D;
-            --navy-light: #1E2749;
-        }
-        
-        * {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
+        :root{--cyan-primary:#00D9FF;--purple-primary:#7B61FF;--navy-dark:#0A0E27;--navy-medium:#151B3D;--navy-light:#1E2749}*{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}body{background:#0A0E27;color:#F1F5F9;margin:0;padding:0}.glass-panel-strong{background:rgba(21,27,61,0.85);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(0,217,255,0.3)}.logo-text{font-size:1.75rem;font-weight:800;letter-spacing:-0.02em;background:linear-gradient(135deg,#00D9FF 0%,#7B61FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase}.btn-primary{background:linear-gradient(135deg,#00D9FF 0%,#0099FF 50%,#7B61FF 100%);box-shadow:0 4px 20px rgba(0,217,255,0.3);transition:all 0.3s cubic-bezier(0.4,0,0.2,1);border:1px solid rgba(255,255,255,0.1);position:relative;overflow:hidden}
+    </style>
+    
+    <!-- Google Fonts - Async Load with display=swap -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Tailwind CSS - Async Load -->
+    <script>!function(){var e=document.createElement("script");e.src="https://cdn.tailwindcss.com",e.async=!0,e.defer=!0,document.head.appendChild(e)}();</script>
+    
+    <!-- Full Styles - Deferred Load -->
+    <link rel="preload" as="style" href="data:text/css,.glass-panel{background:rgba(30,39,73,0.6);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(123,97,255,0.15);box-shadow:0 8px 32px rgba(0,0,0,0.4),0 1px 2px rgba(0,217,255,0.1),inset 0 1px 0 rgba(255,255,255,0.08)}">
+    <style media="print" onload="this.media='all';this.onload=null;">
         body {
-            background: #0A0E27;
             background-image: 
                 radial-gradient(at 0% 0%, rgba(0, 217, 255, 0.08) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(123, 97, 255, 0.08) 0px, transparent 50%),
                 linear-gradient(180deg, #0A0E27 0%, #0D1128 50%, #0A0E27 100%);
-            color: #F1F5F9;
         }
         
         .glass-panel {

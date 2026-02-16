@@ -5,36 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestura - Hand Gesture Control Dashboard</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Socket.IO -->
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Resource Hints -->
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdn.socket.io">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Custom Styles -->
+    <!-- Critical CSS -->
     <style>
-        :root {
-            --cyan-primary: #00D9FF;
-            --purple-primary: #7B61FF;
-            --navy-dark: #0A0E27;
-            --navy-medium: #151B3D;
-            --navy-light: #1E2749;
-        }
-        
-        * {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--navy-dark) 0%, #0D1128 50%, var(--navy-medium) 100%);
-            color: #F1F5F9;
-        }
-        
+        :root{--cyan-primary:#00D9FF;--purple-primary:#7B61FF;--navy-dark:#0A0E27;--navy-medium:#151B3D;--navy-light:#1E2749}*{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}body{background:linear-gradient(135deg,var(--navy-dark) 0%,#0D1128 50%,var(--navy-medium) 100%);color:#F1F5F9;margin:0;padding:0}.glass-panel-strong{background:rgba(21,27,61,0.85);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(0,217,255,0.3)}
+    </style>
+    
+    <!-- Async Script Loading -->
+    <script>
+        !function(){var e=document.createElement("script");e.src="https://cdn.tailwindcss.com",e.async=!0,e.defer=!0,document.head.appendChild(e)}();
+        !function(){var e=document.createElement("script");e.src="https://cdn.socket.io/4.5.4/socket.io.min.js",e.async=!0,e.defer=!0,document.head.appendChild(e)}();
+    </script>
+    
+    <!-- Google Fonts - Async -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Deferred Styles -->
+    <style media="print" onload="this.media='all';this.onload=null;">
         /* Glassmorphism panels */
         .glass-panel {
             background: rgba(30, 39, 73, 0.7);

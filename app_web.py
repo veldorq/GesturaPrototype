@@ -10,9 +10,11 @@ This deployed version showcases the interface and provides download instructions
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
+from flask_compress import Compress
 import os
 import logging
 import sys
+from datetime import timedelta
 
 # Import download handler
 from download_handler import register_download_routes
@@ -23,6 +25,19 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gestura-default-secret-
 app.config['ENV'] = os.environ.get('FLASK_ENV', 'production')
 app.config['DEBUG'] = os.environ.get('DEBUG', 'False').lower() == 'true'
 app.config['PRODUCTION'] = app.config['ENV'] == 'production'
+
+# Performance optimizations
+app.config['COMPRESS_MIMETYPES'] = [
+    'text/html', 'text/css', 'text/xml', 'text/plain',
+    'application/json', 'application/javascript',
+    'application/x-javascript', 'image/svg+xml'
+]
+app.config['COMPRESS_LEVEL'] = 6
+app.config['COMPRESS_MIN_SIZE'] = 500
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(days=365)  # Cache static files
+
+# Initialize compression
+Compress(app)
 
 # Setup structured logging
 def setup_logging():
@@ -75,19 +90,29 @@ GITHUB_REPO = os.environ.get('GITHUB_REPO', 'https://github.com/veldorq/GesturaP
 @app.route('/')
 def home():
     """Redirect to product page"""
-    return render_template('product.html')
+    response = app.make_response(render_template('product.html'))
+    # Add performance headers
+    response.headers['Cache-Control'] = 'public, max-age=300'  # 5 minutes
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 
 @app.route('/product')
 def product():
     """Render product landing page"""
-    return render_template('product.html')
+    response = app.make_response(render_template('product.html'))
+    response.headers['Cache-Control'] = 'public, max-age=300'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 
 @app.route('/dashboard')
 def dashboard():
     """Render demo dashboard (info only - requires local install for full functionality)"""
-    return render_template('dashboard.html')
+    response = app.make_response(render_template('dashboard.html'))
+    response.headers['Cache-Control'] = 'public, max-age=300'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 
 @app.route('/api/status')

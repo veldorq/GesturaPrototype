@@ -9,6 +9,9 @@ import MinimalHero from '@/components/MinimalHero';
 import MinimalFeatures from '@/components/MinimalFeatures';
 import HowItWorks from '@/components/HowItWorks';
 import TechStack from '@/components/TechStack';
+import TechnicalSpecs from '@/components/TechnicalSpecs';
+import GestureLibrary from '@/components/GestureLibrary';
+import SystemRequirements from '@/components/SystemRequirements';
 import ParallaxSection from '@/components/ParallaxSection';
 import ProblemSolution from '@/components/ProblemSolution';
 import FAQ from '@/components/FAQ';
@@ -56,6 +59,18 @@ export default function Home() {
 
         {/* Tech Stack */}
         <TechStack />
+
+        {/* Spacer */}
+        <div className="h-[10vh] md:h-[15vh]" />
+
+        {/* Technical Specifications */}
+        <TechnicalSpecs />
+
+        {/* Gesture Library */}
+        <GestureLibrary />
+
+        {/* System Requirements */}
+        <SystemRequirements />
 
         {/* Spacer */}
         <div className="h-[10vh] md:h-[15vh]" />
