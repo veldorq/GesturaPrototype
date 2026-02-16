@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 interface Gesture {
   name: string;
@@ -102,9 +103,16 @@ const gestures: Gesture[] = [
   }
 ];
 
-const categories = ["Scrolling", "Pointing", "Clicking", "Navigation", "Zoom", "Page Actions", "Accessibility", "System"];
+const categories = ["All", "Scrolling", "Pointing", "Clicking", "Navigation", "Zoom", "Page Actions", "Accessibility", "System"];
 
 export default function GestureLibrary() {
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  
+  // Filter gestures based on selected category
+  const filteredGestures = selectedCategory === "All" 
+    ? gestures 
+    : gestures.filter(gesture => gesture.category === selectedCategory);
+  
   return (
     <section className="relative py-32 px-6 bg-[#0a0a0a] overflow-x-hidden">
       {/* Background gradient */}
@@ -123,31 +131,39 @@ export default function GestureLibrary() {
             Complete Gesture Library
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto mb-8">
-            11 production-ready gestures covering all essential browser interactions. Each gesture has built-in debouncing to prevent accidental triggers.
+            {selectedCategory === "All" 
+              ? "11 production-ready gestures covering all essential browser interactions. Each gesture has built-in debouncing to prevent accidental triggers."
+              : `Showing ${filteredGestures.length} ${selectedCategory.toLowerCase()} gesture${filteredGestures.length !== 1 ? 's' : ''}. Click "All" to view all gestures.`
+            }
           </p>
           
           {/* Category filters */}
           <div className="flex flex-wrap justify-center gap-3 mb-4">
             {categories.map((category, idx) => (
-              <span
+              <button
                 key={idx}
-                className="px-4 py-2 rounded-full text-xs font-medium border border-neutral-700 bg-neutral-800/40 text-neutral-300"
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full text-xs font-medium border transition-all duration-300 cursor-pointer
+                  ${selectedCategory === category 
+                    ? 'border-cyan-500 bg-cyan-500/20 text-cyan-300 shadow-lg shadow-cyan-500/20' 
+                    : 'border-neutral-700 bg-neutral-800/40 text-neutral-300 hover:border-cyan-500/50 hover:bg-neutral-800/60'
+                  }`}
               >
                 {category}
-              </span>
+              </button>
             ))}
           </div>
         </motion.div>
 
         {/* Gesture Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {gestures.map((gesture, index) => (
+          {filteredGestures.map((gesture, index) => (
             <motion.div
-              key={index}
+              key={`${selectedCategory}-${gesture.name}`}
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
               className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-purple-500/30 transition-all duration-300"
             >
               {/* Category badge */}
