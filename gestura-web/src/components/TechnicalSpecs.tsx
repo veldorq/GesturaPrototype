@@ -84,31 +84,28 @@ export default function TechnicalSpecs() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16 px-4"
-        >
+        <div className="text-center mb-16 px-4">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
             Technical Specifications
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
             Real performance metrics from the PROTOTYPE.PY configuration. No marketing fluff—just the actual numbers running in production.
           </p>
-        </motion.div>
+        </div>
 
         {/* Specs Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {specs.map((spec, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300 hover:scale-[1.02]"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300 will-change-transform"
+              style={{ 
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden'
+              }}
             >
               {/* Icon */}
               <div className="text-4xl mb-4">{spec.icon}</div>
@@ -129,23 +126,17 @@ export default function TechnicalSpecs() {
               </p>
 
               {/* Hover gradient */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
             </motion.div>
           ))}
         </div>
 
         {/* Bottom note */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-12 p-6 border border-cyan-500/20 rounded-2xl bg-cyan-500/5 backdrop-blur-sm"
-        >
+        <div className="mt-12 p-6 border border-cyan-500/20 rounded-2xl bg-cyan-500/5 backdrop-blur-sm">
           <p className="text-neutral-300 text-center">
             <span className="text-cyan-400 font-semibold">Developer Note:</span> These values are tuned for <span className="text-white font-medium">hackathon-stable reliability</span>. They prioritize consistent recognition over maximum speed, preventing false triggers during demos and daily use.
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
