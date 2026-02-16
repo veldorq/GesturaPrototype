@@ -17,7 +17,6 @@ const nextConfig = {
   // Optimize chunks and target modern browsers
   experimental: {
     optimizePackageImports: ['framer-motion'],
-    optimizeCss: true, // Optimize CSS bundle size
   },
   
   // Compiler optimizations
