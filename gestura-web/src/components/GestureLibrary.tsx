@@ -50,7 +50,7 @@ const gestures: Gesture[] = [
     action: "Left Click (Alt)",
     handPose: "Index, middle, ring extended",
     category: "Clicking",
-    icon: "🖖",
+    icon: "🤟",
     debounce: "500ms"
   },
   {
