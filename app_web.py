@@ -87,13 +87,61 @@ DEPLOYMENT_MODE = os.environ.get('DEPLOYMENT_MODE', 'demo')
 GITHUB_REPO = os.environ.get('GITHUB_REPO', 'https://github.com/veldorq/GesturaPrototype')
 
 
+# Security Headers Middleware
+@app.after_request
+def add_security_headers(response):
+    """Add comprehensive security headers to all responses"""
+    
+    # Content Security Policy - Prevent XSS attacks
+    csp_directives = [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.socket.io",
+        "style-src 'self' 'unsafe-inline'",
+        "font-src 'self' data:",
+        "img-src 'self' data: blob:",
+        "connect-src 'self' wss: ws: https://gestura-api.onrender.com",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "upgrade-insecure-requests"
+    ]
+    response.headers['Content-Security-Policy'] = '; '.join(csp_directives)
+    
+    # HSTS - Force HTTPS with 2-year max-age
+    response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
+    
+    # Cross-Origin-Opener-Policy - Origin isolation
+    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+    
+    # Cross-Origin-Embedder-Policy
+    response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
+    
+    # Cross-Origin-Resource-Policy
+    response.headers['Cross-Origin-Resource-Policy'] = 'same-origin'
+    
+    # Prevent MIME sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    
+    # Clickjacking protection
+    response.headers['X-Frame-Options'] = 'DENY'
+    
+    # XSS Protection (legacy browsers)
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # Referrer Policy
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    # Permissions Policy - Disable unnecessary features
+    response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+    
+    return response
+
+
 @app.route('/')
 def home():
     """Redirect to product page"""
     response = app.make_response(render_template('product.html'))
-    # Add performance headers
     response.headers['Cache-Control'] = 'public, max-age=300'  # 5 minutes
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
@@ -102,7 +150,6 @@ def product():
     """Render product landing page"""
     response = app.make_response(render_template('product.html'))
     response.headers['Cache-Control'] = 'public, max-age=300'
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
@@ -111,7 +158,6 @@ def dashboard():
     """Render demo dashboard (info only - requires local install for full functionality)"""
     response = app.make_response(render_template('dashboard.html'))
     response.headers['Cache-Control'] = 'public, max-age=300'
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
