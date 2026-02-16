@@ -120,6 +120,9 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+    line-height: 1.5;
   }
   
   /* Text Reveal Animation */

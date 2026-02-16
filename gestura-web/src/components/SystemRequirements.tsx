@@ -83,7 +83,7 @@ export default function SystemRequirements() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
             System Requirements
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
@@ -128,7 +128,7 @@ export default function SystemRequirements() {
           >
             <div className="flex items-center gap-3 mb-6">
               <div className="text-3xl">🚀</div>
-              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 py-1 leading-relaxed">
                 Recommended
               </h3>
             </div>

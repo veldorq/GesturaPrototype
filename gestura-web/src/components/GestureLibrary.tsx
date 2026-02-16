@@ -119,7 +119,7 @@ export default function GestureLibrary() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent py-2 leading-relaxed">
             Complete Gesture Library
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto mb-8">

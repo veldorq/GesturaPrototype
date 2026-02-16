@@ -26,18 +26,16 @@ export default function MinimalFeatures() {
           transition={{ duration: 0.8 }}
           className="mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-light leading-tight mb-4">
-            <span className="block overflow-hidden">
-              <motion.span
-                initial={{ y: '100%' }}
-                whileInView={{ y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                className="block"
-              >
-                Flow Control
-              </motion.span>
-            </span>
+          <h2 className="text-3xl md:text-4xl font-light leading-relaxed mb-4">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="block"
+            >
+              Flow Control
+            </motion.span>
           </h2>
           <div className="w-24 h-px bg-gestura-cyan" />
         </motion.div>

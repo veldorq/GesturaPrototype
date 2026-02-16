@@ -91,7 +91,7 @@ export default function TechnicalSpecs() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
             Technical Specifications
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
@@ -119,7 +119,7 @@ export default function TechnicalSpecs() {
               </div>
               
               {/* Value */}
-              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3">
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">
                 {spec.value}
               </div>
               

@@ -108,12 +108,12 @@ export default function HeroSimplified() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="font-space text-[clamp(2.5rem,8vw,5rem)] font-semibold leading-tight mb-6"
+          className="font-space text-[clamp(2.5rem,8vw,5rem)] font-semibold leading-relaxed mb-6"
         >
-          <span className="block bg-gradient-to-r from-gestura-cyan via-white to-gestura-purple bg-clip-text text-transparent">
+          <span className="block bg-gradient-to-r from-gestura-cyan via-white to-gestura-purple bg-clip-text text-transparent py-1">
             HANDS SPEAK.
           </span>
-          <span className="block bg-gradient-to-r from-gestura-purple via-white to-gestura-cyan bg-clip-text text-transparent mt-2">
+          <span className="block bg-gradient-to-r from-gestura-purple via-white to-gestura-cyan bg-clip-text text-transparent mt-2 py-1">
             SYSTEM LISTENS.
           </span>
         </motion.h1>

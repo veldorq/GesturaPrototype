@@ -71,7 +71,7 @@ export default function GestureShowcase() {
                 className="group"
               >
                 <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
-                  <span className="bg-gradient-to-r from-gestura-cyan to-blue-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
+                  <span className="bg-gradient-to-r from-gestura-cyan to-blue-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform py-1 leading-relaxed">
                     &lt;30ms
                   </span>
                 </div>
@@ -91,7 +91,7 @@ export default function GestureShowcase() {
                 className="group"
               >
                 <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
-                  <span className="bg-gradient-to-r from-gestura-purple to-pink-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
+                  <span className="bg-gradient-to-r from-gestura-purple to-pink-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform py-1 leading-relaxed">
                     99%
                   </span>
                 </div>
@@ -111,7 +111,7 @@ export default function GestureShowcase() {
                 className="group"
               >
                 <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
-                  <span className="bg-gradient-to-r from-gestura-cyan to-gestura-purple bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
+                  <span className="bg-gradient-to-r from-gestura-cyan to-gestura-purple bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform py-1 leading-relaxed">
                     30FPS
                   </span>
                 </div>
