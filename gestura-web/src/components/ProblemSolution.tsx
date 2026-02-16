@@ -2,33 +2,40 @@
 
 import { motion } from 'framer-motion';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import ProblemIcon from './icons/ProblemIcon';
+import SolutionIcon from './icons/SolutionIcon';
 
 interface ProblemSolutionItem {
   problem: string;
   solution: string;
-  icon: string;
+  iconType: 'lightning' | 'target' | 'hand' | 'accessibility';
+  problemIconType: 'alert' | 'disconnect' | 'strain' | 'barrier';
 }
 
 const comparisons: ProblemSolutionItem[] = [
   {
     problem: 'Constant switching between mouse and keyboard breaks workflow',
     solution: 'Control everything with natural hand gestures without touching anything',
-    icon: '⚡'
+    iconType: 'lightning',
+    problemIconType: 'disconnect'
   },
   {
     problem: 'Giving presentations means being tied to your computer',
     solution: 'Present from anywhere in the room with gesture controls',
-    icon: '🎯'
+    iconType: 'target',
+    problemIconType: 'alert'
   },
   {
     problem: 'Repetitive strain from hours of mouse clicking',
     solution: 'Reduce physical strain with contactless gesture control',
-    icon: '💪'
+    iconType: 'hand',
+    problemIconType: 'strain'
   },
   {
     problem: 'Difficult for people with limited mobility to use computers',
     solution: 'Accessible computing through simple hand movements',
-    icon: '♿'
+    iconType: 'accessibility',
+    problemIconType: 'barrier'
   }
 ];
 
@@ -89,8 +96,8 @@ export default function ProblemSolution() {
                 <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="relative flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-2xl border border-red-500/30">
-                    ❌
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-red-500/10 backdrop-blur-sm flex items-center justify-center border border-red-500/30 group-hover:border-red-500/50 transition-all group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-red-500/20">
+                    <ProblemIcon type={item.problemIconType} size={28} glow className="group-hover:scale-110 transition-transform duration-300" />
                   </div>
                   <div>
                     <div className="text-xs uppercase tracking-wider text-red-400 font-semibold mb-2">
@@ -112,8 +119,8 @@ export default function ProblemSolution() {
                 <div className="absolute inset-0 bg-gradient-to-br from-gestura-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="relative flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-gestura-cyan to-blue-500 flex items-center justify-center text-2xl shadow-lg shadow-gestura-cyan/50 border border-gestura-cyan/30">
-                    {item.icon}
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gestura-cyan/10 backdrop-blur-sm flex items-center justify-center border border-gestura-cyan/30 group-hover:border-gestura-cyan/50 transition-all group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-gestura-cyan/20">
+                    <SolutionIcon type={item.iconType} size={28} className="group-hover:scale-110 transition-transform duration-300" />
                   </div>
                   <div>
                     <div className="text-xs uppercase tracking-wider text-gestura-cyan font-semibold mb-2">
