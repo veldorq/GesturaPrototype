@@ -74,7 +74,7 @@ const gestures = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative py-32 px-6 overflow-hidden bg-[#0a0a0a] scroll-mt-20">
+    <section id="how-it-works" className="relative py-32 px-6 overflow-x-hidden bg-[#0a0a0a] scroll-mt-20">
       {/* Grid overlay */}
       <div
         className="absolute inset-0 opacity-10 pointer-events-none"
@@ -93,7 +93,7 @@ export default function HowItWorks() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-20 px-4"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}

@@ -106,7 +106,7 @@ const categories = ["Scrolling", "Pointing", "Clicking", "Navigation", "Zoom", "
 
 export default function GestureLibrary() {
   return (
-    <section className="relative py-32 px-6 bg-[#0a0a0a] overflow-hidden">
+    <section className="relative py-32 px-6 bg-[#0a0a0a] overflow-x-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-purple-900/10 via-transparent to-transparent opacity-20 pointer-events-none" />
 
@@ -117,7 +117,7 @@ export default function GestureLibrary() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-16 px-4"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent py-2 leading-relaxed">
             Complete Gesture Library

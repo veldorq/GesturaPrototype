@@ -39,14 +39,14 @@ const technologies = [
 
 export default function TechStack() {
   return (
-    <section className="relative py-24 px-6 bg-[#151515] overflow-hidden">
+    <section className="relative py-24 px-6 bg-[#151515] overflow-x-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-16 px-4"
         >
           <h2 className="text-3xl md:text-4xl font-light mb-4">
             Built on <span className="gradient-text">Modern Technology</span>

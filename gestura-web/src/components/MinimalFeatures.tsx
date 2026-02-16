@@ -5,7 +5,7 @@ import { gestureFeatures } from '../data/features';
 
 export default function MinimalFeatures() {
   return (
-    <section id="features" className="relative py-32 px-6 overflow-hidden scroll-mt-20">
+    <section id="features" className="relative py-32 px-6 overflow-x-hidden scroll-mt-20">
       {/* Japanese character - background */}
       <motion.div
         initial={{ opacity: 0 }}

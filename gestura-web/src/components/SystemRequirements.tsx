@@ -62,7 +62,7 @@ const dependencies = [
 
 export default function SystemRequirements() {
   return (
-    <section className="relative py-32 px-6 bg-[#0a0a0a] overflow-hidden">
+    <section className="relative py-32 px-6 bg-[#0a0a0a] overflow-x-hidden">
       {/* Grid background */}
       <div className="absolute inset-0 opacity-[0.02]">
         <div className="absolute inset-0" style={{
@@ -81,7 +81,7 @@ export default function SystemRequirements() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-16 px-4"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
             System Requirements

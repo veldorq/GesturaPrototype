@@ -51,7 +51,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className="relative py-32 px-6 bg-[#0A0118] overflow-hidden">
+    <section className="relative py-32 px-6 bg-[#0A0118] overflow-x-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-purple-900/10 via-transparent to-transparent opacity-30 pointer-events-none" />
       
@@ -73,7 +73,7 @@ export default function FAQ() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-16 px-4"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
             Frequently Asked Questions

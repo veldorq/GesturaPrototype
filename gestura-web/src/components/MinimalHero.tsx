@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export default function MinimalHero() {
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative h-screen flex items-center justify-center overflow-x-hidden">
       {/* Background with subtle gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-[#1a1a1a] to-[#0a0a0a] z-0" />
       
