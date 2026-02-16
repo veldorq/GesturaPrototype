@@ -3,7 +3,7 @@ Download Request Handler for Gestura
 Captures leads before providing download link
 """
 
-from flask import render_template, request, jsonify, redirect, url_for
+from flask import render_template, request, jsonify, redirect, url_for  # type: ignore
 import os
 import json
 from datetime import datetime

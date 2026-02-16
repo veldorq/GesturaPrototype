@@ -8,9 +8,9 @@ Usage:
     Then open: http://localhost:5000
 """
 
-from flask import Flask, render_template, jsonify
-from flask_socketio import SocketIO, emit
-from flask_cors import CORS
+from flask import Flask, render_template, jsonify  # type: ignore
+from flask_socketio import SocketIO, emit  # type: ignore
+from flask_cors import CORS  # type: ignore
 import threading
 import time
 import cv2
@@ -19,7 +19,7 @@ import sys
 import traceback
 
 # Import gesture system
-from PROTOTYPE import HandGestureControlSystem, Config
+from PROTOTYPE import HandGestureControlSystem, Config  # type: ignore
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'gestura-secret-key-2026'
@@ -148,7 +148,8 @@ def run_gesture_system():
     global gesture_system, is_running
     
     try:
-        gesture_system.run()
+        if gesture_system is not None:
+            gesture_system.run()
     except Exception as e:
         print(f"[ERROR] Gesture system crashed: {e}")
         traceback.print_exc()

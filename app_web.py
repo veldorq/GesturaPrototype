@@ -7,10 +7,10 @@ NOTE: Full gesture control requires local installation due to camera access.
 This deployed version showcases the interface and provides download instructions.
 """
 
-from flask import Flask, render_template, jsonify
-from flask_socketio import SocketIO
-from flask_cors import CORS
-from flask_compress import Compress
+from flask import Flask, render_template, jsonify  # type: ignore
+from flask_socketio import SocketIO  # type: ignore
+from flask_cors import CORS  # type: ignore
+from flask_compress import Compress  # type: ignore
 import os
 import logging
 import sys
