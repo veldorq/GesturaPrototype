@@ -11,9 +11,13 @@ const nextConfig = {
   // Optimize production builds
   productionBrowserSourceMaps: false,
   
-  // Optimize chunks
+  // SWC Minification for modern browsers
+  swcMinify: true,
+  
+  // Optimize chunks and target modern browsers
   experimental: {
     optimizePackageImports: ['framer-motion'],
+    optimizeCss: true, // Optimize CSS bundle size
   },
   
   // Compiler optimizations
@@ -78,8 +82,8 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Framer Motion needs unsafe-eval
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self' data:",
               "img-src 'self' data: https:",
               "connect-src 'self' https://gestura-api.onrender.com https://*.onrender.com",
               "frame-ancestors 'self'",

@@ -25,7 +25,7 @@ export default function MinimalHero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.05 }}
         transition={{ delay: 1.5, duration: 2 }}
-        className="absolute right-20 top-20 text-[12rem] font-jp font-bold text-white pointer-events-none hidden lg:block"
+        className="absolute right-20 top-20 text-[12rem] font-bold text-white pointer-events-none hidden lg:block"
         style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
       >
         手

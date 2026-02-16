@@ -11,7 +11,7 @@ export default function MinimalFeatures() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 0.03 }}
         viewport={{ once: true }}
-        className="absolute left-10 top-20 text-[10rem] font-jp font-bold text-white pointer-events-none hidden lg:block"
+        className="absolute left-10 top-20 text-[10rem] font-bold text-white pointer-events-none hidden lg:block"
         style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
       >
         制御
