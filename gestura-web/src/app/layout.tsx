@@ -1,24 +1,14 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display, Space_Grotesk } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
 
+// Only load Inter font - primary font
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
-});
-
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-playfair',
-  display: 'swap',
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-space',
-  display: 'swap',
-  weight: ['600', '700'],
+  preload: true,
+  fallback: ['system-ui', 'arial'],
 });
 
 export const metadata: Metadata = {
@@ -31,6 +21,15 @@ export const metadata: Metadata = {
     description: 'Control your computer with natural hand movements',
     type: 'website',
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -39,7 +38,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={inter.variable}>
+      <head>
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+      </head>
       <body className="overflow-x-hidden">{children}</body>
     </html>
   );

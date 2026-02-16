@@ -1,22 +1,27 @@
 'use client';
 
 import { useEffect } from 'react';
-import CustomCursor from '@/components/CustomCursor';
+import dynamic from 'next/dynamic';
 import MinimalNav from '@/components/MinimalNav';
-import ScrollProgressBar from '@/components/ScrollProgressBar';
-import ScrollToTop from '@/components/ScrollToTop';
 import MinimalHero from '@/components/MinimalHero';
-import MinimalFeatures from '@/components/MinimalFeatures';
-import HowItWorks from '@/components/HowItWorks';
-import TechStack from '@/components/TechStack';
-import TechnicalSpecs from '@/components/TechnicalSpecs';
-import GestureLibrary from '@/components/GestureLibrary';
-import SystemRequirements from '@/components/SystemRequirements';
-import ParallaxSection from '@/components/ParallaxSection';
-import ProblemSolution from '@/components/ProblemSolution';
-import FAQ from '@/components/FAQ';
-import MinimalCTA from '@/components/MinimalCTA';
-import MinimalFooter from '@/components/MinimalFooter';
+
+// Lazy load non-critical components with SSR disabled for faster initial load
+const CustomCursor = dynamic(() => import('@/components/CustomCursor'), { ssr: false });
+const ScrollProgressBar = dynamic(() => import('@/components/ScrollProgressBar'), { ssr: false });
+const ScrollToTop = dynamic(() => import('@/components/ScrollToTop'), { ssr: false });
+
+// Lazy load below-the-fold sections
+const MinimalFeatures = dynamic(() => import('@/components/MinimalFeatures'));
+const HowItWorks = dynamic(() => import('@/components/HowItWorks'));
+const TechStack = dynamic(() => import('@/components/TechStack'));
+const TechnicalSpecs = dynamic(() => import('@/components/TechnicalSpecs'));
+const GestureLibrary = dynamic(() => import('@/components/GestureLibrary'));
+const SystemRequirements = dynamic(() => import('@/components/SystemRequirements'));
+const ParallaxSection = dynamic(() => import('@/components/ParallaxSection'));
+const ProblemSolution = dynamic(() => import('@/components/ProblemSolution'));
+const FAQ = dynamic(() => import('@/components/FAQ'));
+const MinimalCTA = dynamic(() => import('@/components/MinimalCTA'));
+const MinimalFooter = dynamic(() => import('@/components/MinimalFooter'));
 
 export default function Home() {
   useEffect(() => {
