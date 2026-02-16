@@ -9,6 +9,8 @@ export default function MinimalNav() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
       className="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex justify-between items-center mix-blend-difference"
+      role="navigation"
+      aria-label="Main navigation"
     >
       <div className="text-xl font-light tracking-tight text-white">
         Gestura
@@ -22,6 +24,7 @@ export default function MinimalNav() {
             document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
           }}
           className="relative group cursor-pointer"
+          aria-label="Navigate to features section"
         >
           <span>Features</span>
           <span className="absolute bottom-0 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
@@ -33,11 +36,12 @@ export default function MinimalNav() {
             document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
           }}
           className="relative group cursor-pointer"
+          aria-label="Navigate to how it works section"
         >
           <span>How It Works</span>
           <span className="absolute bottom-0 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
         </a>
-        <a href="https://github.com/veldorq/GesturaPrototype/releases" target="_blank" rel="noopener noreferrer" className="relative group cursor-pointer">
+        <a href="https://github.com/veldorq/GesturaPrototype/releases" target="_blank" rel="noopener noreferrer" className="relative group cursor-pointer" aria-label="Download Gestura from GitHub (opens in new tab)">
           <span>Download</span>
           <span className="absolute bottom-0 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
         </a>

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import MinimalNav from '@/components/MinimalNav';
 import MinimalHero from '@/components/MinimalHero';
+import SkipToContent from '@/components/SkipToContent';
 
 // Lazy load non-critical components with SSR disabled for faster initial load
 const CustomCursor = dynamic(() => import('@/components/CustomCursor'), { ssr: false });
@@ -34,6 +35,9 @@ export default function Home() {
 
   return (
     <>
+      {/* Skip to Content Link for Keyboard Navigation */}
+      <SkipToContent />
+
       {/* Custom Cursor */}
       <CustomCursor />
 
@@ -43,10 +47,12 @@ export default function Home() {
       {/* Scroll to Top Button */}
       <ScrollToTop />
 
-      {/* Navigation */}
-      <MinimalNav />
+      {/* Navigation Header */}
+      <header>
+        <MinimalNav />
+      </header>
 
-      <main className="bg-[#0a0a0a] min-h-screen overflow-x-hidden">
+      <main id="main-content" className="bg-[#0a0a0a] min-h-screen overflow-x-hidden" tabIndex={-1} role="main">
         {/* Hero Section */}
         <MinimalHero />
 
@@ -54,16 +60,22 @@ export default function Home() {
         <div className="h-[10vh] md:h-[15vh]" />
 
         {/* Features Grid */}
-        <MinimalFeatures />
+        <section aria-label="Key features of Gestura">
+          <MinimalFeatures />
+        </section>
 
         {/* Spacer */}
         <div className="h-[10vh] md:h-[15vh]" />
 
         {/* How It Works - Detailed Technical Explanation */}
-        <HowItWorks />
+        <section aria-label="How Gestura works">
+          <HowItWorks />
+        </section>
 
         {/* Tech Stack */}
-        <TechStack />
+        <section aria-label="Technology stack">
+          <TechStack />
+        </section>
 
         {/* Spacer */}
         <div className="h-[10vh] md:h-[15vh]" />
@@ -90,17 +102,23 @@ export default function Home() {
         <ProblemSolution />
 
         {/* FAQ Section */}
-        <FAQ />
+        <section aria-label="Frequently asked questions">
+          <FAQ />
+        </section>
 
         {/* Spacer */}
         <div className="h-[10vh] md:h-[15vh]" />
 
         {/* Final CTA */}
-        <MinimalCTA />
-
-        {/* Footer */}
-        <MinimalFooter />
+        <section aria-label="Download Gestura">
+          <MinimalCTA />
+        </section>
       </main>
+
+      {/* Footer */}
+      <footer role="contentinfo">
+        <MinimalFooter />
+      </footer>
     </>
   );
 }

@@ -42,6 +42,8 @@ export default function CustomCursor() {
   return (
     <motion.div
       className="fixed top-0 left-0 w-5 h-5 pointer-events-none z-[9999] mix-blend-difference hidden md:block"
+      aria-hidden="true"
+      role="presentation"
       style={{
         x: cursorX,
         y: cursorY,
