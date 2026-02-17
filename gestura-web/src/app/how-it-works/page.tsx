@@ -122,25 +122,25 @@ export default function HowItWorksPage() {
         <MinimalNav />
       </header>
 
-      <main className="bg-[#0B0B0F] min-h-screen overflow-x-hidden">
+      <main className="bg-[#0A0118] min-h-screen overflow-x-hidden">
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center justify-center px-6 pt-32 pb-20">
           {/* Background Effects */}
           <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-b from-gestura-purple/5 via-transparent to-transparent" />
-            <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gestura-purple/10 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gestura-cyan/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+            <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 via-transparent to-transparent opacity-30" />
+            <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
 
           {/* Grid overlay */}
           <div
-            className="absolute inset-0 opacity-10 pointer-events-none"
+            className="absolute inset-0 opacity-[0.02] pointer-events-none"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+                linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
               `,
-              backgroundSize: '50px 50px',
+              backgroundSize: '40px 40px',
             }}
           />
 
@@ -149,10 +149,10 @@ export default function HowItWorksPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-gestura-purple/10 backdrop-blur-sm border border-gestura-purple/30 rounded-full"
+              className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-cyan-500/10 backdrop-blur-sm border border-cyan-500/30 rounded-full"
             >
-              <span className="w-2 h-2 bg-gestura-purple rounded-full animate-pulse" />
-              <span className="text-gestura-purple text-xs font-semibold uppercase tracking-widest">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+              <span className="text-cyan-400 text-xs font-semibold uppercase tracking-widest">
                 The Technology
               </span>
             </motion.div>
@@ -163,7 +163,7 @@ export default function HowItWorksPage() {
               transition={{ delay: 0.1, duration: 0.6 }}
               className="text-5xl md:text-7xl font-light leading-tight mb-6"
             >
-              How <span className="gradient-text">Gestura</span><br />
+              How <span className="gradient-text-specs font-bold">Gestura</span><br />
               Works
             </motion.h1>
 
@@ -209,8 +209,8 @@ export default function HowItWorksPage() {
               viewport={{ once: true }}
               className="text-center mb-20"
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-4">
-                Four-Step <span className="gradient-text">Process</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Four-Step Process
               </h2>
               <p className="text-neutral-400 font-light">
                 Lightning-fast gesture recognition powered by advanced AI
@@ -229,23 +229,23 @@ export default function HowItWorksPage() {
                 >
                   {/* Connection Line */}
                   {index < steps.length - 1 && index % 2 === 0 && (
-                    <div className="hidden md:block absolute top-20 left-full w-8 h-px bg-gradient-to-r from-gestura-cyan/50 to-transparent" />
+                    <div className="hidden md:block absolute top-20 left-full w-8 h-px bg-gradient-to-r from-cyan-400/50 to-transparent" />
                   )}
 
-                  <div className="glass-panel p-8 rounded-lg group hover:border-gestura-cyan/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-gestura-cyan/20">
+                  <div className="glass-panel p-8 rounded-lg group hover:border-cyan-500/30 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-400/20">
                     {/* Number */}
                     <motion.div 
-                      className="text-gestura-cyan text-sm font-mono mb-4"
+                      className="text-cyan-400 text-sm font-mono mb-4"
                       whileHover={{ scale: 1.2, rotate: 5 }}
                     >
                       {step.number}
                     </motion.div>
 
                     {/* Title & Subtitle */}
-                    <h3 className="text-2xl font-light mb-2 group-hover:text-gestura-cyan transition-colors">
+                    <h3 className="text-2xl font-light mb-2 group-hover:text-cyan-400 transition-colors">
                       {step.title}
                     </h3>
-                    <p className="text-sm text-gestura-purple font-medium mb-4">{step.subtitle}</p>
+                    <p className="text-sm text-purple-400 font-medium mb-4">{step.subtitle}</p>
 
                     {/* Description */}
                     <p className="text-neutral-400 text-sm leading-relaxed mb-6">
@@ -256,7 +256,7 @@ export default function HowItWorksPage() {
                     <ul className="space-y-2 mb-6">
                       {step.details.map((detail, i) => (
                         <li key={i} className="text-xs text-neutral-500 flex items-start gap-2">
-                          <span className="text-gestura-cyan mt-1">▸</span>
+                          <span className="text-cyan-400 mt-1">▸</span>
                           <span>{detail}</span>
                         </li>
                       ))}
@@ -297,8 +297,8 @@ export default function HowItWorksPage() {
               viewport={{ once: true }}
               className="mb-16"
             >
-              <h3 className="text-3xl md:text-4xl font-light text-center mb-4">
-                Gesture <span className="gradient-text">Reference</span>
+              <h3 className="text-3xl md:text-4xl font-bold text-center mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Gesture Reference
               </h3>
               <p className="text-center text-neutral-400 font-light mb-2">
                 Master these gestures to control your computer naturally
@@ -322,10 +322,10 @@ export default function HowItWorksPage() {
                   </div>
 
                   {/* Name & Action */}
-                  <h4 className="text-lg font-medium mb-1 group-hover:text-gestura-cyan transition-colors">
+                  <h4 className="text-lg font-medium mb-1 group-hover:text-cyan-400 transition-colors">
                     {gesture.name}
                   </h4>
-                  <p className="text-xs text-gestura-purple uppercase tracking-wider mb-3">
+                  <p className="text-xs text-purple-400 uppercase tracking-wider mb-3">
                     {gesture.action}
                   </p>
 
@@ -346,30 +346,30 @@ export default function HowItWorksPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="glass-panel p-8 md:p-12 rounded-lg"
+              className="relative border border-neutral-800 rounded-2xl p-8 md:p-12 backdrop-blur-sm bg-neutral-900/30"
             >
-              <h3 className="text-2xl md:text-3xl font-light mb-12 text-center">
-                Technical <span className="gradient-text">Specifications</span>
+              <h3 className="text-2xl md:text-3xl font-bold mb-12 text-center bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Technical Specifications
               </h3>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 <div>
-                  <div className="text-4xl md:text-5xl font-light gradient-text mb-3">&lt;30ms</div>
+                  <div className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">&lt;30ms</div>
                   <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Latency</div>
                   <p className="text-xs text-neutral-600">End-to-end processing</p>
                 </div>
                 <div>
-                  <div className="text-4xl md:text-5xl font-light gradient-text mb-3">99%</div>
+                  <div className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">99%</div>
                   <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Accuracy</div>
                   <p className="text-xs text-neutral-600">Recognition rate</p>
                 </div>
                 <div>
-                  <div className="text-4xl md:text-5xl font-light gradient-text mb-3">30 FPS</div>
+                  <div className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">30 FPS</div>
                   <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Tracking</div>
                   <p className="text-xs text-neutral-600">Real-time detection</p>
                 </div>
                 <div>
-                  <div className="text-4xl md:text-5xl font-light gradient-text mb-3">100%</div>
+                  <div className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">100%</div>
                   <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Local</div>
                   <p className="text-xs text-neutral-600">No cloud processing</p>
                 </div>
@@ -387,8 +387,8 @@ export default function HowItWorksPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h3 className="text-3xl md:text-4xl font-light mb-4">
-                Built With <span className="gradient-text">Modern Tech</span>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Built With Modern Tech
               </h3>
               <p className="text-neutral-400 font-light">
                 Industry-leading tools and frameworks
@@ -434,9 +434,9 @@ export default function HowItWorksPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="glass-panel p-6 rounded-lg hover:border-gestura-cyan/50 transition-colors"
+                  className="glass-panel p-6 rounded-lg hover:border-cyan-500/30 transition-colors"
                 >
-                  <div className="text-xs text-gestura-cyan uppercase tracking-wider mb-2">
+                  <div className="text-xs text-cyan-400 uppercase tracking-wider mb-2">
                     {tech.badge}
                   </div>
                   <h4 className="text-xl font-light mb-2">{tech.name}</h4>
