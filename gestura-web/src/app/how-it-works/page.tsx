@@ -127,22 +127,29 @@ export default function HowItWorksPage() {
         <section className="relative min-h-[70vh] flex items-center justify-center px-6 pt-32 pb-20">
           {/* Background Effects */}
           <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 via-transparent to-transparent opacity-30" />
+            <div 
+              className="absolute inset-0 opacity-30 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle, rgba(8, 145, 178, 0.1) 0%, transparent 50%, transparent 100%)'
+              }}
+            />
             <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" />
             <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
 
           {/* Grid overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.02] pointer-events-none"
-            style={{
-              backgroundImage: `
-                linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
-              `,
-              backgroundSize: '40px 40px',
-            }}
-          />
+          <div className="absolute inset-0 opacity-[0.02]">
+            <div 
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `
+                  linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+                  linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+                `,
+                backgroundSize: '40px 40px',
+              }}
+            />
+          </div>
 
           <div className="max-w-5xl mx-auto text-center relative z-10">
             <motion.div
@@ -232,7 +239,7 @@ export default function HowItWorksPage() {
                     <div className="hidden md:block absolute top-20 left-full w-8 h-px bg-gradient-to-r from-cyan-400/50 to-transparent" />
                   )}
 
-                  <div className="glass-panel p-8 rounded-lg group hover:border-cyan-500/30 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-400/20">
+                  <div className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 group hover:border-cyan-500/30 transition-all duration-500 hover:scale-105">
                     {/* Number */}
                     <motion.div 
                       className="text-cyan-400 text-sm font-mono mb-4"
@@ -273,6 +280,9 @@ export default function HowItWorksPage() {
                         </span>
                       ))}
                     </div>
+
+                    {/* Hover gradient */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   </div>
                 </motion.div>
               ))}
@@ -314,8 +324,10 @@ export default function HowItWorksPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className="glass-panel p-6 rounded-lg group cursor-pointer"
+                  className="border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 group hover:border-cyan-500/30 transition-colors cursor-pointer"
                 >
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   {/* Icon */}
                   <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
                     {gesture.icon}
@@ -434,8 +446,10 @@ export default function HowItWorksPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="glass-panel p-6 rounded-lg hover:border-cyan-500/30 transition-colors"
+                  className="border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors"
                 >
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   <div className="text-xs text-cyan-400 uppercase tracking-wider mb-2">
                     {tech.badge}
                   </div>
