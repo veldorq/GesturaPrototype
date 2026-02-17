@@ -109,12 +109,12 @@ export default function DownloadPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Quick Installation
               </h2>
-              <p className="text-neutral-400 font-light">
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
                 Get up and running in three simple steps
               </p>
             </motion.div>
@@ -168,12 +168,12 @@ export default function DownloadPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 System Requirements
               </h2>
-              <p className="text-neutral-400 font-light">
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
                 Runs smoothly on most modern computers
               </p>
             </motion.div>
@@ -264,9 +264,9 @@ export default function DownloadPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Available On All Platforms
               </h2>
             </motion.div>
@@ -329,10 +329,10 @@ export default function DownloadPage() {
               viewport={{ once: true }}
               className="border border-neutral-800 rounded-2xl p-10 backdrop-blur-sm bg-neutral-900/30 text-center"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Need Help?
               </h2>
-              <p className="text-neutral-400 mb-8 font-light">
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto mb-8">
                 Check out our documentation or reach out to the community
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

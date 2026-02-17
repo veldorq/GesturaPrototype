@@ -209,12 +209,12 @@ export default function HowItWorksPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-20"
+              className="text-center mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Four-Step Process
               </h2>
-              <p className="text-neutral-400 font-light">
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
                 Lightning-fast gesture recognition powered by advanced AI
               </p>
             </motion.div>
@@ -300,12 +300,12 @@ export default function HowItWorksPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mb-16"
+              className="text-center mb-16 px-4"
             >
-              <h3 className="text-3xl md:text-4xl font-bold text-center mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h3 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Gesture Reference
               </h3>
-              <p className="text-center text-neutral-400 font-light mb-2">
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
                 Master these gestures to control your computer naturally
               </p>
             </motion.div>
@@ -392,12 +392,12 @@ export default function HowItWorksPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-16 px-4"
             >
-              <h3 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h3 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Built With Modern Tech
               </h3>
-              <p className="text-neutral-400 font-light">
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
                 Industry-leading tools and frameworks
               </p>
             </motion.div>
