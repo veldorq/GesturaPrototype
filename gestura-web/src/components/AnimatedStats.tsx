@@ -71,7 +71,7 @@ interface AnimatedStatsProps {
 
 export default function AnimatedStats({ stats, title, subtitle }: AnimatedStatsProps) {
   return (
-    <section className="relative py-24 bg-[#0A0118] overflow-hidden">
+    <section className="relative py-24 bg-[#0f1419] overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gestura-cyan rounded-full blur-[100px]" />

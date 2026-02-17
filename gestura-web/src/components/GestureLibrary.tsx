@@ -92,7 +92,7 @@ const gestures: Gesture[] = [
 ];
 
 const GestureIcon = ({ name }: { name: string }) => {
-  const iconClass = "w-[18px] h-[18px] text-zinc-400 group-hover:text-[#6C63FF] transition-all duration-200 group-hover:scale-110 flex-shrink-0";
+  const iconClass = "w-[18px] h-[18px] text-zinc-400 group-hover:text-[#22d3ee] transition-all duration-200 group-hover:scale-110 flex-shrink-0";
   
   switch (name) {
     case "Open Palm":
@@ -182,7 +182,7 @@ export default function GestureLibrary() {
     : gestures.filter(gesture => gesture.category === selectedCategory);
   
   return (
-    <section className="relative py-32 px-6 bg-[#0A0118] overflow-x-hidden">
+    <section className="relative py-32 px-6 bg-[#0f1419] overflow-x-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-purple-900/10 via-transparent to-transparent opacity-20 pointer-events-none" />
 

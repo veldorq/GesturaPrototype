@@ -6,7 +6,7 @@ export default function MinimalHero() {
   return (
     <section className="relative h-screen flex items-center justify-center overflow-x-hidden">
       {/* Background with subtle gradient */}
-      <div className="absolute inset-0 bg-gradient-radial from-[#1F2937] to-[#0B0B0F] z-0" />
+      <div className="absolute inset-0 bg-gradient-radial from-[#242b3d] to-[#0f1419] z-0" />
       
       {/* Grid lines overlay */}
       <div
@@ -20,16 +20,6 @@ export default function MinimalHero() {
         }}
       />
 
-      {/* Japanese character - decorative - load after initial paint */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.05 }}
-        transition={{ delay: 1.5, duration: 2 }}
-        className="absolute right-20 top-20 text-[12rem] font-bold text-white pointer-events-none hidden lg:block"
-        style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
-      >
-        手
-      </motion.div>
 
       {/* Hero Content */}
       <div className="relative z-10 text-center px-4 max-w-7xl mx-auto">
@@ -117,21 +107,6 @@ export default function MinimalHero() {
           </motion.a>
         </motion.div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 1 }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-      >
-        <span className="text-xs tracking-[0.3em] uppercase text-neutral-500">Scroll</span>
-        <motion.div
-          animate={{ scaleY: [1, 0.5, 1] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-px h-16 bg-gradient-to-b from-transparent via-white/50 to-transparent"
-        />
-      </motion.div>
     </section>
   );
 }

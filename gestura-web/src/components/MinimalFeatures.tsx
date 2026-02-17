@@ -6,16 +6,6 @@ import { gestureFeatures } from '../data/features';
 export default function MinimalFeatures() {
   return (
     <section id="features" className="relative py-32 px-6 overflow-x-hidden scroll-mt-20">
-      {/* Japanese character - background */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 0.03 }}
-        viewport={{ once: true }}
-        className="absolute left-10 top-20 text-[10rem] font-bold text-white pointer-events-none hidden lg:block"
-        style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
-      >
-        制御
-      </motion.div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Title */}

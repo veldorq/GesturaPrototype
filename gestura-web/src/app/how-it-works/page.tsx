@@ -128,7 +128,7 @@ export default function HowItWorksPage() {
         <MinimalNav />
       </header>
 
-      <main className="bg-[#0A0118] min-h-screen overflow-x-hidden">
+      <main className="bg-[#0f1419] min-h-screen overflow-x-hidden">
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center justify-center px-6 pt-32 pb-20">
           {/* Background Effects */}

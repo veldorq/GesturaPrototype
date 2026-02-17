@@ -29,7 +29,7 @@ export default function ScrollToTop() {
       }}
       transition={{ duration: 0.3 }}
       onClick={scrollToTop}
-      className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-gestura-cyan hover:bg-gestura-purple transition-colors duration-300 rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl group"
+      className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-gestura-cyan hover:bg-gestura-blue transition-colors duration-300 rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl group"
       style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
       aria-label="Scroll to top"
       aria-hidden={!isVisible}

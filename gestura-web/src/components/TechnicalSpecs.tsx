@@ -67,7 +67,7 @@ const specs = [
 
 export default function TechnicalSpecs() {
   return (
-    <section className="relative py-32 px-6 bg-[#0A0118] overflow-x-hidden">
+    <section className="relative py-32 px-6 bg-[#0f1419] overflow-x-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-cyan-900/10 via-transparent to-transparent opacity-30 pointer-events-none" />
       

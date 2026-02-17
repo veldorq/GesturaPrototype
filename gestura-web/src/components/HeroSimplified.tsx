@@ -21,7 +21,7 @@ export default function HeroSimplified() {
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0A0118]">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0f1419]">
       {/* Animated gradient orbs background */}
       <div className="absolute inset-0">
         <motion.div

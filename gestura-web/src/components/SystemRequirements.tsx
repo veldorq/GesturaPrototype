@@ -62,7 +62,7 @@ const dependencies = [
 
 export default function SystemRequirements() {
   return (
-    <section className="relative py-32 px-6 bg-[#0A0118] overflow-x-hidden">
+    <section className="relative py-32 px-6 bg-[#0f1419] overflow-x-hidden">
       {/* Grid background */}
       <div className="absolute inset-0 opacity-[0.02]">
         <div className="absolute inset-0" style={{

@@ -134,7 +134,7 @@ export default function FeatureHighlights() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.2 }}
-                className="glass-panel p-8 rounded-2xl border border-gestura-navy-light/50 hover:border-gestura-purple/50 transition-all duration-300 group"
+                className="glass-panel p-8 rounded-2xl border border-gestura-navy-light/50 hover:border-gestura-cyan/50 transition-all duration-300 group"
               >
                 {feature.metric && (
                   <div className="mb-4">

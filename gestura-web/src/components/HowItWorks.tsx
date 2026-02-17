@@ -74,7 +74,7 @@ const gestures = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative py-32 px-6 overflow-x-hidden bg-[#0A0118] scroll-mt-20">
+    <section id="how-it-works" className="relative py-32 px-6 overflow-x-hidden bg-[#0f1419] scroll-mt-20">
       {/* Grid overlay */}
       <div
         className="absolute inset-0 opacity-10 pointer-events-none"

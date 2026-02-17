@@ -10,19 +10,21 @@ const config: Config = {
     extend: {
       colors: {
         'gestura': {
-          // Accent Colors
-          'purple': '#6C63FF',        // Primary accent - refined purple
-          'cyan': '#00D9FF',          // Secondary accent - cyan
+          // Accent Colors - Refined Cyan Theme
+          'cyan': '#22d3ee',          // Primary accent - bright cyan
+          'blue': '#3b82f6',          // Secondary accent - blue
+          'purple': '#6C63FF',        // Tertiary accent - purple (legacy)
           
-          // Background Colors
-          'navy-dark': '#0B0B0F',     // Primary background - deep blue-black
-          'navy': '#111827',          // Secondary background - blue-gray
-          'navy-light': '#1F2937',    // Tertiary background - lighter blue-gray
+          // Background Colors - Premium Dark Theme
+          'navy-dark': '#0a0f1a',     // Primary background - darkest blue-black
+          'navy': '#111827',          // Secondary background - dark blue-gray
+          'navy-light': '#1f2937',    // Tertiary background - blue-gray
           
-          // Text Colors
-          'text-primary': '#FFFFFF',  // Primary text - pure white
-          'text-secondary': '#9CA3AF', // Secondary text - refined gray
-          'text-muted': '#6B7280',    // Muted text - subtle gray
+          // Text Colors - Refined Hierarchy
+          'text-primary': '#f9fafb',  // Primary text - near white
+          'text-secondary': '#9ca3af', // Secondary text - slate gray
+          'text-tertiary': '#6b7280', // Tertiary text - medium gray
+          'text-muted': '#4b5563',    // Muted text - dim gray
           
           // Legacy accent colors (preserved for compatibility)
           'accent-teal': '#4F9C8F',
@@ -32,7 +34,6 @@ const config: Config = {
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
         'space': ['Space Grotesk', 'sans-serif'], // Display font for headings
-        'jp': ['Noto Serif JP', 'serif'], // Japanese aesthetic font
       },
       fontSize: {
         // Fluid typography scale (mobile-first, responsive)
@@ -59,8 +60,8 @@ const config: Config = {
           '50%': { transform: 'translateY(-20px)' },
         },
         glow: {
-          '0%': { 'box-shadow': '0 0 20px rgba(108, 99, 255, 0.3)' },
-          '100%': { 'box-shadow': '0 0 40px rgba(108, 99, 255, 0.6)' },
+          '0%': { 'box-shadow': '0 0 20px rgba(34, 211, 238, 0.3)' },
+          '100%': { 'box-shadow': '0 0 40px rgba(34, 211, 238, 0.6)' },
         },
         'slide-up': {
           '0%': { opacity: '0', transform: 'translateY(30px)' },

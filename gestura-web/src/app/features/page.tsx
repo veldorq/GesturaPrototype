@@ -29,7 +29,7 @@ export default function FeaturesPage() {
         <MinimalNav />
       </header>
 
-      <main className="bg-[#0A0118] min-h-screen overflow-x-hidden">
+      <main className="bg-[#0f1419] min-h-screen overflow-x-hidden">
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center justify-center px-6 pt-32 pb-20">
           {/* Background Effects */}
@@ -150,16 +150,6 @@ export default function FeaturesPage() {
         {/* Gesture Categories */}
         <section className="relative py-20 px-6">
           {/* Japanese character background */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 0.03 }}
-            viewport={{ once: true }}
-            className="absolute left-10 top-20 text-[10rem] font-bold text-white pointer-events-none hidden lg:block"
-            style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
-          >
-            機能
-          </motion.div>
-
           <div className="max-w-7xl mx-auto relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 30 }}

@@ -4,11 +4,16 @@ import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import MinimalNav from '@/components/MinimalNav';
 import MinimalHero from '@/components/MinimalHero';
-import SkipToContent from '@/components/SkipToContent';
+
+// Premium UI Components
+const PremiumCursor = dynamic(() => import('@/components/premium/CustomCursor'), { ssr: false });
+const NoiseOverlay = dynamic(() => import('@/components/premium/NoiseOverlay'), { ssr: false });
+const GridPattern = dynamic(() => import('@/components/premium/GridPattern'), { ssr: false });
+const AmbientLights = dynamic(() => import('@/components/premium/AmbientLights'), { ssr: false });
+const ReadingProgress = dynamic(() => import('@/components/premium/ReadingProgress'), { ssr: false });
+const PageTransition = dynamic(() => import('@/components/premium/PageTransition'), { ssr: false });
 
 // Lazy load non-critical components with SSR disabled for faster initial load
-const CustomCursor = dynamic(() => import('@/components/CustomCursor'), { ssr: false });
-const ScrollProgressBar = dynamic(() => import('@/components/ScrollProgressBar'), { ssr: false });
 const ScrollToTop = dynamic(() => import('@/components/ScrollToTop'), { ssr: false });
 
 // Lazy load below-the-fold sections
@@ -18,7 +23,6 @@ const TechStack = dynamic(() => import('@/components/TechStack'));
 const TechnicalSpecs = dynamic(() => import('@/components/TechnicalSpecs'));
 const GestureLibrary = dynamic(() => import('@/components/GestureLibrary'));
 const SystemRequirements = dynamic(() => import('@/components/SystemRequirements'));
-const ParallaxSection = dynamic(() => import('@/components/ParallaxSection'));
 const ProblemSolution = dynamic(() => import('@/components/ProblemSolution'));
 const FAQ = dynamic(() => import('@/components/FAQ'));
 const MinimalCTA = dynamic(() => import('@/components/MinimalCTA'));
@@ -35,16 +39,13 @@ export default function Home() {
 
   return (
     <>
-      {/* Skip to Content Link for Keyboard Navigation */}
-      <SkipToContent />
-
-      {/* Custom Cursor */}
-      <CustomCursor />
-
-      {/* Scroll Progress Indicator */}
-      <ScrollProgressBar />
-
-      {/* Scroll to Top Button */}
+      {/* Premium UI Enhancements */}
+      <PageTransition />
+      <PremiumCursor />
+      <ReadingProgress />
+      <NoiseOverlay />
+      <GridPattern />
+      <AmbientLights />
       <ScrollToTop />
 
       {/* Navigation Header */}
@@ -52,7 +53,7 @@ export default function Home() {
         <MinimalNav />
       </header>
 
-      <main id="main-content" className="bg-[#0A0118] min-h-screen overflow-x-hidden" tabIndex={-1} role="main">
+      <main id="main-content" className="bg-[#0a0f1a] min-h-screen overflow-x-hidden relative" tabIndex={-1} role="main">
         {/* Hero Section */}
         <MinimalHero />
 
@@ -88,12 +89,6 @@ export default function Home() {
 
         {/* System Requirements */}
         <SystemRequirements />
-
-        {/* Spacer */}
-        <div className="h-[10vh] md:h-[15vh]" />
-
-        {/* Parallax Philosophy */}
-        <ParallaxSection />
 
         {/* Spacer */}
         <div className="h-[10vh] md:h-[15vh]" />
