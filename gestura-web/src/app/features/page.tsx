@@ -39,6 +39,17 @@ export default function FeaturesPage() {
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
 
+          {/* Grid overlay */}
+          <div className="absolute inset-0 opacity-[0.02]">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '40px 40px'
+            }} />
+          </div>
+
           <div className="max-w-5xl mx-auto text-center relative z-10">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -106,25 +117,30 @@ export default function FeaturesPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300"
+                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300"
                 >
                   {/* Hover gradient */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   
-                  {highlight.metric && (
-                    <div className="relative mb-4">
-                      <span className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 py-1 leading-relaxed">
-                        {highlight.metric}
-                      </span>
-                      {highlight.metricLabel && (
-                        <span className="block text-sm text-cyan-400 uppercase tracking-wider mt-2">
-                          {highlight.metricLabel}
-                        </span>
-                      )}
+                  {/* Label */}
+                  {highlight.metricLabel && (
+                    <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">
+                      {highlight.metricLabel}
                     </div>
                   )}
-                  <h3 className="relative text-2xl font-light mb-3">{highlight.title}</h3>
-                  <p className="relative text-neutral-400 text-sm leading-relaxed">{highlight.description}</p>
+                  
+                  {/* Value */}
+                  {highlight.metric && (
+                    <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">
+                      {highlight.metric}
+                    </div>
+                  )}
+                  
+                  {/* Title */}
+                  <h3 className="text-xl font-medium mb-3">{highlight.title}</h3>
+                  
+                  {/* Description */}
+                  <p className="text-sm text-neutral-400 leading-relaxed">{highlight.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -166,36 +182,31 @@ export default function FeaturesPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   whileHover={{ y: -5 }}
-                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300 overflow-hidden"
+                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300 overflow-hidden"
                 >
                   {/* Gradient overlay on hover */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-                  {/* Number */}
-                  <div className="relative text-cyan-400 text-sm font-mono mb-4">
-                    {String(index + 1).padStart(2, '0')}
+                  {/* Icon */}
+                  <div className="text-4xl mb-4">{feature.icon}</div>
+
+                  {/* Category Label */}
+                  <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">
+                    {feature.category}
                   </div>
 
-                  {/* Icon */}
-                  <div className="relative text-4xl mb-4">{feature.icon}</div>
-
-                  {/* Content */}
-                  <h3 className="relative text-2xl font-light mb-2 group-hover:text-cyan-400 transition-colors">
+                  {/* Name */}
+                  <h3 className="text-xl font-medium mb-2 group-hover:text-cyan-400 transition-colors">
                     {feature.name}
                   </h3>
 
-                  <p className="relative text-sm text-purple-400 uppercase tracking-wider mb-4 font-medium">{feature.action}</p>
+                  {/* Action */}
+                  <p className="text-sm text-purple-400 mb-3">{feature.action}</p>
 
-                  <p className="relative text-sm text-neutral-400 leading-relaxed">
+                  {/* Description */}
+                  <p className="text-sm text-neutral-400 leading-relaxed">
                     {feature.description}
                   </p>
-
-                  {/* Category Badge */}
-                  <div className="relative mt-4 inline-block">
-                    <span className="text-xs px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400">
-                      {feature.category}
-                    </span>
-                  </div>
                 </motion.div>
               ))}
             </div>
@@ -248,14 +259,14 @@ export default function FeaturesPage() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300"
+                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300"
                 >
                   {/* Hover gradient */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   
-                  <div className="relative text-5xl mb-4">{benefit.icon}</div>
-                  <h3 className="relative text-2xl font-light mb-3">{benefit.title}</h3>
-                  <p className="relative text-neutral-400 leading-relaxed">{benefit.description}</p>
+                  <div className="text-4xl mb-4">{benefit.icon}</div>
+                  <h3 className="text-xl font-medium mb-3">{benefit.title}</h3>
+                  <p className="text-sm text-neutral-400 leading-relaxed">{benefit.description}</p>
                 </motion.div>
               ))}
             </div>

@@ -38,6 +38,17 @@ export default function DownloadPage() {
             <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
 
+          {/* Grid overlay */}
+          <div className="absolute inset-0 opacity-[0.02]">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '40px 40px'
+            }} />
+          </div>
+
           <div className="max-w-4xl mx-auto text-center relative z-10">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -135,15 +146,15 @@ export default function DownloadPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.15 }}
-                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300 hover:scale-105"
+                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300 hover:scale-105"
                 >
                   {/* Hover gradient */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   
-                  <div className="relative text-cyan-400 text-sm font-mono mb-4">{step.number}</div>
-                  <div className="relative text-5xl mb-4">{step.icon}</div>
-                  <h3 className="relative text-2xl font-light mb-3">{step.title}</h3>
-                  <p className="relative text-sm text-neutral-400 leading-relaxed">{step.description}</p>
+                  <div className="text-4xl mb-4">{step.icon}</div>
+                  <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">{step.number}</div>
+                  <h3 className="text-xl font-medium mb-3">{step.title}</h3>
+                  <p className="text-sm text-neutral-400 leading-relaxed">{step.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -173,7 +184,7 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
+                className="border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30"
               >
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-3xl">💻</span>
@@ -200,7 +211,7 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="border border-cyan-500/30 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
+                className="border border-cyan-500/30 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30"
               >
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-3xl">⚡</span>
@@ -287,19 +298,19 @@ export default function DownloadPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 text-center hover:border-cyan-500/30 transition-all duration-300 hover:scale-105 cursor-pointer"
+                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 text-center hover:border-cyan-500/30 transition-colors duration-300 hover:scale-105 cursor-pointer"
                 >
                   {/* Hover gradient */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   
-                  <div className="relative text-6xl mb-4">{platform.icon}</div>
-                  <h3 className="relative text-2xl font-light mb-2">{platform.platform}</h3>
-                  <p className="relative text-sm text-neutral-400 mb-4">{platform.description}</p>
+                  <div className="text-5xl mb-4">{platform.icon}</div>
+                  <h3 className="text-xl font-medium mb-2">{platform.platform}</h3>
+                  <p className="text-sm text-neutral-400 mb-4">{platform.description}</p>
                   <a
                     href="https://github.com/veldorq/GesturaPrototype/releases/latest"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative text-sm text-cyan-400 hover:text-white transition-colors"
+                    className="text-sm text-cyan-400 hover:text-white transition-colors"
                   >
                     {platform.download} →
                   </a>
@@ -354,9 +365,9 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
+                className="border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30"
               >
-                <h3 className="text-2xl font-light mb-4">Explore Features</h3>
+                <h3 className="text-xl font-medium mb-3">Explore Features</h3>
                 <p className="text-sm text-neutral-400 mb-6">
                   Discover all the gestures and capabilities Gestura offers
                 </p>
@@ -372,9 +383,9 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
+                className="border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30"
               >
-                <h3 className="text-2xl font-light mb-4">How It Works</h3>
+                <h3 className="text-xl font-medium mb-3">How It Works</h3>
                 <p className="text-sm text-neutral-400 mb-6">
                   Learn about the technology behind gesture recognition
                 </p>

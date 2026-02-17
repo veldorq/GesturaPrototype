@@ -234,20 +234,20 @@ export default function HowItWorksPage() {
                     <div className="hidden md:block absolute top-20 left-full w-8 h-px bg-gradient-to-r from-cyan-400/50 to-transparent" />
                   )}
 
-                  <div className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 group hover:border-cyan-500/30 transition-all duration-500 hover:scale-105">
+                  <div className="border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 group hover:border-cyan-500/30 transition-colors duration-300 hover:scale-105">
                     {/* Number */}
                     <motion.div 
-                      className="text-cyan-400 text-sm font-mono mb-4"
-                      whileHover={{ scale: 1.2, rotate: 5 }}
+                      className="text-sm text-neutral-500 uppercase tracking-wider mb-2"
+                      whileHover={{ scale: 1.1 }}
                     >
-                      {step.number}
+                      STEP {step.number}
                     </motion.div>
 
                     {/* Title & Subtitle */}
-                    <h3 className="text-2xl font-light mb-2 group-hover:text-cyan-400 transition-colors">
+                    <h3 className="text-xl font-medium mb-2 group-hover:text-cyan-400 transition-colors">
                       {step.title}
                     </h3>
-                    <p className="text-sm text-purple-400 font-medium mb-4">{step.subtitle}</p>
+                    <p className="text-sm text-purple-400 mb-4">{step.subtitle}</p>
 
                     {/* Description */}
                     <p className="text-neutral-400 text-sm leading-relaxed mb-6">
@@ -319,12 +319,12 @@ export default function HowItWorksPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors cursor-pointer"
+                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300 cursor-pointer"
                 >
                   {/* Hover gradient */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   {/* Icon */}
-                  <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
+                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">
                     {gesture.icon}
                   </div>
 
