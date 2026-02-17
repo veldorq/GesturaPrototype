@@ -73,36 +73,42 @@ const gestures = [
     name: 'Pinch Zoom',
     action: 'Zoom in/out',
     description: 'Pinch fingers together to zoom into content, spread apart to zoom out',
+    gif: '/gestures/pinch-zoom.gif',
   },
   {
     icon: '👆',
     name: 'Swipe',
     action: 'Navigate tabs',
     description: 'Point with index finger and move left/right to switch between tabs',
+    gif: '/gestures/swipe.gif',
   },
   {
     icon: '✋',
     name: 'Open Palm',
     action: 'Scroll pages',
     description: 'Show open palm and move up/down to scroll through content smoothly',
+    gif: '/gestures/open-palm.gif',
   },
   {
     icon: '✊',
     name: 'Fist',
     action: 'Pause media',
     description: 'Make a fist to pause/play videos and audio instantly',
+    gif: '/gestures/fist.gif',
   },
   {
     icon: '🤙',
     name: 'Call Sign',
     action: 'Toggle mute',
     description: 'Shaka hand sign to mute/unmute audio with a single gesture',
+    gif: '/gestures/call-sign.gif',
   },
   {
     icon: '👎',
     name: 'Thumbs Down',
     action: 'Close window',
     description: 'Point thumb down to close the active window or application',
+    gif: '/gestures/thumbs-down.gif',
   },
 ];
 
@@ -211,10 +217,10 @@ export default function HowItWorksPage() {
               viewport={{ once: true }}
               className="text-center mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-cyan-200 to-purple-400 bg-clip-text text-transparent py-2 leading-tight">
                 Four-Step Process
               </h2>
-              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+              <p className="text-xl md:text-2xl text-neutral-300 max-w-3xl mx-auto font-light">
                 Lightning-fast gesture recognition powered by advanced AI
               </p>
             </motion.div>
@@ -319,20 +325,32 @@ export default function HowItWorksPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300 cursor-pointer"
+                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300 cursor-pointer overflow-hidden"
                 >
                   {/* Hover gradient */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  {/* Icon */}
-                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">
-                    {gesture.icon}
+                  
+                  {/* GIF/Icon Container */}
+                  <div className="relative mb-4 h-32 flex items-center justify-center bg-neutral-950/50 rounded-xl overflow-hidden">
+                    <img 
+                      src={gesture.gif} 
+                      alt={gesture.name}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        // Fallback to icon if GIF fails to load
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <div className="text-5xl group-hover:scale-110 transition-transform pointer-events-none">
+                      {gesture.icon}
+                    </div>
                   </div>
 
                   {/* Name & Action */}
-                  <h4 className="text-lg font-medium mb-1 group-hover:text-cyan-400 transition-colors">
+                  <h4 className="text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">
                     {gesture.name}
                   </h4>
-                  <p className="text-xs text-purple-400 uppercase tracking-wider mb-3">
+                  <p className="text-sm text-cyan-400 font-medium mb-3">
                     {gesture.action}
                   </p>
 
