@@ -354,24 +354,24 @@ export default function HowItWorksPage() {
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 <div>
-                  <div className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">&lt;30ms</div>
-                  <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Latency</div>
-                  <p className="text-xs text-neutral-600">End-to-end processing</p>
+                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">&lt;30ms</div>
+                  <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">Latency</div>
+                  <p className="text-sm text-neutral-400 leading-relaxed">End-to-end processing</p>
                 </div>
                 <div>
-                  <div className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">99%</div>
-                  <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Accuracy</div>
-                  <p className="text-xs text-neutral-600">Recognition rate</p>
+                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">99%</div>
+                  <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">Accuracy</div>
+                  <p className="text-sm text-neutral-400 leading-relaxed">Recognition rate</p>
                 </div>
                 <div>
-                  <div className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">30 FPS</div>
-                  <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Tracking</div>
-                  <p className="text-xs text-neutral-600">Real-time detection</p>
+                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">30 FPS</div>
+                  <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">Tracking</div>
+                  <p className="text-sm text-neutral-400 leading-relaxed">Real-time detection</p>
                 </div>
                 <div>
-                  <div className="text-4xl md:text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">100%</div>
-                  <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Local</div>
-                  <p className="text-xs text-neutral-600">No cloud processing</p>
+                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">100%</div>
+                  <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">Local</div>
+                  <p className="text-sm text-neutral-400 leading-relaxed">No cloud processing</p>
                 </div>
               </div>
             </motion.div>
