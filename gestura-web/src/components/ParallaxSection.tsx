@@ -16,7 +16,7 @@ export default function ParallaxSection() {
   return (
     <section ref={containerRef} className="relative py-32 px-6 overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#151515] to-[#0a0a0a]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B0F] via-[#111827] to-[#0B0B0F]" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">

@@ -10,13 +10,21 @@ const config: Config = {
     extend: {
       colors: {
         'gestura': {
-          'cyan': '#00D9FF',
-          'purple': '#7B61FF',
-          'navy-dark': '#0A0A0A', // Pure black for minimal aesthetic
-          'navy': '#151515', // Very dark gray
-          'navy-light': '#1E1E1E',
-          'text-primary': '#e5e5e5',
-          'text-secondary': '#737373',
+          // Accent Colors
+          'purple': '#6C63FF',        // Primary accent - refined purple
+          'cyan': '#00D9FF',          // Secondary accent - cyan
+          
+          // Background Colors
+          'navy-dark': '#0B0B0F',     // Primary background - deep blue-black
+          'navy': '#111827',          // Secondary background - blue-gray
+          'navy-light': '#1F2937',    // Tertiary background - lighter blue-gray
+          
+          // Text Colors
+          'text-primary': '#FFFFFF',  // Primary text - pure white
+          'text-secondary': '#9CA3AF', // Secondary text - refined gray
+          'text-muted': '#6B7280',    // Muted text - subtle gray
+          
+          // Legacy accent colors (preserved for compatibility)
           'accent-teal': '#4F9C8F',
           'accent-gold': '#D4A574',
         },
@@ -51,8 +59,8 @@ const config: Config = {
           '50%': { transform: 'translateY(-20px)' },
         },
         glow: {
-          '0%': { 'box-shadow': '0 0 20px rgba(0, 217, 255, 0.3)' },
-          '100%': { 'box-shadow': '0 0 40px rgba(123, 97, 255, 0.6)' },
+          '0%': { 'box-shadow': '0 0 20px rgba(108, 99, 255, 0.3)' },
+          '100%': { 'box-shadow': '0 0 40px rgba(108, 99, 255, 0.6)' },
         },
         'slide-up': {
           '0%': { opacity: '0', transform: 'translateY(30px)' },

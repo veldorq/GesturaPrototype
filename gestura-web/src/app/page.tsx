@@ -52,7 +52,7 @@ export default function Home() {
         <MinimalNav />
       </header>
 
-      <main id="main-content" className="bg-[#0a0a0a] min-h-screen overflow-x-hidden" tabIndex={-1} role="main">
+      <main id="main-content" className="bg-[#0B0B0F] min-h-screen overflow-x-hidden" tabIndex={-1} role="main">
         {/* Hero Section */}
         <MinimalHero />
 

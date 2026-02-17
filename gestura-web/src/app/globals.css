@@ -4,12 +4,23 @@
 
 @layer base {
   :root {
-    --gestura-cyan: #00D9FF;
-    --gestura-purple: #7B61FF;
-    --gestura-navy-dark: #0A0A0A;
-    --gestura-navy: #151515;
-    --color-text: #e5e5e5;
-    --color-muted: #737373;
+    /* Accent Colors */
+    --gestura-purple: #6C63FF;        /* Primary accent - refined purple */
+    --gestura-cyan: #00D9FF;          /* Secondary accent - cyan */
+    
+    /* Background Colors */
+    --gestura-navy-dark: #0B0B0F;     /* Primary background - deep blue-black */
+    --gestura-navy: #111827;          /* Secondary background - blue-gray */
+    --gestura-navy-light: #1F2937;    /* Tertiary background - lighter blue-gray */
+    
+    /* Text Colors */
+    --color-text: #FFFFFF;            /* Primary text - pure white */
+    --color-text-secondary: #9CA3AF;  /* Secondary text - refined gray */
+    --color-muted: #6B7280;           /* Muted text - subtle gray */
+    
+    /* Border Colors */
+    --color-border: rgba(255, 255, 255, 0.08);        /* Subtle borders */
+    --color-border-hover: rgba(108, 99, 255, 0.3);   /* Accent borders on hover */
   }
   
   * {
@@ -35,8 +46,8 @@
   }
   
   ::selection {
-    background-color: var(--gestura-cyan);
-    color: var(--gestura-navy-dark);
+    background-color: var(--gestura-purple);
+    color: #FFFFFF;
   }
   
   /* Minimal Scrollbar */
@@ -54,7 +65,7 @@
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 217, 255, 0.3);
+    background: rgba(108, 99, 255, 0.5);
   }
   
   /* Screen reader only - hide visually but keep accessible */
@@ -82,7 +93,7 @@
   
   /* Focus visible for keyboard navigation */
   *:focus-visible {
-    outline: 2px solid var(--gestura-cyan);
+    outline: 2px solid var(--gestura-purple);
     outline-offset: 2px;
   }
   
@@ -110,13 +121,13 @@
   
   .glass-panel:hover {
     background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(0, 217, 255, 0.3);
+    border-color: rgba(108, 99, 255, 0.4);
     transform: translateY(-2px);
   }
   
   /* Minimal Gradient Text */
   .gradient-text {
-    background: linear-gradient(135deg, #fff 0%, #737373 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #9CA3AF 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -149,11 +160,11 @@
   
   /* Subtle Glow */
   .glow-cyan {
-    box-shadow: 0 0 40px rgba(0, 217, 255, 0.15);
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.2);
   }
   
   .glow-purple {
-    box-shadow: 0 0 40px rgba(123, 97, 255, 0.15);
+    box-shadow: 0 0 40px rgba(108, 99, 255, 0.2);
   }
   
   /* Performance: GPU acceleration for animated elements */

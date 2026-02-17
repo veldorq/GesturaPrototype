@@ -182,7 +182,7 @@ export default function GestureLibrary() {
     : gestures.filter(gesture => gesture.category === selectedCategory);
   
   return (
-    <section className="relative py-32 px-6 bg-[#0a0a0a] overflow-x-hidden">
+    <section className="relative py-32 px-6 bg-[#0B0B0F] overflow-x-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-purple-900/10 via-transparent to-transparent opacity-20 pointer-events-none" />
 
