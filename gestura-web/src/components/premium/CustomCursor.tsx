@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const outlineRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>();
 
   useEffect(() => {
     // Only enable on desktop with fine pointer
@@ -22,8 +23,9 @@ export default function CustomCursor() {
     let mouseY = 0;
     let outlineX = 0;
     let outlineY = 0;
+    let isAnimating = false;
 
-    // Mouse move handler
+    // Mouse move handler (passive for better performance)
     const handleMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
@@ -32,6 +34,12 @@ export default function CustomCursor() {
       if (dot) {
         dot.style.left = `${mouseX}px`;
         dot.style.top = `${mouseY}px`;
+      }
+
+      // Start animation if not already running
+      if (!isAnimating) {
+        isAnimating = true;
+        animateOutline();
       }
     };
 
@@ -46,7 +54,7 @@ export default function CustomCursor() {
         outline.style.top = `${outlineY}px`;
       }
 
-      requestAnimationFrame(animateOutline);
+      rafRef.current = requestAnimationFrame(animateOutline);
     };
 
     // Hover state handlers
@@ -58,27 +66,44 @@ export default function CustomCursor() {
       if (outline) outline.classList.remove('hover');
     };
 
-    // Add event listeners
-    window.addEventListener('mousemove', handleMouseMove);
+    // Add event listeners with passive flag
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     
-    // Add hover listeners to interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, [role="button"]');
-    interactiveElements.forEach(el => {
-      el.addEventListener('mouseenter', handleMouseEnter);
-      el.addEventListener('mouseleave', handleMouseLeave);
-    });
+    // Defer hover listeners setup to reduce blocking time
+    const setupHoverListeners = () => {
+      const interactiveElements = document.querySelectorAll('a, button, [role="button"]');
+      interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', handleMouseEnter, { passive: true } as any);
+        el.addEventListener('mouseleave', handleMouseLeave, { passive: true } as any);
+      });
+      return interactiveElements;
+    };
 
-    // Start animation loop
-    animateOutline();
+    // Use requestIdleCallback if available, otherwise setTimeout
+    let interactiveElements: NodeListOf<Element>;
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        interactiveElements = setupHoverListeners();
+      });
+    } else {
+      setTimeout(() => {
+        interactiveElements = setupHoverListeners();
+      }, 100);
+    }
 
     // Cleanup
     return () => {
       document.body.classList.remove('cursor-enabled');
       window.removeEventListener('mousemove', handleMouseMove);
-      interactiveElements.forEach(el => {
-        el.removeEventListener('mouseenter', handleMouseEnter);
-        el.removeEventListener('mouseleave', handleMouseLeave);
-      });
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      if (interactiveElements) {
+        interactiveElements.forEach(el => {
+          el.removeEventListener('mouseenter', handleMouseEnter);
+          el.removeEventListener('mouseleave', handleMouseLeave);
+        });
+      }
     };
   }, []);
 

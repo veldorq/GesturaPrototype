@@ -1,19 +1,24 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import MinimalNav from '@/components/MinimalNav';
 import MinimalHero from '@/components/MinimalHero';
 
-// Premium UI Components
-const PremiumCursor = dynamic(() => import('@/components/premium/CustomCursor'), { ssr: false });
+// Defer premium UI components to after initial paint (reduce blocking time)
+const PremiumCursor = dynamic(() => import('@/components/premium/CustomCursor'), { 
+  ssr: false,
+  loading: () => null 
+});
+const ReadingProgress = dynamic(() => import('@/components/premium/ReadingProgress'), { 
+  ssr: false,
+  loading: () => null 
+});
+
+// Lazy load non-critical visual enhancements after page is interactive
 const NoiseOverlay = dynamic(() => import('@/components/premium/NoiseOverlay'), { ssr: false });
 const GridPattern = dynamic(() => import('@/components/premium/GridPattern'), { ssr: false });
 const AmbientLights = dynamic(() => import('@/components/premium/AmbientLights'), { ssr: false });
-const ReadingProgress = dynamic(() => import('@/components/premium/ReadingProgress'), { ssr: false });
-const PageTransition = dynamic(() => import('@/components/premium/PageTransition'), { ssr: false });
-
-// Lazy load non-critical components with SSR disabled for faster initial load
 const ScrollToTop = dynamic(() => import('@/components/ScrollToTop'), { ssr: false });
 
 // Lazy load below-the-fold sections
@@ -29,24 +34,38 @@ const MinimalCTA = dynamic(() => import('@/components/MinimalCTA'));
 const MinimalFooter = dynamic(() => import('@/components/MinimalFooter'));
 
 export default function Home() {
+  const [isInteractive, setIsInteractive] = useState(false);
+
   useEffect(() => {
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
     
     // Prevent FOUC
     document.body.classList.add('loaded');
+
+    // Defer heavy visual effects until page is interactive (reduce TBT)
+    const timer = setTimeout(() => {
+      setIsInteractive(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <>
-      {/* Premium UI Enhancements */}
-      <PageTransition />
+      {/* Critical UI - Load immediately */}
       <PremiumCursor />
       <ReadingProgress />
-      <NoiseOverlay />
-      <GridPattern />
-      <AmbientLights />
       <ScrollToTop />
+
+      {/* Non-critical visual enhancements - Defer to reduce blocking time */}
+      {isInteractive && (
+        <>
+          <NoiseOverlay />
+          <GridPattern />
+          <AmbientLights />
+        </>
+      )}
 
       {/* Navigation Header */}
       <header>

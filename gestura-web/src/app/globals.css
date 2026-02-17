@@ -1015,7 +1015,7 @@
   /* Parallax Layers */
   .parallax-slow,
   .parallax-fast {
-    will-change: transform;
+    transform: translateZ(0);
     transition: transform 0.1s linear;
   }
 
@@ -1326,12 +1326,11 @@
   /* GPU Acceleration */
   .gpu-accelerated {
     transform: translateZ(0);
-    will-change: transform;
   }
 
   /* Performance: GPU acceleration for animated elements */
   [class*="motion-"] {
-    will-change: transform, opacity;
+    transform: translateZ(0);
   }
   
   /* Performance: Content visibility for off-screen sections */
