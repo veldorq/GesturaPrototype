@@ -29,14 +29,14 @@ export default function FeaturesPage() {
         <MinimalNav />
       </header>
 
-      <main className="bg-[#0B0B0F] min-h-screen overflow-x-hidden">
+      <main className="bg-[#0A0118] min-h-screen overflow-x-hidden">
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center justify-center px-6 pt-32 pb-20">
           {/* Background Effects */}
           <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-b from-gestura-cyan/5 via-transparent to-transparent" />
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gestura-cyan/10 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gestura-purple/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+            <div className="absolute inset-0 bg-gradient-radial from-cyan-900/10 via-transparent to-transparent opacity-30 pointer-events-none" />
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
 
           <div className="max-w-5xl mx-auto text-center relative z-10">
@@ -59,7 +59,7 @@ export default function FeaturesPage() {
               className="text-5xl md:text-7xl font-light leading-tight mb-6"
             >
               Control Everything<br />
-              <span className="gradient-text">With Your Hands</span>
+              <span className="gradient-text-specs font-bold">With Your Hands</span>
             </motion.h1>
 
             <motion.p
@@ -98,7 +98,7 @@ export default function FeaturesPage() {
         {/* Feature Highlights Grid */}
         <section className="relative py-20 px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
               {featureHighlights.map((highlight, index) => (
                 <motion.div
                   key={index}
@@ -106,22 +106,25 @@ export default function FeaturesPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="glass-panel p-8 rounded-lg hover:border-gestura-cyan/50 transition-all duration-300"
+                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300"
                 >
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  
                   {highlight.metric && (
-                    <div className="mb-4">
-                      <span className="text-5xl font-light gradient-text">
+                    <div className="relative mb-4">
+                      <span className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 py-1 leading-relaxed">
                         {highlight.metric}
                       </span>
                       {highlight.metricLabel && (
-                        <span className="block text-sm text-gestura-cyan/70 mt-1">
+                        <span className="block text-sm text-cyan-400 uppercase tracking-wider mt-2">
                           {highlight.metricLabel}
                         </span>
                       )}
                     </div>
                   )}
-                  <h3 className="text-2xl font-light mb-3">{highlight.title}</h3>
-                  <p className="text-neutral-400 text-sm leading-relaxed">{highlight.description}</p>
+                  <h3 className="relative text-2xl font-light mb-3">{highlight.title}</h3>
+                  <p className="relative text-neutral-400 text-sm leading-relaxed">{highlight.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -148,10 +151,10 @@ export default function FeaturesPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-4">
-                Gesture <span className="gradient-text">Library</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Gesture Library
               </h2>
-              <div className="w-24 h-1 bg-gestura-cyan mx-auto" />
+              <p className="text-neutral-400 font-light">Master all available gestures for full control</p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -163,13 +166,13 @@ export default function FeaturesPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   whileHover={{ y: -5 }}
-                  className="group relative glass-panel p-8 rounded-lg overflow-hidden"
+                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300 overflow-hidden"
                 >
                   {/* Gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gestura-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
                   {/* Number */}
-                  <div className="relative text-gestura-cyan text-sm font-mono mb-4">
+                  <div className="relative text-cyan-400 text-sm font-mono mb-4">
                     {String(index + 1).padStart(2, '0')}
                   </div>
 
@@ -177,11 +180,11 @@ export default function FeaturesPage() {
                   <div className="relative text-4xl mb-4">{feature.icon}</div>
 
                   {/* Content */}
-                  <h3 className="relative text-2xl font-light mb-2 group-hover:text-gestura-cyan transition-colors">
+                  <h3 className="relative text-2xl font-light mb-2 group-hover:text-cyan-400 transition-colors">
                     {feature.name}
                   </h3>
 
-                  <p className="relative text-sm text-gestura-purple mb-4 font-medium">{feature.action}</p>
+                  <p className="relative text-sm text-purple-400 uppercase tracking-wider mb-4 font-medium">{feature.action}</p>
 
                   <p className="relative text-sm text-neutral-400 leading-relaxed">
                     {feature.description}
@@ -189,7 +192,7 @@ export default function FeaturesPage() {
 
                   {/* Category Badge */}
                   <div className="relative mt-4 inline-block">
-                    <span className="text-xs px-3 py-1 bg-gestura-cyan/10 border border-gestura-cyan/30 rounded-full text-gestura-cyan">
+                    <span className="text-xs px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400">
                       {feature.category}
                     </span>
                   </div>
@@ -208,8 +211,8 @@ export default function FeaturesPage() {
               viewport={{ once: true }}
               className="text-center mb-20"
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-6">
-                Why Choose <span className="gradient-text">Gestura</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Why Choose Gestura
               </h2>
               <p className="text-lg text-neutral-400 max-w-2xl mx-auto font-light">
                 Built for creators, professionals, and anyone who wants a better way to interact with technology
@@ -245,11 +248,14 @@ export default function FeaturesPage() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="glass-panel p-8 rounded-lg hover:border-gestura-cyan/50 transition-all duration-300"
+                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300"
                 >
-                  <div className="text-5xl mb-4">{benefit.icon}</div>
-                  <h3 className="text-2xl font-light mb-3">{benefit.title}</h3>
-                  <p className="text-neutral-400 leading-relaxed">{benefit.description}</p>
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  
+                  <div className="relative text-5xl mb-4">{benefit.icon}</div>
+                  <h3 className="relative text-2xl font-light mb-3">{benefit.title}</h3>
+                  <p className="relative text-neutral-400 leading-relaxed">{benefit.description}</p>
                 </motion.div>
               ))}
             </div>

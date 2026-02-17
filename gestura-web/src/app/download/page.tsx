@@ -28,14 +28,14 @@ export default function DownloadPage() {
         <MinimalNav />
       </header>
 
-      <main className="bg-[#0B0B0F] min-h-screen overflow-x-hidden">
+      <main className="bg-[#0A0118] min-h-screen overflow-x-hidden">
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center justify-center px-6 pt-32 pb-20">
           {/* Background Effects */}
           <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-b from-gestura-cyan/5 via-transparent to-transparent" />
-            <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-gestura-cyan/10 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-gestura-purple/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+            <div className="absolute inset-0 bg-gradient-radial from-cyan-900/10 via-transparent to-transparent opacity-30 pointer-events-none" />
+            <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
 
           <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -57,7 +57,7 @@ export default function DownloadPage() {
               transition={{ delay: 0.1, duration: 0.6 }}
               className="text-5xl md:text-7xl font-light leading-tight mb-6"
             >
-              Download <span className="gradient-text">Gestura</span>
+              Download <span className="gradient-text-specs font-bold">Gestura</span>
             </motion.h1>
 
             <motion.p
@@ -80,7 +80,7 @@ export default function DownloadPage() {
                 href="https://github.com/veldorq/GesturaPrototype/releases/latest"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block px-12 py-5 bg-gradient-to-r from-gestura-cyan to-gestura-purple text-white hover:scale-105 transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer shadow-2xl shadow-gestura-cyan/30"
+                className="inline-block px-12 py-5 bg-gradient-to-r from-cyan-400 to-purple-400 text-white hover:scale-105 transition-all duration-300 rounded-full font-semibold tracking-wide cursor-pointer shadow-2xl shadow-cyan-400/30"
               >
                 Download Latest Version
               </a>
@@ -100,8 +100,8 @@ export default function DownloadPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-4">
-                Quick <span className="gradient-text">Installation</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Quick Installation
               </h2>
               <p className="text-neutral-400 font-light">
                 Get up and running in three simple steps
@@ -135,12 +135,15 @@ export default function DownloadPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.15 }}
-                  className="glass-panel p-8 rounded-lg hover:border-gestura-cyan/50 transition-all duration-300 hover:scale-105"
+                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-all duration-300 hover:scale-105"
                 >
-                  <div className="text-gestura-cyan text-sm font-mono mb-4">{step.number}</div>
-                  <div className="text-5xl mb-4">{step.icon}</div>
-                  <h3 className="text-2xl font-light mb-3">{step.title}</h3>
-                  <p className="text-sm text-neutral-400 leading-relaxed">{step.description}</p>
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  
+                  <div className="relative text-cyan-400 text-sm font-mono mb-4">{step.number}</div>
+                  <div className="relative text-5xl mb-4">{step.icon}</div>
+                  <h3 className="relative text-2xl font-light mb-3">{step.title}</h3>
+                  <p className="relative text-sm text-neutral-400 leading-relaxed">{step.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -156,8 +159,8 @@ export default function DownloadPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-4">
-                System <span className="gradient-text">Requirements</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                System Requirements
               </h2>
               <p className="text-neutral-400 font-light">
                 Runs smoothly on most modern computers
@@ -170,7 +173,7 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="glass-panel p-8 rounded-lg"
+                className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
               >
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-3xl">💻</span>
@@ -197,12 +200,12 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="glass-panel p-8 rounded-lg border-gestura-cyan/30"
+                className="border border-cyan-500/30 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
               >
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-3xl">⚡</span>
-                  <h3 className="text-2xl font-light">
-                    <span className="gradient-text">Recommended</span>
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                    Recommended
                   </h3>
                 </div>
                 <ul className="space-y-4">
@@ -227,12 +230,12 @@ export default function DownloadPage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-8 glass-panel p-6 rounded-lg"
+              className="mt-8 border border-cyan-500/20 rounded-2xl p-6 backdrop-blur-sm bg-cyan-500/5"
             >
               <div className="flex items-start gap-3">
                 <span className="text-2xl">💡</span>
                 <div>
-                  <h4 className="font-medium mb-2 text-gestura-cyan">Note</h4>
+                  <h4 className="font-semibold mb-2 text-cyan-400">Note</h4>
                   <p className="text-sm text-neutral-400 leading-relaxed">
                     A working webcam is required for hand tracking. Good lighting conditions improve gesture recognition accuracy. 
                     All processing happens locally on your device—no internet connection required after installation.
@@ -252,8 +255,8 @@ export default function DownloadPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-4">
-                Available On All <span className="gradient-text">Platforms</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Available On All Platforms
               </h2>
             </motion.div>
 
@@ -284,16 +287,19 @@ export default function DownloadPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="glass-panel p-8 rounded-lg text-center hover:border-gestura-cyan/50 transition-all duration-300 hover:scale-105 cursor-pointer"
+                  className="group relative border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30 text-center hover:border-cyan-500/30 transition-all duration-300 hover:scale-105 cursor-pointer"
                 >
-                  <div className="text-6xl mb-4">{platform.icon}</div>
-                  <h3 className="text-2xl font-light mb-2">{platform.platform}</h3>
-                  <p className="text-sm text-neutral-400 mb-4">{platform.description}</p>
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  
+                  <div className="relative text-6xl mb-4">{platform.icon}</div>
+                  <h3 className="relative text-2xl font-light mb-2">{platform.platform}</h3>
+                  <p className="relative text-sm text-neutral-400 mb-4">{platform.description}</p>
                   <a
                     href="https://github.com/veldorq/GesturaPrototype/releases/latest"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gestura-cyan hover:text-white transition-colors"
+                    className="relative text-sm text-cyan-400 hover:text-white transition-colors"
                   >
                     {platform.download} →
                   </a>
@@ -310,10 +316,10 @@ export default function DownloadPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="glass-panel p-10 rounded-lg text-center"
+              className="border border-neutral-800 rounded-2xl p-10 backdrop-blur-sm bg-neutral-900/30 text-center"
             >
-              <h2 className="text-3xl md:text-4xl font-light mb-4">
-                Need <span className="gradient-text">Help?</span>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+                Need Help?
               </h2>
               <p className="text-neutral-400 mb-8 font-light">
                 Check out our documentation or reach out to the community
@@ -348,7 +354,7 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="glass-panel p-8 rounded-lg"
+                className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
               >
                 <h3 className="text-2xl font-light mb-4">Explore Features</h3>
                 <p className="text-sm text-neutral-400 mb-6">
@@ -356,7 +362,7 @@ export default function DownloadPage() {
                 </p>
                 <Link
                   href="/features"
-                  className="inline-block text-sm text-gestura-cyan hover:text-white transition-colors"
+                  className="inline-block text-sm text-cyan-400 hover:text-white transition-colors"
                 >
                   View All Features →
                 </Link>
@@ -366,7 +372,7 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="glass-panel p-8 rounded-lg"
+                className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
               >
                 <h3 className="text-2xl font-light mb-4">How It Works</h3>
                 <p className="text-sm text-neutral-400 mb-6">
@@ -374,7 +380,7 @@ export default function DownloadPage() {
                 </p>
                 <Link
                   href="/how-it-works"
-                  className="inline-block text-sm text-gestura-cyan hover:text-white transition-colors"
+                  className="inline-block text-sm text-cyan-400 hover:text-white transition-colors"
                 >
                   See the Technology →
                 </Link>
