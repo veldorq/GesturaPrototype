@@ -43,7 +43,7 @@ export default function ProblemSolution() {
   const { ref, opacity, translateY } = useScrollReveal();
 
   return (
-    <section className="relative py-24 md:py-32 bg-gestura-navy overflow-hidden">
+    <section className="relative py-24 md:py-32 bg-[#0A0118] overflow-hidden">
       {/* Background Gradient Orbs */}
       <div className="absolute top-20 left-10 w-64 h-64 md:w-96 md:h-96 bg-gestura-cyan/10 rounded-full blur-[128px] animate-pulse" />
       <div className="absolute bottom-20 right-10 w-64 h-64 md:w-96 md:h-96 bg-gestura-purple/10 rounded-full blur-[128px] animate-pulse" style={{ animationDelay: '2s' }} />

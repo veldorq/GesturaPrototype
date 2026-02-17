@@ -8,7 +8,7 @@ export default function UseCases() {
     <section className="relative py-32 px-4 md:px-8 overflow-hidden">
       {/* Enhanced Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gestura-navy-dark" />
+        <div className="absolute inset-0 bg-[#0A0118]" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-gestura-cyan/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-gestura-purple/10 rounded-full blur-3xl" />
       </div>

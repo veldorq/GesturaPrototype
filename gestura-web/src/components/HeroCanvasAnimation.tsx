@@ -116,7 +116,7 @@ export default function HeroCanvasAnimation() {
 
   if (!imagesLoaded) {
     return (
-      <div className="fixed inset-0 bg-gestura-navy-dark flex flex-col items-center justify-center z-50">
+      <div className="fixed inset-0 bg-[#0A0118] flex flex-col items-center justify-center z-50">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}

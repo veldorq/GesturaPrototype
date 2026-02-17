@@ -61,7 +61,7 @@ export default function GestureShowcase() {
           {/* Gradient border effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-gestura-cyan via-gestura-purple to-gestura-cyan opacity-50 blur-xl" />
           
-          <div className="relative bg-gestura-navy-dark/90 backdrop-blur-2xl rounded-3xl p-12">
+          <div className="relative bg-[#0A0118]/90 backdrop-blur-2xl rounded-3xl p-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
               <motion.div
                 initial={{ scale: 0 }}

@@ -27,7 +27,7 @@ export default function GestureCard({ feature, index }: GestureCardProps) {
         >
           {feature.icon}
         </motion.div>
-        <div className="flex items-center gap-2 bg-gestura-navy-dark/70 px-3 py-1 rounded-full">
+        <div className="flex items-center gap-2 bg-[#0A0118]/70 px-3 py-1 rounded-full">
           <span className="text-yellow-400 text-lg">★</span>
           <span className="text-gestura-text-primary font-semibold text-sm">{feature.rating}</span>
         </div>
