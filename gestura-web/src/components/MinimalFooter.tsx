@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function MinimalFooter() {
   return (
@@ -14,7 +15,9 @@ export default function MinimalFooter() {
             viewport={{ once: true }}
             className="text-lg md:text-xl font-light tracking-tight"
           >
-            Gestura
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              Gestura
+            </Link>
           </motion.div>
 
           {/* Links */}
@@ -28,29 +31,15 @@ export default function MinimalFooter() {
             <a href="https://github.com/veldorq/GesturaPrototype" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors cursor-pointer">
               GitHub
             </a>
-            <a href="https://github.com/veldorq/GesturaPrototype/releases" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors cursor-pointer">
+            <Link href="/download" className="hover:text-white transition-colors cursor-pointer">
               Download
-            </a>
-            <a 
-              href="#features" 
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
+            </Link>
+            <Link href="/features" className="hover:text-white transition-colors cursor-pointer">
               Features
-            </a>
-            <a 
-              href="#how-it-works" 
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
+            </Link>
+            <Link href="/how-it-works" className="hover:text-white transition-colors cursor-pointer">
               How It Works
-            </a>
+            </Link>
           </motion.div>
 
           {/* Copyright */}
