@@ -224,3 +224,9 @@
 .animate-float-subtle {
   animation: float-subtle 6s ease-in-out infinite;
 }
+
+@layer utilities {
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+}
