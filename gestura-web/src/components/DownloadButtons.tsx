@@ -32,8 +32,13 @@ export default function DownloadButtons() {
   const REPO_URL = 'https://github.com/veldorq/GesturaPrototype';
   const LATEST_RELEASE = `${REPO_URL}/releases/latest/download`;
   
-  // Temporary: Check if releases exist, fallback to GitHub repo
-  const USE_DIRECT_DOWNLOADS = false; // Set to true after first release
+  // UPDATE THIS LINK after building and uploading your file!
+  // Instructions: Run BUILD_AND_SHARE.bat, upload to Google Drive/Dropbox,
+  // then paste the direct download link here
+  const CUSTOM_DOWNLOAD_URL = ''; // Example: 'https://drive.google.com/uc?export=download&id=YOUR_FILE_ID'
+  
+  // If you have a custom download link, use it. Otherwise, fall back to GitHub releases.
+  const USE_CUSTOM_DOWNLOAD = CUSTOM_DOWNLOAD_URL.length > 0;
 
   const downloadOptions: DownloadOption[] = [
     {
@@ -41,9 +46,9 @@ export default function DownloadButtons() {
       icon: '🪟',
       filename: 'Gestura-Windows-x64.zip',
       size: '~85 MB',
-      downloadUrl: USE_DIRECT_DOWNLOADS 
-        ? `${LATEST_RELEASE}/Gestura-Windows-x64.zip`
-        : `${REPO_URL}/releases`,
+      downloadUrl: USE_CUSTOM_DOWNLOAD 
+        ? CUSTOM_DOWNLOAD_URL
+        : `${LATEST_RELEASE}/Gestura-Windows-x64.zip`,
       instructions: [
         'Extract the ZIP file',
         'Run Gestura.exe',
@@ -56,9 +61,9 @@ export default function DownloadButtons() {
       icon: '🍎',
       filename: 'Gestura-macOS-x64.zip',
       size: '~90 MB',
-      downloadUrl: USE_DIRECT_DOWNLOADS 
-        ? `${LATEST_RELEASE}/Gestura-macOS-x64.zip`
-        : `${REPO_URL}/releases`,
+      downloadUrl: USE_CUSTOM_DOWNLOAD
+        ? CUSTOM_DOWNLOAD_URL
+        : `${LATEST_RELEASE}/Gestura-macOS-x64.zip`,
       instructions: [
         'Extract the ZIP file',
         'Right-click Gestura → Open',
@@ -71,9 +76,9 @@ export default function DownloadButtons() {
       icon: '🐧',
       filename: 'Gestura-Linux-x64.zip',
       size: '~80 MB',
-      downloadUrl: USE_DIRECT_DOWNLOADS 
-        ? `${LATEST_RELEASE}/Gestura-Linux-x64.zip`
-        : `${REPO_URL}/releases`,
+      downloadUrl: USE_CUSTOM_DOWNLOAD
+        ? CUSTOM_DOWNLOAD_URL
+        : `${LATEST_RELEASE}/Gestura-Linux-x64.zip`,
       instructions: [
         'Extract: unzip Gestura-Linux-x64.zip',
         'Make executable: chmod +x Gestura',
@@ -87,15 +92,18 @@ export default function DownloadButtons() {
   const otherOptions = downloadOptions.filter(opt => opt.os !== detectedOS);
 
   if (!isClient) {
-    // Server-side render fallback
+    // Server-side render fallback - show generic download button
     return (
       <div className="flex flex-col items-center gap-4">
         <a
-          href={`${REPO_URL}/releases/latest`}
+          href={CUSTOM_DOWNLOAD_URL || `${REPO_URL}/releases/latest`}
           className="inline-block px-12 py-5 bg-gradient-to-r from-cyan-400 to-purple-400 text-white hover:scale-105 transition-all duration-300 rounded-full font-semibold tracking-wide cursor-pointer shadow-2xl shadow-cyan-400/30"
         >
           Download Gestura
         </a>
+        <p className="text-xs text-neutral-500">
+          Windows, macOS, Linux • Free & Open Source
+        </p>
       </div>
     );
   }

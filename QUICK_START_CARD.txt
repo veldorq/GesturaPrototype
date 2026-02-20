@@ -1,0 +1,97 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║   🚀 MAKE DOWNLOADS WORK IN 5 MINUTES                        ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+┌───────────────────────────────────────────────────────────────┐
+│  STEP 1: BUILD THE FILE                                       │
+└───────────────────────────────────────────────────────────────┘
+
+    ▶ Double-click:  BUILD_AND_SHARE.bat
+    ▶ Wait 2-5 minutes
+    ▶ Result: "Gestura-Release" folder created
+
+┌───────────────────────────────────────────────────────────────┐
+│  STEP 2: ZIP THE FOLDER                                       │
+└───────────────────────────────────────────────────────────────┘
+
+    ▶ Right-click "Gestura-Release" folder
+    ▶ Select: Send to → Compressed (zipped) folder
+    ▶ Name it: Gestura-Windows.zip
+
+┌───────────────────────────────────────────────────────────────┐
+│  STEP 3: UPLOAD TO GOOGLE DRIVE (EASIEST)                    │
+└───────────────────────────────────────────────────────────────┘
+
+    ▶ Go to: drive.google.com
+    ▶ Click "New" → "File upload"
+    ▶ Upload Gestura-Windows.zip
+    ▶ Right-click file → "Share"
+    ▶ Set to: "Anyone with the link"
+    ▶ Copy the link
+
+┌───────────────────────────────────────────────────────────────┐
+│  STEP 4: CONVERT TO DIRECT DOWNLOAD LINK                     │
+└───────────────────────────────────────────────────────────────┘
+
+    Your Google Drive link looks like:
+    https://drive.google.com/file/d/1xYz789ABC/view?usp=sharing
+                                      ↑↑↑↑↑↑↑↑↑
+    Change it to this format:
+    https://drive.google.com/uc?export=download&id=1xYz789ABC
+                                                    ↑↑↑↑↑↑↑↑↑
+    (Just copy the FILE_ID from the middle)
+
+┌───────────────────────────────────────────────────────────────┐
+│  STEP 5: UPDATE WEBSITE CODE                                 │
+└───────────────────────────────────────────────────────────────┘
+
+    ▶ Open: gestura-web\src\components\DownloadButtons.tsx
+    ▶ Find line 35 (search for: CUSTOM_DOWNLOAD_URL)
+    ▶ Change from:
+        const CUSTOM_DOWNLOAD_URL = '';
+    
+    ▶ Change to (paste your link):
+        const CUSTOM_DOWNLOAD_URL = 'https://drive.google.com/uc?export=download&id=1xYz789ABC';
+    
+    ▶ Save the file
+
+┌───────────────────────────────────────────────────────────────┐
+│  STEP 6: DEPLOY WEBSITE                                      │
+└───────────────────────────────────────────────────────────────┘
+
+    In terminal/PowerShell:
+    
+    cd gestura-web
+    git add .
+    git commit -m "Add working download link"
+    git push
+
+    (If using Vercel/Netlify, deployment happens automatically)
+
+┌───────────────────────────────────────────────────────────────┐
+│  STEP 7: TEST IT!                                            │
+└───────────────────────────────────────────────────────────────┘
+
+    ▶ Open your website in Incognito/Private mode
+    ▶ Click "Download" button
+    ▶ Verify: File downloads immediately (not GitHub page!)
+    ▶ Extract and run Gestura.exe to confirm it works
+
+╔═══════════════════════════════════════════════════════════════╗
+║  ✅ DONE! Users can now download your app like normal       ║
+║     software - no GitHub confusion!                          ║
+╚═══════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════
+
+TOTAL TIME: ~5-10 minutes
+DIFFICULTY: Easy (just follow the steps)
+RESULT: Professional download experience for users
+
+═══════════════════════════════════════════════════════════════
+
+For detailed instructions, see: EASY_DOWNLOAD_SETUP.md
+
+Need help? The script will guide you through each step!
