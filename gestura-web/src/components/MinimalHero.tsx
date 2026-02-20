@@ -45,7 +45,8 @@ export default function MinimalHero() {
           transition={{ delay: 0.3, duration: 0.6 }}
           className="text-base md:text-lg text-neutral-400 font-light mb-8 max-w-2xl mx-auto"
         >
-          No hardware. No setup. Just your webcam and 30 seconds.
+          Real-time assistive technology enabling touchless navigation through hand gestures.
+          <br />Designed for accessibility. Built for reliability.
         </motion.p>
 
         {/* Trust Signals */}

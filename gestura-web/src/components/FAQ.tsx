@@ -10,36 +10,36 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: "How long does it take to set up Gestura?",
-    answer: "Less than 30 seconds. Just download the executable, grant camera permissions, and start waving. No installation wizards, no configuration files, no technical knowledge required."
+    question: "What are the system requirements for Gestura?",
+    answer: "Gestura requires Python 3.10 or higher, a standard webcam (built-in or external USB), and runs on Windows, macOS, or Linux. The application processes video locally and doesn't require GPU acceleration."
   },
   {
-    question: "Is my data being collected or sent anywhere?",
-    answer: "Absolutely not. Gestura runs 100% locally on your computer. All hand tracking happens on your device using your CPU. No internet connection required after download, no data leaves your machine, no third-party servers involved."
-  },
-  {
-    question: "What system requirements do I need?",
-    answer: "Minimal requirements: Windows 10/11, any working webcam, and a dual-core CPU. Gestura is optimized to run at 30 FPS even on budget laptops. No GPU or fancy hardware needed."
-  },
-  {
-    question: "Does Gestura work offline?",
-    answer: "Yes! Once downloaded, Gestura works completely offline. It doesn't need internet connectivity to function. Perfect for presentations, private browsing, or air-gapped systems."
+    question: "Is my camera data being collected or transmitted?",
+    answer: "No. All hand tracking and gesture recognition happens locally on your device. No video frames, hand landmarks, or usage data are transmitted to external servers or stored persistently. The application only accesses the webcam during active use."
   },
   {
     question: "How accurate is the gesture recognition?",
-    answer: "Gestura achieves 99% accuracy using a hybrid approach: MediaPipe for hand tracking + custom CNN trained on 100,000+ gesture samples. It adapts to different hand sizes, lighting conditions, and room setups."
+    answer: "Recognition accuracy depends on consistent gesture execution and environmental conditions. The system uses geometric feature extraction from hand landmarks and applies multi-stage stabilization to reduce false activations from tremors or involuntary movements."
   },
   {
-    question: "Can I customize the gestures?",
-    answer: "Not yet, but it's coming! The current version includes 11 pre-configured gestures optimized for web browsing. Future updates will add gesture remapping and custom action triggers."
+    question: "Can I customize which gestures trigger which actions?",
+    answer: "Yes. Gesture-to-action mappings are stored in JSON configuration files that can be edited. The system includes a GestureRecorder class for defining custom gestures, though it's not yet integrated into the main UI."
   },
   {
-    question: "Why isn't my camera working?",
-    answer: "Common fixes: (1) Close other apps using your webcam (Zoom, Teams), (2) Check Windows Privacy Settings → Camera → Allow desktop apps, (3) Try restarting the application. Gestura includes automatic retry logic with detailed error messages."
+    question: "What should I do if gestures aren't being recognized?",
+    answer: "Improve lighting conditions by adding front-facing light sources. Move closer to the camera (1-2 feet is optimal). Ensure your hand remains within the frame throughout the dwell period. Execute gestures more slowly and deliberately. You can also adjust confidence thresholds in the configuration files."
   },
   {
-    question: "Does it work with multiple monitors?",
-    answer: "Yes! Gestura works seamlessly across multiple displays. Your hand movements control the cursor across all connected monitors, just like a traditional mouse."
+    question: "Does Gestura work offline?",
+    answer: "Yes, once dependencies are installed. The application processes everything locally without requiring internet connectivity during operation."
+  },
+  {
+    question: "Why is the camera not being detected?",
+    answer: "Verify no other applications are using the webcam. Check system camera permissions (particularly on macOS). Try modifying the CAMERA_INDEX value in config/constants.py (try 0, 1, or 2)."
+  },
+  {
+    question: "How do I adjust the sensitivity or dwell time?",
+    answer: "Edit config/constants.py to modify MIN_DETECTION_CONFIDENCE (default 0.7), DWELL_TIME_SECONDS (default 1.5), STABILIZATION_WINDOW (default 5 frames), and other recognition parameters. Higher confidence thresholds reduce false positives but require more precise gestures."
   }
 ];
 
@@ -79,7 +79,7 @@ export default function FAQ() {
             Frequently Asked Questions
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
-            Everything you need to know about Gestura. Can't find what you're looking for? Reach out on GitHub.
+            Common questions about setup, usage, and troubleshooting. For additional support, open an issue on GitHub.
           </p>
         </motion.div>
 

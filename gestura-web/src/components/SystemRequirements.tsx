@@ -4,20 +4,18 @@ import { motion } from "framer-motion";
 
 const requirements = {
   minimum: [
-    { item: "OS", value: "Windows 10/11 (64-bit)" },
-    { item: "CPU", value: "Dual-core 2.0 GHz" },
-    { item: "RAM", value: "4 GB" },
-    { item: "Webcam", value: "Any 720p camera (30 FPS)" },
-    { item: "Storage", value: "500 MB available space" },
-    { item: "Browser", value: "Chrome, Edge, Firefox (latest)" }
+    { item: "OS", value: "Windows 10/11, macOS, or Linux" },
+    { item: "Python", value: "3.10 or higher" },
+    { item: "Webcam", value: "Any standard webcam (built-in or USB)" },
+    { item: "Storage", value: "Minimal space for dependencies" },
+    { item: "Internet", value: "Required for initial setup only" }
   ],
   recommended: [
-    { item: "OS", value: "Windows 11 (64-bit)" },
-    { item: "CPU", value: "Quad-core 3.0 GHz or better" },
-    { item: "RAM", value: "8 GB or more" },
-    { item: "Webcam", value: "1080p camera (60 FPS)" },
-    { item: "Storage", value: "1 GB available space" },
-    { item: "Environment", value: "Well-lit room (reduces detection errors)" }
+    { item: "OS", value: "Windows 11 or macOS latest" },
+    { item: "Python", value: "3.10+ with pip installed" },
+    { item: "RAM", value: "4 GB or more available" },
+    { item: "Lighting", value: "Consistent front-facing light source" },
+    { item: "Environment", value: "Minimal hand-like shapes in background" }
   ]
 };
 
@@ -25,37 +23,30 @@ const dependencies = [
   {
     name: "Python",
     version: "3.10+",
-    purpose: "Runtime environment for desktop application",
+    purpose: "Core runtime environment for the application",
     icon: "🐍"
   },
   {
     name: "OpenCV",
-    version: "4.5+",
-    purpose: "Computer vision and camera capture",
+    version: "4.x",
+    purpose: "Camera capture and image processing operations",
     icon: "📷"
   },
   {
     name: "MediaPipe",
-    version: "0.10+",
-    purpose: "Real-time hand tracking and landmark detection",
-    icon: "✋"
-  },
+    version: "Latest",
+    purpose: "Hand landmark detection and tracking (21 landmarks)",
+    icon: "✋"  },
   {
     name: "PyAutoGUI",
-    version: "0.9.54",
-    purpose: "Cross-platform mouse and keyboard automation",
+    version: "Latest",
+    purpose: "Cross-platform GUI automation for action execution",
     icon: "⌨️"
   },
   {
-    name: "TensorFlow Lite",
-    version: "2.13+",
-    purpose: "CNN gesture classification inference",
-    icon: "🧠"
-  },
-  {
     name: "NumPy",
-    version: "1.24+",
-    purpose: "Numerical computations and array operations",
+    version: "Latest",
+    purpose: "Numerical operations for feature extraction",
     icon: "🔢"
   }
 ];
@@ -87,7 +78,7 @@ export default function SystemRequirements() {
             System Requirements
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
-            Gestura runs on modest hardware. No GPU required—everything runs on your CPU.
+            Gestura requires Python 3.10+ and a working webcam. Compatible with Windows, macOS, and Linux.
           </p>
         </motion.div>
 
@@ -106,7 +97,7 @@ export default function SystemRequirements() {
               <h3 className="text-2xl font-bold text-white">Minimum</h3>
             </div>
             <p className="text-sm text-neutral-400 mb-6">
-              Runs at 20-25 FPS on budget laptops. Functional for basic gestures.
+              Basic requirements to run Gestura. Functional for testing and limited use.
             </p>
             <div className="space-y-3">
               {requirements.minimum.map((req, idx) => (
@@ -133,7 +124,7 @@ export default function SystemRequirements() {
               </h3>
             </div>
             <p className="text-sm text-neutral-300 mb-6">
-              Smooth 30 FPS performance. Best experience for daily use.
+              Optimal conditions for reliable recognition and consistent performance.
             </p>
             <div className="space-y-3">
               {requirements.recommended.map((req, idx) => (

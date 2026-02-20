@@ -13,7 +13,7 @@ export default function MinimalCTA() {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl font-light leading-tight mb-10"
         >
-          Code With <span className="gradient-text">Clarity</span>
+          Experience <span className="gradient-text">Touchless Control</span>
         </motion.h2>
 
         {/* Stats Row */}
@@ -25,9 +25,9 @@ export default function MinimalCTA() {
           className="flex flex-wrap justify-center gap-16 mb-16"
         >
           {[
-            { value: '<30ms', label: 'Response Time' },
-            { value: '99%', label: 'Accuracy Rate'  },
-            { value: '100%', label: 'Privacy First' },
+            { value: '~30', label: 'FPS Target' },
+            { value: '1.5s', label: 'Dwell Time'  },
+            { value: '100%', label: 'Local Processing' },
           ].map((stat, i) => (
             <motion.div
               key={i}

@@ -14,80 +14,52 @@ interface Gesture {
 const gestures: Gesture[] = [
   {
     name: "Open Palm",
-    action: "Scroll Down",
-    handPose: "All 5 fingers spread apart",
-    category: "Scrolling",
-    debounce: "400ms hold"
+    action: "Pause State",
+    handPose: "All 5 fingers extended and spread apart",
+    category: "System",
+    debounce: "Neutral position"
   },
   {
     name: "Closed Fist",
-    action: "Scroll Up",
+    action: "Left Click",
     handPose: "All fingers folded into palm",
-    category: "Scrolling",
-    debounce: "400ms hold"
-  },
-  {
-    name: "Index Only",
-    action: "Mouse Move",
-    handPose: "Index finger extended, others folded",
-    category: "Pointing",
-    debounce: "Real-time"
+    category: "Clicking",
+    debounce: "1.5s dwell time"
   },
   {
     name: "Peace Sign",
-    action: "Left Click",
-    handPose: "Index + middle fingers extended",
+    action: "Right Click",
+    handPose: "Index and middle fingers extended in V shape",
     category: "Clicking",
-    debounce: "500ms"
+    debounce: "1.5s dwell time"
   },
   {
-    name: "Three Fingers",
-    action: "Left Click (Alt)",
-    handPose: "Index, middle, ring extended",
-    category: "Clicking",
-    debounce: "500ms"
-  },
-  {
-    name: "Swipe Left",
-    action: "Browser Back",
-    handPose: "Hand motion to the left",
-    category: "Navigation",
-    debounce: "800ms"
-  },
-  {
-    name: "Swipe Right",
-    action: "Browser Forward",
-    handPose: "Hand motion to the right",
-    category: "Navigation",
-    debounce: "800ms"
-  },
-  {
-    name: "Thumb Up",
-    action: "Zoom In",
+    name: "Thumbs Up",
+    action: "Scroll Up",
     handPose: "Thumb extended upward, fingers folded",
-    category: "Zoom",
-    debounce: "600ms"
+    category: "Scrolling",
+    debounce: "1.5s dwell time"
   },
   {
-    name: "Four Fingers",
-    action: "Refresh Page",
-    handPose: "4 fingers extended, thumb tucked",
-    category: "Page Actions",
-    debounce: "800ms"
+    name: "Thumbs Down",
+    action: "Scroll Down",
+    handPose: "Thumb pointed downward, fingers folded",
+    category: "Scrolling",
+    debounce: "1.5s dwell time"
   },
   {
-    name: "Pinky Only",
-    action: "Mute/Unmute",
-    handPose: "Only pinky finger extended",
-    category: "Accessibility",
-    debounce: "600ms"
+    name: "Browser Back",
+    action: "Navigate Back",
+    handPose: "Configured gesture for backward navigation",
+    category: "Navigation",
+    debounce: "1.5s dwell time"
   },
   {
-    name: "Rock Sign",
-    action: "Exit Program",
-    handPose: "Index + pinky extended (hold 1.5s)",
-    category: "System",
-    debounce: "1500ms hold"
+    name: "Browser Forward",
+    action: "Navigate Forward",
+    handPose: "Configured gesture for forward navigation",
+    category: "Navigation",
+    debounce: "1.5s dwell time"
   }
 ];
 

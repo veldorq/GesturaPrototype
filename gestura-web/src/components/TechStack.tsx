@@ -3,43 +3,43 @@
 import { motion } from 'framer-motion';
 
 const techBadges = [
-  { name: 'Python 3.11', url: 'https://www.python.org' },
-  { name: 'MediaPipe 0.10', url: 'https://developers.google.com/mediapipe' },
-  { name: 'TensorFlow 2.x', url: 'https://www.tensorflow.org' },
+  { name: 'Python 3.10+', url: 'https://www.python.org' },
+  { name: 'MediaPipe', url: 'https://developers.google.com/mediapipe' },
   { name: 'OpenCV 4.x', url: 'https://opencv.org' },
+  { name: 'PyAutoGUI', url: 'https://pyautogui.readthedocs.io' },
 ];
 
 const technologies = [
   {
     category: 'Computer Vision',
     items: [
-      { name: 'MediaPipe', description: 'Real-time hand tracking with 21 landmarks per hand' },
-      { name: 'OpenCV', description: 'Image processing and transformation pipeline' },
-      { name: 'TensorFlow Lite', description: 'Lightweight ML inference on edge devices' },
+      { name: 'MediaPipe Hands', description: 'Real-time hand landmark detection with 21 tracked points per hand' },
+      { name: 'OpenCV', description: 'Camera capture, frame processing, and image transformation pipeline' },
+      { name: 'Landmark Normalization', description: 'Palm-based scaling for distance-invariant feature extraction' },
     ],
   },
   {
-    category: 'Machine Learning',
+    category: 'Recognition System',
     items: [
-      { name: 'CNN Architecture', description: 'Custom convolutional neural network for gesture classification' },
-      { name: 'Data Augmentation', description: 'Robust training with rotation, scaling, and noise injection' },
-      { name: 'Transfer Learning', description: 'Fine-tuned models for specific gesture recognition' },
+      { name: 'Geometric Features', description: 'Finger extension, spread, thumb angle, and curl measurements' },
+      { name: 'Euclidean Distance', description: 'Normalized distance comparison for gesture matching' },
+      { name: 'Temporal Filtering', description: 'Multi-frame consistency validation to reduce false positives' },
     ],
   },
   {
     category: 'System Integration',
     items: [
-      { name: 'PyAutoGUI', description: 'Cross-platform system control and automation' },
-      { name: 'Threading', description: 'Parallel processing for camera, inference, and actions' },
-      { name: 'Kalman Filtering', description: 'Smooth motion prediction and noise reduction' },
+      { name: 'PyAutoGUI', description: 'Cross-platform system automation for action execution' },
+      { name: 'JSON Configuration', description: 'Persistent gesture mappings and user preferences' },
+      { name: 'Resource Management', description: 'Context managers for camera acquisition and cleanup' },
     ],
   },
   {
-    category: 'Performance',
+    category: 'Stabilization',
     items: [
-      { name: 'WebAssembly', description: 'Near-native speed in browser environments' },
-      { name: 'GPU Acceleration', description: 'Hardware-accelerated neural network inference' },
-      { name: 'Frame Skipping', description: 'Intelligent processing to maintain 30 FPS' },
+      { name: 'Confidence Thresholds', description: 'Minimum confidence requirements for gesture validation' },
+      { name: 'Dwell-Time Activation', description: 'Sustained gesture requirements prevent accidental triggers' },
+      { name: 'Debounce Logic', description: 'Cooldown periods between successive action executions' },
     ],
   },
 ];
@@ -56,10 +56,10 @@ export default function TechStack() {
           className="text-center mb-16 px-4"
         >
           <h2 className="text-3xl md:text-4xl font-light mb-4">
-            Built on <span className="gradient-text">Modern Technology</span>
+            Built on <span className="gradient-text">Proven Technology</span>
           </h2>
           <p className="text-neutral-400 text-sm max-w-2xl mx-auto">
-            Industry-leading tools and frameworks power Gestura's gesture recognition
+            Established libraries and frameworks provide reliable hand tracking and system automation
           </p>
         </motion.div>
 

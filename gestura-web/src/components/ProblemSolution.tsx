@@ -14,28 +14,28 @@ interface ProblemSolutionItem {
 
 const comparisons: ProblemSolutionItem[] = [
   {
-    problem: 'Constant switching between mouse and keyboard breaks workflow',
-    solution: 'Control everything with natural hand gestures without touching anything',
-    iconType: 'lightning',
-    problemIconType: 'disconnect'
-  },
-  {
-    problem: 'Giving presentations means being tied to your computer',
-    solution: 'Present from anywhere in the room with gesture controls',
-    iconType: 'target',
-    problemIconType: 'alert'
-  },
-  {
-    problem: 'Repetitive strain from hours of mouse clicking',
-    solution: 'Reduce physical strain with contactless gesture control',
+    problem: 'Traditional input devices require precise motor control and sustained physical effort',
+    solution: 'Low-effort gestures with tremor compensation and stabilization accommodate motor variability',
     iconType: 'hand',
     problemIconType: 'strain'
   },
   {
-    problem: 'Difficult for people with limited mobility to use computers',
-    solution: 'Accessible computing through simple hand movements',
+    problem: 'Mouse and keyboard interaction creates physical strain from repetitive movements',
+    solution: 'Touchless control reduces repetitive strain through contactless gesture activation',
+    iconType: 'lightning',
+    problemIconType: 'disconnect'
+  },
+  {
+    problem: 'Limited accessibility options for users with partial motor impairments',
+    solution: 'Single-hand operation with customizable dwell times provides alternative input method',
     iconType: 'accessibility',
     problemIconType: 'barrier'
+  },
+  {
+    problem: 'Concern about privacy when using cloud-based gesture recognition systems',
+    solution: 'All processing happens locally on your device with no external data transmission',
+    iconType: 'target',
+    problemIconType: 'alert'
   }
 ];
 
@@ -67,12 +67,12 @@ export default function ProblemSolution() {
           </motion.div>
 
           <h2 className="text-3xl md:text-4xl font-space font-semibold mb-6">
-            From <span className="text-red-400">Frustration</span> to{' '}
-            <span className="gradient-text">Freedom</span>
+            From <span className="text-red-400">Challenges</span> to{' '}
+            <span className="gradient-text">Solutions</span>
           </h2>
           <p className="text-base md:text-lg text-gestura-text-secondary font-inter max-w-3xl mx-auto leading-relaxed">
-            See how Gestura solves the challenges you face
-            <span className="text-white font-medium"> every single day</span>
+            Understanding how Gestura addresses{' '}
+            <span className="text-white font-medium">accessibility and usability needs</span>
           </p>
         </motion.div>
 

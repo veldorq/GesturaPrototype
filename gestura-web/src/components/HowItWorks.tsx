@@ -5,70 +5,70 @@ import { motion } from 'framer-motion';
 const steps = [
   {
     number: '01',
-    title: 'Hand Detection',
-    subtitle: 'AI-Powered Recognition',
-    description: 'Advanced computer vision algorithms detect your hand in real-time using your webcam. MediaPipe technology identifies 21 key landmarks on each hand with sub-millimeter precision.',
-    tech: ['MediaPipe', 'TensorFlow Lite', 'WebAssembly'],
+    title: 'Hand Landmark Detection',
+    subtitle: 'MediaPipe Computer Vision',
+    description: 'MediaPipe detects 21 three-dimensional hand landmarks in real-time. The system processes one hand at a time at approximately 30 frames per second, extracting wrist, finger joints, and fingertip positions.',
+    tech: ['MediaPipe Hands', 'Landmark Tracking', '30 FPS'],
   },
   {
     number: '02',
-    title: 'Gesture Classification',
-    subtitle: 'Neural Network Processing',
-    description: 'Custom-trained convolutional neural network analyzes hand landmarks and classifies gestures instantly. Recognizes 11+ distinct gestures with 99% accuracy.',
-    tech: ['CNN Model', 'Real-time Inference', 'Edge Computing'],
+    title: 'Feature Extraction',
+    subtitle: 'Geometric Analysis',
+    description: 'Landmarks are normalized by palm dimensions to handle varying distances from camera. Geometric features including finger extension states, fingertip spacing, and thumb orientation are extracted from normalized positions.',
+    tech: ['Normalization', 'Geometric Features', 'Distance Invariant'],
   },
   {
     number: '03',
-    title: 'Motion Mapping',
-    subtitle: 'Gesture to Action',
-    description: 'Each recognized gesture triggers specific system actions. Smooth interpolation ensures natural, responsive control without lag or jitter.',
-    tech: ['Action Mapping', 'Smoothing Pipeline', 'Event Handling'],
+    title: 'Gesture Recognition',
+    subtitle: 'Pattern Matching',
+    description: 'Extracted features are compared against the gesture library using normalized Euclidean distance. Matches accumulate in a temporal buffer for consistency validation across multiple frames.',
+    tech: ['Pattern Matching', 'Temporal Filtering', 'Confidence Scoring'],
   },
   {
     number: '04',
-    title: 'System Control',
-    subtitle: 'Direct Integration',
-    description: 'Gestures become system commands - zoom, scroll, navigate, pause. All processing happens locally on your device. Zero latency, complete privacy.',
-    tech: ['Native APIs', 'Local Processing', 'Zero Cloud'],
+    title: 'Stabilization & Action',
+    subtitle: 'Deliberate Activation',
+    description: 'Multi-stage stabilization through confidence thresholds, temporal consistency, and dwell-time monitoring ensures deliberate activation. Actions trigger after successful dwell completion and debounce validation.',
+    tech: ['Dwell-Time', 'Tremor Compensation', 'Debounce Logic'],
   },
 ];
 
 const gestures = [
   {
-    icon: '🤏',
-    name: 'Pinch Zoom',
-    action: 'Zoom in/out',
-    description: 'Pinch fingers together to zoom into content, spread apart to zoom out',
-  },
-  {
-    icon: '👆',
-    name: 'Swipe',
-    action: 'Navigate tabs',
-    description: 'Point with index finger and move left/right to switch between tabs',
-  },
-  {
     icon: '✋',
     name: 'Open Palm',
-    action: 'Scroll pages',
-    description: 'Show open palm and move up/down to scroll through content smoothly',
+    action: 'Pause State',
+    description: 'Show open palm to enter pause state. No actions will trigger while in this neutral position.',
   },
   {
     icon: '✊',
-    name: 'Fist',
-    action: 'Pause media',
-    description: 'Make a fist to pause/play videos and audio instantly',
+    name: 'Closed Fist',
+    action: 'Left Click',
+    description: 'Make a closed fist and maintain dwell time to trigger left mouse click action.',
   },
   {
-    icon: '🤙',
-    name: 'Call Sign',
-    action: 'Toggle mute',
-    description: 'Shaka hand sign to mute/unmute audio with a single gesture',
+    icon: '✌️',
+    name: 'Peace Sign',
+    action: 'Right Click',
+    description: 'Show peace sign gesture to trigger right mouse click after dwell completion.',
+  },
+  {
+    icon: '👍',
+    name: 'Thumbs Up',
+    action: 'Scroll Up',
+    description: 'Point thumb up to scroll upward through pages and documents smoothly.',
   },
   {
     icon: '👎',
     name: 'Thumbs Down',
-    action: 'Close window',
-    description: 'Point thumb down to close the active window or application',
+    action: 'Scroll Down',
+    description: 'Point thumb down to scroll downward through content with controlled speed.',
+  },
+  {
+    icon: '👈',
+    name: 'Browser Back',
+    action: 'Navigate Back',
+    description: 'Use designated gesture to navigate backward in browser history.',
   },
 ];
 
@@ -111,7 +111,7 @@ export default function HowItWorks() {
             How <span className="gradient-text">Gestura</span> Works
           </h2>
           <p className="text-base md:text-lg text-neutral-400 max-w-3xl mx-auto font-light">
-            From hand detection to system control in under 30 milliseconds
+            From hand detection to action execution through multi-stage recognition and stabilization
           </p>
         </motion.div>
 
@@ -233,19 +233,19 @@ export default function HowItWorks() {
           
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl font-light gradient-text mb-2">&lt;30ms</div>
-              <div className="text-xs text-neutral-500 uppercase tracking-wider">Latency</div>
-              <p className="text-xs text-neutral-600 mt-2">End-to-end processing time</p>
+              <div className="text-3xl font-light gradient-text mb-2">~30</div>
+              <div className="text-xs text-neutral-500 uppercase tracking-wider">FPS Target</div>
+              <p className="text-xs text-neutral-600 mt-2">Real-time frame processing</p>
             </div>
             <div>
-              <div className="text-3xl font-light gradient-text mb-2">99%</div>
-              <div className="text-xs text-neutral-500 uppercase tracking-wider">Accuracy</div>
-              <p className="text-xs text-neutral-600 mt-2">Gesture recognition rate</p>
+              <div className="text-3xl font-light gradient-text mb-2">1.5s</div>
+              <div className="text-xs text-neutral-500 uppercase tracking-wider">Dwell Time</div>
+              <p className="text-xs text-neutral-600 mt-2">Deliberate activation period</p>
             </div>
             <div>
-              <div className="text-3xl font-light gradient-text mb-2">30 FPS</div>
-              <div className="text-xs text-neutral-500 uppercase tracking-wider">Tracking</div>
-              <p className="text-xs text-neutral-600 mt-2">Real-time hand detection</p>
+              <div className="text-3xl font-light gradient-text mb-2">21</div>
+              <div className="text-xs text-neutral-500 uppercase tracking-wider">Landmarks</div>
+              <p className="text-xs text-neutral-600 mt-2">Hand points tracked per frame</p>
             </div>
             <div>
               <div className="text-3xl font-light gradient-text mb-2">100%</div>
