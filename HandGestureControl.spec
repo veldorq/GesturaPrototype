@@ -2,11 +2,11 @@
 
 
 a = Analysis(
-    ['PROTOTYPE.PY'],
+    ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('requirements.txt', '.')],
-    hiddenimports=['mediapipe', 'cv2', 'pyautogui', 'numpy'],
+    datas=[('models', 'models'), ('config', 'config')],
+    hiddenimports=['mediapipe', 'cv2', 'pyautogui', 'numpy', 'PIL', 'dataclasses'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='HandGestureControl',
+    name='Gestura',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -35,4 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='icon.ico',  # Add icon if you have one
 )

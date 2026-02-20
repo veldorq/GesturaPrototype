@@ -11,6 +11,7 @@ const ScrollProgressBar = dynamic(() => import('@/components/ScrollProgressBar')
 const ScrollToTop = dynamic(() => import('@/components/ScrollToTop'), { ssr: false });
 const MinimalNav = dynamic(() => import('@/components/MinimalNav'));
 const MinimalFooter = dynamic(() => import('@/components/MinimalFooter'));
+const DownloadButtons = dynamic(() => import('@/components/DownloadButtons'), { ssr: false });
 
 export default function DownloadPage() {
   useEffect(() => {
@@ -85,19 +86,8 @@ export default function DownloadPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="flex flex-col items-center gap-4"
             >
-              <a
-                href="https://github.com/veldorq/GesturaPrototype/releases/latest"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-12 py-5 bg-gradient-to-r from-cyan-400 to-purple-400 text-white hover:scale-105 transition-all duration-300 rounded-full font-semibold tracking-wide cursor-pointer shadow-2xl shadow-cyan-400/30"
-              >
-                Download Latest Version
-              </a>
-              <p className="text-xs text-neutral-500">
-                Version 1.0 • Windows, macOS, Linux • Free & Open Source
-              </p>
+              <DownloadButtons />
             </motion.div>
           </div>
         </section>

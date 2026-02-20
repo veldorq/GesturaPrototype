@@ -1,0 +1,248 @@
+name: Build and Release Gestura
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-windows:
+    name: Build Windows Executable
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build executable with PyInstaller
+        run: |
+          pyinstaller --onefile `
+            --name "Gestura" `
+            --add-data "models;models" `
+            --add-data "config;config" `
+            --hidden-import="mediapipe" `
+            --hidden-import="cv2" `
+            --hidden-import="pyautogui" `
+            --hidden-import="numpy" `
+            --hidden-import="PIL" `
+            --hidden-import="dataclasses" `
+            --collect-all mediapipe `
+            --console `
+            main.py
+      
+      - name: Create release package
+        run: |
+          mkdir release
+          copy dist\Gestura.exe release\
+          copy END_USER_INSTALL_GUIDE.md release\README.txt
+          copy USER_GUIDE.md release\
+          copy LICENSE release\
+          
+      - name: Create ZIP archive
+        run: |
+          Compress-Archive -Path release\* -DestinationPath Gestura-Windows-x64.zip
+      
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gestura-Windows-x64
+          path: Gestura-Windows-x64.zip
+          retention-days: 7
+
+  build-macos:
+    name: Build macOS Application
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build application with PyInstaller
+        run: |
+          pyinstaller --onefile \
+            --name "Gestura" \
+            --add-data "models:models" \
+            --add-data "config:config" \
+            --hidden-import="mediapipe" \
+            --hidden-import="cv2" \
+            --hidden-import="pyautogui" \
+            --hidden-import="numpy" \
+            --hidden-import="PIL" \
+            --hidden-import="dataclasses" \
+            --collect-all mediapipe \
+            --console \
+            main.py
+      
+      - name: Create release package
+        run: |
+          mkdir -p release
+          cp dist/Gestura release/
+          cp END_USER_INSTALL_GUIDE.md release/README.txt
+          cp USER_GUIDE.md release/
+          cp LICENSE release/
+      
+      - name: Create ZIP archive
+        run: |
+          cd release && zip -r ../Gestura-macOS-x64.zip . && cd ..
+      
+      - name: Upload macOS build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gestura-macOS-x64
+          path: Gestura-macOS-x64.zip
+          retention-days: 7
+
+  build-linux:
+    name: Build Linux Binary
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-opencv python3-tk
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build binary with PyInstaller
+        run: |
+          pyinstaller --onefile \
+            --name "Gestura" \
+            --add-data "models:models" \
+            --add-data "config:config" \
+            --hidden-import="mediapipe" \
+            --hidden-import="cv2" \
+            --hidden-import="pyautogui" \
+            --hidden-import="numpy" \
+            --hidden-import="PIL" \
+            --hidden-import="dataclasses" \
+            --collect-all mediapipe \
+            --console \
+            main.py
+      
+      - name: Create release package
+        run: |
+          mkdir -p release
+          cp dist/Gestura release/
+          chmod +x release/Gestura
+          cp END_USER_INSTALL_GUIDE.md release/README.txt
+          cp USER_GUIDE.md release/
+          cp LICENSE release/
+      
+      - name: Create ZIP archive
+        run: |
+          cd release && zip -r ../Gestura-Linux-x64.zip . && cd ..
+      
+      - name: Upload Linux build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gestura-Linux-x64
+          path: Gestura-Linux-x64.zip
+          retention-days: 7
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/Gestura-Windows-x64/Gestura-Windows-x64.zip
+            artifacts/Gestura-macOS-x64/Gestura-macOS-x64.zip
+            artifacts/Gestura-Linux-x64/Gestura-Linux-x64.zip
+          body: |
+            ## Gestura ${{ github.ref_name }}
+            
+            ### 🎮 Hand Gesture Control for Your Computer
+            
+            Control your computer using hand gestures through your webcam. No keyboard, no mouse needed!
+            
+            ### 📦 Installation
+            
+            1. **Download** the appropriate file for your operating system:
+               - Windows: `Gestura-Windows-x64.zip`
+               - macOS: `Gestura-macOS-x64.zip`
+               - Linux: `Gestura-Linux-x64.zip`
+            
+            2. **Extract** the ZIP file
+            
+            3. **Run** the Gestura executable
+            
+            4. **Allow** camera permissions when prompted
+            
+            ### 🎯 Quick Gestures
+            
+            - ✋ **Open Palm** → Scroll Down
+            - ✊ **Closed Fist** → Scroll Up  
+            - ☝️ **Index Finger** → Move Mouse
+            - ✌️ **Peace Sign** → Click
+            
+            **Press Q to quit**
+            
+            ### 📋 System Requirements
+            
+            - OS: Windows 10+, macOS 10.15+, Ubuntu 20.04+
+            - Webcam: 720p (30 FPS) or better
+            - RAM: 4 GB minimum
+            - Storage: 500 MB available space
+            
+            ### 🔗 Links
+            
+            - [Full Documentation](https://github.com/${{ github.repository }})
+            - [Report Issues](https://github.com/${{ github.repository }}/issues)
+            - [Website](https://gestura.app)
+            
+            ---
+            
+            **Note:** This is free and open-source software. No data is collected or transmitted.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

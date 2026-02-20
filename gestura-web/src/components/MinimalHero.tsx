@@ -97,12 +97,10 @@ export default function MinimalHero() {
           </motion.a>
           
           <motion.a
-            href="https://github.com/veldorq/GesturaPrototype/releases"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/download"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide"
+            className="px-10 py-4 text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide cursor-pointer"
           >
             Download Now
           </motion.a>

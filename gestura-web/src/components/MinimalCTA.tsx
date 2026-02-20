@@ -66,12 +66,10 @@ export default function MinimalCTA() {
           </motion.a>
 
           <motion.a
-            href="https://github.com/veldorq/GesturaPrototype/releases"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/download"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 border border-white/20 text-white hover:border-white transition-all duration-300 rounded-full font-light"
+            className="px-10 py-4 border border-white/20 text-white hover:border-white transition-all duration-300 rounded-full font-light cursor-pointer"
           >
             Download Now
           </motion.a>

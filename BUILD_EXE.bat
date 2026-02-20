@@ -29,24 +29,32 @@ echo.
 
 REM Build executable
 pyinstaller --onefile ^
-    --name "HandGestureControl" ^
-    --add-data "requirements.txt;." ^
+    --name "Gestura" ^
+    --add-data "models;models" ^
+    --add-data "config;config" ^
     --hidden-import="mediapipe" ^
     --hidden-import="cv2" ^
     --hidden-import="pyautogui" ^
     --hidden-import="numpy" ^
-    PROTOTYPE.PY
+    --hidden-import="PIL" ^
+    --hidden-import="dataclasses" ^
+    --collect-all mediapipe ^
+    main.py
 
 echo.
 echo ========================================
 echo Build Complete!
 echo ========================================
 echo.
-echo Executable location: dist\HandGestureControl.exe
+echo Executable location: dist\Gestura.exe
 echo.
-echo To distribute:
-echo   1. Copy dist\HandGestureControl.exe
-echo   2. Include USER_GUIDE.md
-echo   3. Users just double-click the .exe file!
+echo To create distribution package:
+echo   1. Copy dist\Gestura.exe to release/
+echo   2. Copy END_USER_INSTALL_GUIDE.md to release/README.txt
+echo   3. Copy USER_GUIDE.md to release/
+echo   4. ZIP the release/ folder
+echo   5. Upload to GitHub Releases
+echo.
+echo Users will download the ZIP, extract, and run Gestura.exe
 echo.
 pause
