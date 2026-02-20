@@ -31,6 +31,9 @@ export default function DownloadButtons() {
 
   const REPO_URL = 'https://github.com/veldorq/GesturaPrototype';
   const LATEST_RELEASE = `${REPO_URL}/releases/latest/download`;
+  
+  // Temporary: Check if releases exist, fallback to GitHub repo
+  const USE_DIRECT_DOWNLOADS = false; // Set to true after first release
 
   const downloadOptions: DownloadOption[] = [
     {
@@ -38,7 +41,9 @@ export default function DownloadButtons() {
       icon: '🪟',
       filename: 'Gestura-Windows-x64.zip',
       size: '~85 MB',
-      downloadUrl: `${LATEST_RELEASE}/Gestura-Windows-x64.zip`,
+      downloadUrl: USE_DIRECT_DOWNLOADS 
+        ? `${LATEST_RELEASE}/Gestura-Windows-x64.zip`
+        : `${REPO_URL}/releases`,
       instructions: [
         'Extract the ZIP file',
         'Run Gestura.exe',
@@ -51,7 +56,9 @@ export default function DownloadButtons() {
       icon: '🍎',
       filename: 'Gestura-macOS-x64.zip',
       size: '~90 MB',
-      downloadUrl: `${LATEST_RELEASE}/Gestura-macOS-x64.zip`,
+      downloadUrl: USE_DIRECT_DOWNLOADS 
+        ? `${LATEST_RELEASE}/Gestura-macOS-x64.zip`
+        : `${REPO_URL}/releases`,
       instructions: [
         'Extract the ZIP file',
         'Right-click Gestura → Open',
@@ -64,7 +71,9 @@ export default function DownloadButtons() {
       icon: '🐧',
       filename: 'Gestura-Linux-x64.zip',
       size: '~80 MB',
-      downloadUrl: `${LATEST_RELEASE}/Gestura-Linux-x64.zip`,
+      downloadUrl: USE_DIRECT_DOWNLOADS 
+        ? `${LATEST_RELEASE}/Gestura-Linux-x64.zip`
+        : `${REPO_URL}/releases`,
       instructions: [
         'Extract: unzip Gestura-Linux-x64.zip',
         'Make executable: chmod +x Gestura',
