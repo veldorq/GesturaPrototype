@@ -35,7 +35,7 @@ const steps = [
 
 const gestures = [
   {
-    icon: '✋',
+    icon: '🖐️',
     name: 'Open Palm',
     action: 'Pause State',
     description: 'Show open palm to enter pause state. No actions will trigger while in this neutral position.',
@@ -65,7 +65,7 @@ const gestures = [
     description: 'Point thumb down to scroll downward through content with controlled speed.',
   },
   {
-    icon: '👈',
+    icon: '👉',
     name: 'Browser Back',
     action: 'Navigate Back',
     description: 'Use designated gesture to navigate backward in browser history.',
@@ -102,8 +102,8 @@ export default function HowItWorks() {
             className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-gestura-cyan/10 backdrop-blur-sm border border-gestura-cyan/30 rounded-full"
           >
             <span className="w-2 h-2 bg-gestura-cyan rounded-full animate-pulse" />
-            <span className="text-gestura-cyan text-xs font-semibold uppercase tracking-widest">
-              The Technology
+            <span className="text-gestura-cyan text-sm font-semibold uppercase tracking-wider">
+              🔬 Technical Process
             </span>
           </motion.div>
 

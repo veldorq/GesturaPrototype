@@ -86,7 +86,7 @@ export default function TechnicalSpecs() {
         {/* Header */}
         <div className="text-center mb-16 px-4">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
-            Technical Specifications
+            🔧 Technical Specifications
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
             Real performance metrics from the PROTOTYPE.PY configuration. No marketing fluff—just the actual numbers running in production.

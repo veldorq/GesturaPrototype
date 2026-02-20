@@ -56,7 +56,7 @@ export default function TechStack() {
           className="text-center mb-16 px-4"
         >
           <h2 className="text-3xl md:text-4xl font-light mb-4">
-            Built on <span className="gradient-text">Proven Technology</span>
+            🚀 Built on <span className="gradient-text">Proven Technology</span>
           </h2>
           <p className="text-neutral-400 text-sm max-w-2xl mx-auto">
             Established libraries and frameworks provide reliable hand tracking and system automation

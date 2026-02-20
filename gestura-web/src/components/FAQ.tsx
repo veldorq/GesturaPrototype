@@ -10,35 +10,35 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: "What are the system requirements for Gestura?",
+    question: "💻 What are the system requirements for Gestura?",
     answer: "Gestura requires Python 3.10 or higher, a standard webcam (built-in or external USB), and runs on Windows, macOS, or Linux. The application processes video locally and doesn't require GPU acceleration."
   },
   {
-    question: "Is my camera data being collected or transmitted?",
+    question: "🔒 Is my camera data being collected or transmitted?",
     answer: "No. All hand tracking and gesture recognition happens locally on your device. No video frames, hand landmarks, or usage data are transmitted to external servers or stored persistently. The application only accesses the webcam during active use."
   },
   {
-    question: "How accurate is the gesture recognition?",
+    question: "🎯 How accurate is the gesture recognition?",
     answer: "Recognition accuracy depends on consistent gesture execution and environmental conditions. The system uses geometric feature extraction from hand landmarks and applies multi-stage stabilization to reduce false activations from tremors or involuntary movements."
   },
   {
-    question: "Can I customize which gestures trigger which actions?",
+    question: "✨ Can I customize which gestures trigger which actions?",
     answer: "Yes. Gesture-to-action mappings are stored in JSON configuration files that can be edited. The system includes a GestureRecorder class for defining custom gestures, though it's not yet integrated into the main UI."
   },
   {
-    question: "What should I do if gestures aren't being recognized?",
+    question: "👀 What should I do if gestures aren't being recognized?",
     answer: "Improve lighting conditions by adding front-facing light sources. Move closer to the camera (1-2 feet is optimal). Ensure your hand remains within the frame throughout the dwell period. Execute gestures more slowly and deliberately. You can also adjust confidence thresholds in the configuration files."
   },
   {
-    question: "Does Gestura work offline?",
+    question: "🌐 Does Gestura work offline?",
     answer: "Yes, once dependencies are installed. The application processes everything locally without requiring internet connectivity during operation."
   },
   {
-    question: "Why is the camera not being detected?",
+    question: "📷 Why is the camera not being detected?",
     answer: "Verify no other applications are using the webcam. Check system camera permissions (particularly on macOS). Try modifying the CAMERA_INDEX value in config/constants.py (try 0, 1, or 2)."
   },
   {
-    question: "How do I adjust the sensitivity or dwell time?",
+    question: "⚙️ How do I adjust the sensitivity or dwell time?",
     answer: "Edit config/constants.py to modify MIN_DETECTION_CONFIDENCE (default 0.7), DWELL_TIME_SECONDS (default 1.5), STABILIZATION_WINDOW (default 5 frames), and other recognition parameters. Higher confidence thresholds reduce false positives but require more precise gestures."
   }
 ];
@@ -76,7 +76,7 @@ export default function FAQ() {
           className="text-center mb-16 px-4"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
-            Frequently Asked Questions
+            ❓ Frequently Asked Questions
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
             Common questions about setup, usage, and troubleshooting. For additional support, open an issue on GitHub.

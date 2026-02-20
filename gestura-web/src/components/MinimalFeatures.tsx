@@ -24,7 +24,7 @@ export default function MinimalFeatures() {
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="block"
             >
-              Flow Control
+              ⚡ Flow Control
             </motion.span>
           </h2>
           <div className="w-24 h-px bg-gestura-cyan" />

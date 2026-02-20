@@ -115,7 +115,7 @@ export default function DownloadPage() {
                   number: '01',
                   title: 'Download',
                   description: 'Download the installer for your operating system from GitHub releases',
-                  icon: '⬇️',
+                  icon: '📥',
                 },
                 {
                   number: '02',

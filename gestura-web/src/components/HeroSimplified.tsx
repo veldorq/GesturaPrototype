@@ -59,7 +59,7 @@ export default function HeroSimplified() {
       {/* Floating gesture icons */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {[
-          { icon: '✋', x: '10%', y: '20%', delay: 0, duration: 6 },
+          { icon: '🖐️', x: '10%', y: '20%', delay: 0, duration: 6 },
           { icon: '👆', x: '80%', y: '30%', delay: 1, duration: 7 },
           { icon: '✊', x: '15%', y: '70%', delay: 2, duration: 8 },
           { icon: '🤏', x: '85%', y: '60%', delay: 1.5, duration: 7.5 },

@@ -36,7 +36,7 @@ const dependencies = [
     name: "MediaPipe",
     version: "Latest",
     purpose: "Hand landmark detection and tracking (21 landmarks)",
-    icon: "✋"  },
+    icon: "🖐️"  },
   {
     name: "PyAutoGUI",
     version: "Latest",
@@ -75,7 +75,7 @@ export default function SystemRequirements() {
           className="text-center mb-16 px-4"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
-            System Requirements
+            💻 System Requirements
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
             Gestura requires Python 3.10+ and a working webcam. Compatible with Windows, macOS, and Linux.
