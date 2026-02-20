@@ -16,7 +16,12 @@ from hand_tracking import HandDetector
 from gestures import GestureLibrary, GestureRecognizer
 from actions import BrowserActions
 from ui import OverlayRenderer
-from config import Constants, Settings
+from config import Constants, Settings, ConfigValidator, ConfigValidationError
+from utils import setup_logging, get_logger, PerformanceMetrics
+
+# Initialize logging
+setup_logging(log_level="INFO", enable_file_logging=True)
+logger = get_logger(__name__)
 
 
 class AccessAble:
@@ -33,45 +38,57 @@ class AccessAble:
     
     def __init__(self):
         """Initialize all application components."""
-        print("=" * 60)
-        print("AccessAble - Gesture-Based Web Navigation")
-        print("=" * 60)
-        print()
+        logger.info("=" * 60)
+        logger.info("AccessAble - Gesture-Based Web Navigation")
+        logger.info("=" * 60)
         
-        # Load configuration
-        self.settings = Settings()
-        
-        # Initialize camera
-        print("Initializing camera...")
-        self.camera = Webcam()
-        
-        # Initialize hand detector
-        print("Initializing hand detection...")
-        self.hand_detector = HandDetector()
-        
-        # Initialize gesture system
-        print("Loading gesture library...")
-        self.gesture_library = GestureLibrary()
-        self.gesture_recognizer = GestureRecognizer(self.gesture_library)
-        
-        # Initialize action executor
-        print("Initializing action system...")
-        self.actions = BrowserActions()
-        
-        # Initialize UI overlay
-        print("Initializing UI...")
-        self.overlay = OverlayRenderer()
-        
-        # Application state
-        self.is_running = False
-        self.is_paused = False
-        
-        # Performance tracking
-        self.fps = 0.0
-        self.frame_times = []
-        
-        print("\nInitialization complete!")
-        print()
+        try:
+            # Validate configuration
+            logger.info("Validating configuration...")
+            warnings = ConfigValidator.validate_constants(Constants)
+            for warning in warnings:
+                logger.warning(f"Config warning: {warning}")
+            
+            # Load settings
+            self.settings = Settings()
+            
+            # Initialize performance metrics
+            self.metrics = PerformanceMetrics()
+            logger.info("Performance monitoring enabled")
+            
+            # Initialize camera
+            logger.info("Initializing camera...")
+            self.camera = Webcam()
+            
+            # Initialize hand detector
+            logger.info("Initializing hand detection...")
+            self.hand_detector = HandDetector()
+            
+            # Initialize gesture system
+            logger.info("Loading gesture library...")
+            self.gesture_library = GestureLibrary()
+            self.gesture_recognizer = GestureRecognizer(self.gesture_library)
+            
+            # Initialize action executor
+            logger.info("Initializing action system...")
+            self.actions = BrowserActions()
+            
+            # Initialize UI overlay
+            logger.info("Initializing UI...")
+            self.overlay = OverlayRenderer()
+            
+            # Application state
+            self.is_running = False
+            self.is_paused = False
+            
+            logger.info("Initialization complete!")
+            
+        except ConfigValidationError as e:
+            logger.error(f"Configuration validation failed: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Initialization failed: {e}", exc_info=True)
+            raise
     
     def run(self) -> None:
         """
@@ -84,65 +101,51 @@ class AccessAble:
         4. Executes actions
         5. Renders visual feedback
         """
-        # Start camera
-        if not self.camera.start():
-            print("Error: Failed to start camera")
-            return
-        
-        self.is_running = True
-        
-        print("Application started!")
-        print()
-        print("Controls:")
-        print("  ESC   - Emergency stop (pause/resume)")
-        print("  Q     - Quit application")
-        print("  Space - Toggle pause")
-        print()
-        print("Default Gestures:")
-        print("  Open Palm    - Pause (neutral)")
-        print("  Fist         - Left Click")
-        print("  Peace Sign   - Right Click")
-        print("  Thumbs Up    - Scroll Up")
-        print("  Thumbs Down  - Scroll Down")
-        print()
-        print("Ready! Show your hand to the camera...")
-        print()
-        
-        last_frame_time = time.time()
-        
         try:
+            # Start camera
+            if not self.camera.start():
+                logger.error("Failed to start camera")
+                return
+            
+            self.is_running = True
+            
+            logger.info("Application started!")
+            logger.info("Controls: ESC/Space=Pause, Q=Quit")
+            logger.info("Default Gestures: Open Palm=Pause, Fist=Left Click, Peace=Right Click")
+            logger.info("Ready! Show your hand to the camera...")
+            
             while self.is_running:
                 frame_start = time.time()
                 
-                # Capture frame
-                success, frame = self.camera.read_frame()
-                if not success:
-                    print("Warning: Failed to read frame")
+                try:
+                    # Capture frame
+                    success, frame = self.camera.read_frame()
+                    if not success:
+                        logger.warning("Failed to read frame")
+                        continue
+                    
+                    # Process frame
+                    self._process_frame(frame)
+                    
+                    # Display frame
+                    cv2.imshow('AccessAble - Gesture Navigation', frame)
+                    
+                    # Handle keyboard input
+                    key = cv2.waitKey(1) & 0xFF
+                    self._handle_keyboard(key)
+                    
+                    # Record frame metrics
+                    frame_time = time.time() - frame_start
+                    self.metrics.record_frame_time(frame_time)
+                    
+                except Exception as e:
+                    logger.error(f"Error processing frame: {e}", exc_info=True)
                     continue
-                
-                # Process frame
-                self._process_frame(frame)
-                
-                # Display frame
-                cv2.imshow('AccessAble - Gesture Navigation', frame)
-                
-                # Handle keyboard input
-                key = cv2.waitKey(1) & 0xFF
-                self._handle_keyboard(key)
-                
-                # Calculate FPS
-                frame_time = time.time() - frame_start
-                self.frame_times.append(frame_time)
-                if len(self.frame_times) > 30:
-                    self.frame_times.pop(0)
-                
-                if self.frame_times:
-                    avg_frame_time = sum(self.frame_times) / len(self.frame_times)
-                    self.fps = 1.0 / avg_frame_time if avg_frame_time > 0 else 0.0
-                
+                    
         except KeyboardInterrupt:
-            print("\nInterrupted by user")
-        
+            logger.info("Interrupted by user")
+        except Exception as e:
+            logger.error(f"Fatal error in main loop: {e}", exc_info=True)
         finally:
             self._cleanup()
     
@@ -156,7 +159,10 @@ class AccessAble:
         current_time = time.time()
         
         # Detect hand landmarks
+        detection_start = time.time()
         hand_landmarks = self.hand_detector.detect(frame)
+        detection_time = time.time() - detection_start
+        self.metrics.record_detection_time(detection_time, hand_landmarks is not None)
         
         gesture_name: Optional[str] = None
         action_name: Optional[str] = None
@@ -169,8 +175,11 @@ class AccessAble:
             
             # Recognize gesture
             if not self.is_paused:
+                recognition_start = time.time()
                 gesture_name, confidence, should_activate = \
                     self.gesture_recognizer.recognize(hand_landmarks, current_time)
+                recognition_time = time.time() - recognition_start
+                self.metrics.record_recognition_time(recognition_time, gesture_name is not None)
                 
                 if gesture_name:
                     # Get mapped action
@@ -182,11 +191,13 @@ class AccessAble:
                         pass
                     elif should_activate and action_name:
                         # Execute action
-                        success = self.actions.execute(action_name)
-                        if success:
-                            # Visual feedback for action execution
-                            # (Could add notification here)
-                            pass
+                        try:
+                            success = self.actions.execute(action_name)
+                            if success:
+                                self.metrics.record_action_execution()
+                                logger.debug(f"Executed action: {action_name}")
+                        except Exception as e:
+                            logger.error(f"Failed to execute action {action_name}: {e}")
                 
                 # Get dwell progress for UI
                 dwell_progress = self.gesture_recognizer.get_dwell_progress()
@@ -204,8 +215,9 @@ class AccessAble:
         # Add help text
         self.overlay.render_help_text(frame)
         
-        # Add FPS counter (bottom right)
-        fps_text = f"FPS: {int(self.fps)}"
+        # Add FPS counter and metrics (bottom right)
+        fps = self.metrics.get_fps()
+        fps_text = f"FPS: {int(fps)}"
         cv2.putText(
             frame,
             fps_text,
@@ -225,40 +237,57 @@ class AccessAble:
         """
         # Q - Quit
         if key == ord('q') or key == ord('Q'):
-            print("\nQuitting...")
+            logger.info("Quit requested by user")
             self.is_running = False
         
         # ESC - Emergency stop / Toggle pause
         elif key == 27:  # ESC key
             self.is_paused = not self.is_paused
             status = "PAUSED" if self.is_paused else "RESUMED"
-            print(f"\n>>> {status} <<<\n")
+            logger.info(f">>> {status} <<<")
             self.gesture_recognizer.reset()
         
         # Space - Toggle pause
         elif key == ord(' '):
             self.is_paused = not self.is_paused
             status = "PAUSED" if self.is_paused else "RESUMED"
-            print(f"\n>>> {status} <<<\n")
+            logger.info(f">>> {status} <<<")
             self.gesture_recognizer.reset()
+        
+        # M - Print metrics
+        elif key == ord('m') or key == ord('M'):
+            metrics = self.metrics.get_summary()
+            logger.info("=== Performance Metrics ===")
+            for key, value in metrics.items():
+                logger.info(f"{key}: {value:.2f}")
     
     def _cleanup(self) -> None:
         """Clean up resources and shut down gracefully."""
-        print("\nShutting down...")
+        logger.info("Shutting down...")
         
-        # Release camera
-        self.camera.release()
-        
-        # Release hand detector
-        self.hand_detector.release()
-        
-        # Close all windows
-        cv2.destroyAllWindows()
-        
-        # Save configuration
-        self.settings.save()
-        
-        print("Cleanup complete. Goodbye!")
+        try:
+            # Print final metrics
+            metrics = self.metrics.get_summary()
+            logger.info("=== Final Performance Metrics ===")
+            for key, value in metrics.items():
+                logger.info(f"{key}: {value:.2f}")
+            
+            # Release camera
+            self.camera.release()
+            
+            # Release hand detector
+            self.hand_detector.release()
+            
+            # Close all windows
+            cv2.destroyAllWindows()
+            
+            # Save configuration
+            self.settings.save()
+            
+            logger.info("Cleanup complete. Goodbye!")
+            
+        except Exception as e:
+            logger.error(f"Error during cleanup: {e}", exc_info=True)
 
 
 def main():
@@ -266,10 +295,11 @@ def main():
     try:
         app = AccessAble()
         app.run()
+    except ConfigValidationError as e:
+        logger.error(f"Configuration error: {e}")
+        sys.exit(1)
     except Exception as e:
-        print(f"\nFatal error: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.critical(f"Fatal error: {e}", exc_info=True)
         sys.exit(1)
 
 
