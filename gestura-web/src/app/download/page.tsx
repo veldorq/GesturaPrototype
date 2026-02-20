@@ -296,14 +296,13 @@ export default function DownloadPage() {
                   <div className="text-5xl mb-4">{platform.icon}</div>
                   <h3 className="text-xl font-medium mb-2">{platform.platform}</h3>
                   <p className="text-sm text-neutral-400 mb-4">{platform.description}</p>
-                  <a
-                    href="https://github.com/veldorq/GesturaPrototype/releases/latest"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-cyan-400 hover:text-white transition-colors"
+                  <button
+                    disabled
+                    className="text-sm text-neutral-500 opacity-60 cursor-not-allowed"
+                    title="Download coming soon"
                   >
-                    {platform.download} →
-                  </a>
+                    Coming Soon
+                  </button>
                 </motion.div>
               ))}
             </div>
@@ -322,27 +321,9 @@ export default function DownloadPage() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Need Help?
               </h2>
-              <p className="text-lg text-neutral-400 max-w-2xl mx-auto mb-8">
-                Check out our documentation or reach out to the community
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+                Documentation is included with your download. Check the README and Quick Start guides for setup instructions and troubleshooting.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="https://github.com/veldorq/GesturaPrototype"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-8 py-3 border border-white/20 text-white hover:border-white/60 transition-all duration-300 rounded-full font-light"
-                >
-                  📚 Documentation
-                </a>
-                <a
-                  href="https://github.com/veldorq/GesturaPrototype/issues"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-8 py-3 border border-white/20 text-white hover:border-white/60 transition-all duration-300 rounded-full font-light"
-                >
-                  💬 Support Forum
-                </a>
-              </div>
             </motion.div>
           </div>
         </section>
@@ -402,16 +383,15 @@ export default function DownloadPage() {
                 Ready to Begin?
               </h2>
               <p className="text-lg text-neutral-400 mb-10 font-light">
-                Download Gestura now and transform how you interact with your computer
+                Download Gestura and transform how you interact with your computer
               </p>
-              <a
-                href="https://github.com/veldorq/GesturaPrototype/releases/latest"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-12 py-5 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer"
+              <button
+                disabled
+                className="inline-block px-12 py-5 border border-neutral-600 text-neutral-500 opacity-60 rounded-full font-light tracking-wide cursor-not-allowed"
+                title="Download coming soon"
               >
-                Download Now
-              </a>
+                Coming Soon
+              </button>
             </motion.div>
           </div>
         </section>

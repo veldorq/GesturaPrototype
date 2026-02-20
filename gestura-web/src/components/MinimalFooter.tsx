@@ -28,9 +28,6 @@ export default function MinimalFooter() {
             transition={{ delay: 0.1 }}
             className="flex gap-8 text-sm text-neutral-500"
           >
-            <a href="https://github.com/veldorq/GesturaPrototype" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors cursor-pointer">
-              GitHub
-            </a>
             <Link href="/download" className="hover:text-white transition-colors cursor-pointer">
               Download
             </Link>

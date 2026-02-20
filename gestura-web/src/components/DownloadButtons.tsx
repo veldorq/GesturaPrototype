@@ -29,16 +29,13 @@ export default function DownloadButtons() {
     }
   }, []);
 
-  const REPO_URL = 'https://github.com/veldorq/GesturaPrototype';
-  const LATEST_RELEASE = `${REPO_URL}/releases/latest/download`;
-  
   // UPDATE THIS LINK after building and uploading your file!
   // Instructions: Run BUILD_AND_SHARE.bat, upload to Google Drive/Dropbox,
   // then paste the direct download link here
   const CUSTOM_DOWNLOAD_URL = ''; // Example: 'https://drive.google.com/uc?export=download&id=YOUR_FILE_ID'
   
-  // If you have a custom download link, use it. Otherwise, fall back to GitHub releases.
-  const USE_CUSTOM_DOWNLOAD = CUSTOM_DOWNLOAD_URL.length > 0;
+  // Set to true when you have a working download link
+  const DOWNLOAD_READY = false;
 
   const downloadOptions: DownloadOption[] = [
     {
@@ -46,9 +43,7 @@ export default function DownloadButtons() {
       icon: '🪟',
       filename: 'Gestura-Windows-x64.zip',
       size: '~85 MB',
-      downloadUrl: USE_CUSTOM_DOWNLOAD 
-        ? CUSTOM_DOWNLOAD_URL
-        : `${LATEST_RELEASE}/Gestura-Windows-x64.zip`,
+      downloadUrl: '#', // Empty link - button won't navigate anywhere
       instructions: [
         'Extract the ZIP file',
         'Run Gestura.exe',
@@ -61,9 +56,7 @@ export default function DownloadButtons() {
       icon: '🍎',
       filename: 'Gestura-macOS-x64.zip',
       size: '~90 MB',
-      downloadUrl: USE_CUSTOM_DOWNLOAD
-        ? CUSTOM_DOWNLOAD_URL
-        : `${LATEST_RELEASE}/Gestura-macOS-x64.zip`,
+      downloadUrl: '#',
       instructions: [
         'Extract the ZIP file',
         'Right-click Gestura → Open',
@@ -76,9 +69,7 @@ export default function DownloadButtons() {
       icon: '🐧',
       filename: 'Gestura-Linux-x64.zip',
       size: '~80 MB',
-      downloadUrl: USE_CUSTOM_DOWNLOAD
-        ? CUSTOM_DOWNLOAD_URL
-        : `${LATEST_RELEASE}/Gestura-Linux-x64.zip`,
+      downloadUrl: '#',
       instructions: [
         'Extract: unzip Gestura-Linux-x64.zip',
         'Make executable: chmod +x Gestura',
@@ -92,15 +83,16 @@ export default function DownloadButtons() {
   const otherOptions = downloadOptions.filter(opt => opt.os !== detectedOS);
 
   if (!isClient) {
-    // Server-side render fallback - show generic download button
+    // Server-side render fallback - show disabled button
     return (
       <div className="flex flex-col items-center gap-4">
-        <a
-          href={CUSTOM_DOWNLOAD_URL || `${REPO_URL}/releases/latest`}
-          className="inline-block px-12 py-5 bg-gradient-to-r from-cyan-400 to-purple-400 text-white hover:scale-105 transition-all duration-300 rounded-full font-semibold tracking-wide cursor-pointer shadow-2xl shadow-cyan-400/30"
+        <button
+          disabled
+          className="inline-block px-12 py-5 bg-neutral-700 text-neutral-400 cursor-not-allowed rounded-full font-semibold tracking-wide opacity-60"
+          title="Download coming soon"
         >
-          Download Gestura
-        </a>
+          Coming Soon
+        </button>
         <p className="text-xs text-neutral-500">
           Windows, macOS, Linux • Free & Open Source
         </p>
@@ -141,12 +133,22 @@ export default function DownloadButtons() {
               </div>
 
               <div className="flex-shrink-0">
-                <a
-                  href={recommendedOption.downloadUrl}
-                  className="inline-block px-12 py-5 bg-gradient-to-r from-cyan-400 to-purple-400 text-white hover:scale-105 transition-all duration-300 rounded-full font-semibold tracking-wide cursor-pointer shadow-2xl shadow-cyan-400/30"
-                >
-                  Download Now
-                </a>
+                {DOWNLOAD_READY ? (
+                  <a
+                    href={CUSTOM_DOWNLOAD_URL}
+                    className="inline-block px-12 py-5 bg-gradient-to-r from-cyan-400 to-purple-400 text-white hover:scale-105 transition-all duration-300 rounded-full font-semibold tracking-wide cursor-pointer shadow-2xl shadow-cyan-400/30"
+                  >
+                    Download Now
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    className="inline-block px-12 py-5 bg-neutral-700 text-neutral-400 cursor-not-allowed rounded-full font-semibold tracking-wide opacity-60"
+                    title="Download coming soon"
+                  >
+                    Coming Soon
+                  </button>
+                )}
               </div>
             </div>
 
@@ -192,56 +194,32 @@ export default function DownloadButtons() {
                   {option.os === 'macos' ? 'macOS' : option.os}
                 </h4>
                 <p className="text-sm text-neutral-400 mb-4">{option.size}</p>
-                <a
-                  href={option.downloadUrl}
-                  className="inline-block px-8 py-3 border border-gestura-cyan/30 text-gestura-cyan hover:bg-gestura-cyan/10 transition-all duration-300 rounded-full font-medium"
-                >
-                  Download
-                </a>
+                {DOWNLOAD_READY ? (
+                  <a
+                    href={CUSTOM_DOWNLOAD_URL}
+                    className="inline-block px-8 py-3 border border-gestura-cyan/30 text-gestura-cyan hover:bg-gestura-cyan/10 transition-all duration-300 rounded-full font-medium"
+                  >
+                    Download
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    className="inline-block px-8 py-3 border border-neutral-700 text-neutral-500 cursor-not-allowed rounded-full font-medium opacity-60"
+                    title="Download coming soon"
+                  >
+                    Coming Soon
+                  </button>
+                )}
               </div>
             </div>
           ))}
         </div>
       </motion.div>
 
-      {/* Alternative: Source Code */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="mt-12 text-center"
-      >
-        <div className="inline-block border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30">
-          <p className="text-neutral-400 mb-4">
-            <strong>For Developers:</strong> Build from source or contribute
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href={`${REPO_URL}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-neutral-700 text-neutral-300 hover:border-white hover:text-white transition-all duration-300 rounded-full font-medium"
-            >
-              <span>📦</span>
-              <span>View on GitHub</span>
-            </a>
-            <a
-              href={`${REPO_URL}/releases`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-neutral-700 text-neutral-300 hover:border-white hover:text-white transition-all duration-300 rounded-full font-medium"
-            >
-              <span>📋</span>
-              <span>All Releases</span>
-            </a>
-          </div>
-        </div>
-      </motion.div>
-
       {/* Version Info */}
       <div className="mt-8 text-center">
         <p className="text-xs text-neutral-600">
-          Latest Version: 1.0.0 • Released February 2026 • Free & Open Source
+          Latest Version: 1.0.0 • Coming Soon • Free & Open Source
         </p>
         <p className="text-xs text-neutral-600 mt-2">
           Windows 10+, macOS 10.15+, Ubuntu 20.04+ • No internet required after installation
