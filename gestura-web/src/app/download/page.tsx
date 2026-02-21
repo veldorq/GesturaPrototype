@@ -174,13 +174,13 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30"
+                className="border border-neutral-800 rounded-2xl p-4 sm:p-6 backdrop-blur-sm bg-neutral-900/30"
               >
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-3xl">💻</span>
-                  <h3 className="text-2xl font-light">Minimum</h3>
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <span className="text-2xl sm:text-3xl">💻</span>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-light">Minimum</h3>
                 </div>
-                <ul className="space-y-4">
+                <ul className="space-y-3 sm:space-y-4">
                   {[
                     { label: 'OS', value: 'Windows 10, macOS 10.15, Ubuntu 20.04' },
                     { label: 'Processor', value: 'Intel Core i3 or equivalent' },
@@ -188,9 +188,9 @@ export default function DownloadPage() {
                     { label: 'Webcam', value: '720p (30 FPS)' },
                     { label: 'Storage', value: '500 MB available space' },
                   ].map((req, i) => (
-                    <li key={i} className="flex justify-between items-start gap-4 pb-4 border-b border-white/5">
-                      <span className="text-neutral-500 text-sm">{req.label}</span>
-                      <span className="text-neutral-300 text-sm text-right">{req.value}</span>
+                    <li key={i} className="flex justify-between items-start gap-2 sm:gap-4 pb-3 sm:pb-4 border-b border-white/5">
+                      <span className="text-neutral-500 text-xs sm:text-sm">{req.label}</span>
+                      <span className="text-neutral-300 text-xs sm:text-sm text-right">{req.value}</span>
                     </li>
                   ))}
                 </ul>
@@ -201,15 +201,15 @@ export default function DownloadPage() {
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="border border-cyan-500/30 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30"
+                className="border border-cyan-500/30 rounded-2xl p-4 sm:p-6 backdrop-blur-sm bg-neutral-900/30"
               >
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-3xl">⚡</span>
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <span className="text-2xl sm:text-3xl">⚡</span>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                     Recommended
                   </h3>
                 </div>
-                <ul className="space-y-4">
+                <ul className="space-y-3 sm:space-y-4">
                   {[
                     { label: 'OS', value: 'Windows 11, macOS 12+, Ubuntu 22.04' },
                     { label: 'Processor', value: 'Intel Core i5 or better' },
@@ -217,9 +217,9 @@ export default function DownloadPage() {
                     { label: 'Webcam', value: '1080p (60 FPS)' },
                     { label: 'Storage', value: '1 GB available space' },
                   ].map((req, i) => (
-                    <li key={i} className="flex justify-between items-start gap-4 pb-4 border-b border-white/5">
-                      <span className="text-neutral-500 text-sm">{req.label}</span>
-                      <span className="text-neutral-300 text-sm text-right">{req.value}</span>
+                    <li key={i} className="flex justify-between items-start gap-2 sm:gap-4 pb-3 sm:pb-4 border-b border-white/5">
+                      <span className="text-neutral-500 text-xs sm:text-sm">{req.label}</span>
+                      <span className="text-neutral-300 text-xs sm:text-sm text-right">{req.value}</span>
                     </li>
                   ))}
                 </ul>

@@ -83,27 +83,27 @@ export default function SystemRequirements() {
         </motion.div>
 
         {/* Requirements comparison */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16">
           {/* Minimum Requirements */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="border border-neutral-800 rounded-2xl p-8 backdrop-blur-sm bg-neutral-900/30"
+            className="border border-neutral-800 rounded-2xl p-4 sm:p-6 md:p-8 backdrop-blur-sm bg-neutral-900/30"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="text-3xl">💻</div>
-              <h3 className="text-2xl font-bold text-white">Minimum</h3>
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="text-2xl sm:text-3xl">💻</div>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Minimum</h3>
             </div>
-            <p className="text-sm text-neutral-400 mb-6">
+            <p className="text-xs sm:text-sm text-neutral-400 mb-4 sm:mb-6">
               Basic requirements to run Gestura. Functional for testing and limited use.
             </p>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {requirements.minimum.map((req, idx) => (
-                <div key={idx} className="flex justify-between items-center py-2 border-b border-neutral-800/50 last:border-0">
-                  <span className="text-neutral-400 text-sm">{req.item}</span>
-                  <span className="text-white text-sm font-medium">{req.value}</span>
+                <div key={idx} className="flex justify-between items-center py-2 border-b border-neutral-800/50 last:border-0 gap-2">
+                  <span className="text-neutral-400 text-xs sm:text-sm">{req.item}</span>
+                  <span className="text-white text-xs sm:text-sm font-medium text-right">{req.value}</span>
                 </div>
               ))}
             </div>
@@ -115,22 +115,22 @@ export default function SystemRequirements() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="border border-cyan-500/30 rounded-2xl p-8 backdrop-blur-sm bg-gradient-to-br from-cyan-500/5 to-purple-500/5"
+            className="border border-cyan-500/30 rounded-2xl p-4 sm:p-6 md:p-8 backdrop-blur-sm bg-gradient-to-br from-cyan-500/5 to-purple-500/5"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="text-3xl">🚀</div>
-              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 py-1 leading-relaxed">
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="text-2xl sm:text-3xl">🚀</div>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 py-1 leading-relaxed">
                 Recommended
               </h3>
             </div>
-            <p className="text-sm text-neutral-300 mb-6">
+            <p className="text-xs sm:text-sm text-neutral-300 mb-4 sm:mb-6">
               Optimal conditions for reliable recognition and consistent performance.
             </p>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {requirements.recommended.map((req, idx) => (
-                <div key={idx} className="flex justify-between items-center py-2 border-b border-neutral-700/50 last:border-0">
-                  <span className="text-neutral-300 text-sm">{req.item}</span>
-                  <span className="text-cyan-300 text-sm font-medium">{req.value}</span>
+                <div key={idx} className="flex justify-between items-center py-2 border-b border-neutral-700/50 last:border-0 gap-2">
+                  <span className="text-neutral-300 text-xs sm:text-sm">{req.item}</span>
+                  <span className="text-cyan-300 text-xs sm:text-sm font-medium text-right">{req.value}</span>
                 </div>
               ))}
             </div>
