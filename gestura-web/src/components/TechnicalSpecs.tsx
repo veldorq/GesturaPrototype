@@ -67,7 +67,7 @@ const specs = [
 
 export default function TechnicalSpecs() {
   return (
-    <section className="relative py-32 px-6 bg-[#0f1419] overflow-x-hidden">
+    <section className="relative py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-[#0f1419] overflow-x-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-cyan-900/10 via-transparent to-transparent opacity-30 pointer-events-none" />
       
@@ -84,8 +84,8 @@ export default function TechnicalSpecs() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-16 px-4">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+        <div className="text-center mb-12 sm:mb-16 px-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
             🔧 Technical Specifications
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">

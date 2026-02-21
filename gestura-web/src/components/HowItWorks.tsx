@@ -74,7 +74,7 @@ const gestures = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative py-32 px-6 overflow-x-hidden bg-[#0f1419] scroll-mt-20">
+    <section id="how-it-works" className="relative py-16 sm:py-24 md:py-32 px-4 sm:px-6 overflow-x-hidden bg-[#0f1419] scroll-mt-20">
       {/* Grid overlay */}
       <div
         className="absolute inset-0 opacity-10 pointer-events-none"
@@ -180,17 +180,17 @@ export default function HowItWorks() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16"
+          className="mb-12 sm:mb-16"
         >
-          <h3 className="text-2xl md:text-3xl font-light text-center mb-4">
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-light text-center mb-3 sm:mb-4">
             Gesture <span className="gradient-text">Reference</span>
           </h3>
-          <p className="text-center text-neutral-400 text-sm mb-12">
+          <p className="text-center text-neutral-400 text-xs sm:text-sm mb-8 sm:mb-12 px-4">
             Master these gestures to control your computer naturally
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {gestures.map((gesture, index) => (
             <motion.div
               key={index}
@@ -199,23 +199,23 @@ export default function HowItWorks() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               whileHover={{ scale: 1.05, y: -5 }}
-              className="glass-panel p-6 rounded-lg group cursor-pointer"
+              className="glass-panel p-4 sm:p-6 rounded-lg group cursor-pointer"
             >
               {/* Icon */}
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
+              <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform">
                 {gesture.icon}
               </div>
 
               {/* Name & Action */}
-              <h4 className="text-lg font-medium mb-1 group-hover:text-gestura-cyan transition-colors">
+              <h4 className="text-base sm:text-lg font-medium mb-1 group-hover:text-gestura-cyan transition-colors">
                 {gesture.name}
               </h4>
-              <p className="text-xs text-gestura-purple uppercase tracking-wider mb-3">
+              <p className="text-[10px] sm:text-xs text-gestura-purple uppercase tracking-wider mb-2 sm:mb-3">
                 {gesture.action}
               </p>
 
               {/* Description */}
-              <p className="text-sm text-neutral-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
                 {gesture.description}
               </p>
             </motion.div>

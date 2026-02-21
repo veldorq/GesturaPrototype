@@ -5,7 +5,7 @@ import { gestureFeatures } from '../data/features';
 
 export default function MinimalFeatures() {
   return (
-    <section id="features" className="relative py-32 px-6 overflow-x-hidden scroll-mt-20">
+    <section id="features" className="relative py-16 sm:py-24 md:py-32 px-4 sm:px-6 overflow-x-hidden scroll-mt-20">
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Title */}
@@ -14,9 +14,9 @@ export default function MinimalFeatures() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mb-16"
+          className="mb-12 sm:mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-light leading-relaxed mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-light leading-relaxed mb-4">
             <motion.span
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -31,7 +31,7 @@ export default function MinimalFeatures() {
         </motion.div>
 
         {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {gestureFeatures.slice(0, 6).map((feature, index) => (
             <motion.div
               key={feature.id}
@@ -44,7 +44,7 @@ export default function MinimalFeatures() {
                 ease: [0.16, 1, 0.3, 1],
               }}
               whileHover={{ y: -5 }}
-              className="group relative glass-panel p-8 overflow-hidden rounded-lg"
+              className="group relative glass-panel p-6 sm:p-8 overflow-hidden rounded-lg"
             >
               {/* Gradient overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-gestura-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -55,15 +55,15 @@ export default function MinimalFeatures() {
               </div>
 
               {/* Icon */}
-              <div className="relative text-4xl mb-4">{feature.icon}</div>
+              <div className="relative text-3xl sm:text-4xl mb-4">{feature.icon}</div>
 
               {/* Title */}
-              <h3 className="relative text-xl font-light mb-3 group-hover:text-gestura-cyan transition-colors duration-300">
+              <h3 className="relative text-lg sm:text-xl font-light mb-3 group-hover:text-gestura-cyan transition-colors duration-300">
                 {feature.name}
               </h3>
 
               {/* Description */}
-              <p className="relative text-neutral-400 text-sm leading-relaxed">
+              <p className="relative text-neutral-400 text-xs sm:text-sm leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>

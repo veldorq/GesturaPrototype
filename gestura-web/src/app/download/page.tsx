@@ -31,7 +31,7 @@ export default function DownloadPage() {
 
       <main className="bg-[#0f1419] min-h-screen overflow-x-hidden">
         {/* Hero Section */}
-        <section className="relative min-h-[70vh] flex items-center justify-center px-6 pt-32 pb-20">
+        <section className="relative min-h-[70vh] flex items-center justify-center px-4 sm:px-6 pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20">
           {/* Background Effects */}
           <div className="absolute inset-0">
             <div className="absolute inset-0 bg-gradient-radial from-cyan-900/10 via-transparent to-transparent opacity-30 pointer-events-none" />
@@ -67,7 +67,7 @@ export default function DownloadPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-5xl md:text-7xl font-light leading-tight mb-6"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light leading-tight mb-4 sm:mb-6"
             >
               Download <span className="gradient-text-specs font-bold">Gestura</span>
             </motion.h1>
@@ -76,7 +76,7 @@ export default function DownloadPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto mb-10 font-light"
+              className="text-base sm:text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto mb-8 sm:mb-10 font-light px-4"
             >
               Get instant access to hands-free computer control. 
               Simple installation, zero configuration required.
@@ -93,23 +93,23 @@ export default function DownloadPage() {
         </section>
 
         {/* Installation Steps */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16 px-4"
+              className="text-center mb-12 sm:mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Quick Installation
               </h2>
-              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
                 Get up and running in three simple steps
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-8 mb-20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-16 sm:mb-20">
               {[
                 {
                   number: '01',
@@ -136,15 +136,15 @@ export default function DownloadPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.15 }}
-                  className="group relative border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300 hover:scale-105"
+                  className="group relative border border-neutral-800 rounded-2xl p-5 sm:p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-cyan-500/30 transition-colors duration-300 hover:scale-105"
                 >
                   {/* Hover gradient */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   
-                  <div className="text-4xl mb-4">{step.icon}</div>
-                  <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">{step.number}</div>
-                  <h3 className="text-xl font-medium mb-3">{step.title}</h3>
-                  <p className="text-sm text-neutral-400 leading-relaxed">{step.description}</p>
+                  <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{step.icon}</div>
+                  <div className="text-xs sm:text-sm text-neutral-500 uppercase tracking-wider mb-2">{step.number}</div>
+                  <h3 className="text-lg sm:text-xl font-medium mb-2 sm:mb-3">{step.title}</h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">{step.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -152,23 +152,23 @@ export default function DownloadPage() {
         </section>
 
         {/* System Requirements */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16 px-4"
+              className="text-center mb-12 sm:mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 System Requirements
               </h2>
-              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
                 Runs smoothly on most modern computers
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
               {/* Minimum Requirements */}
               <motion.div
                 initial={{ opacity: 0, x: -30 }}

@@ -12,15 +12,15 @@ export default function MinimalNav() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex justify-between items-center mix-blend-difference"
+      className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 md:py-6 flex justify-between items-center mix-blend-difference"
       role="navigation"
       aria-label="Main navigation"
     >
-      <Link href="/" className="text-xl font-light tracking-tight text-white hover:opacity-80 transition-opacity">
+      <Link href="/" className="text-lg sm:text-xl font-light tracking-tight text-white hover:opacity-80 transition-opacity">
         Gestura
       </Link>
 
-      <div className="flex gap-6 md:gap-8 text-xs md:text-sm uppercase tracking-widest text-white">
+      <div className="flex gap-3 sm:gap-4 md:gap-8 text-[10px] sm:text-xs md:text-sm uppercase tracking-wider md:tracking-widest text-white">
         <Link 
           href="/features"
           className="relative group cursor-pointer"

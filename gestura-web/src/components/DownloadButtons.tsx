@@ -117,33 +117,33 @@ export default function DownloadButtons() {
           </div>
         </div>
 
-        <div className="relative border-2 border-gestura-cyan/50 rounded-3xl p-8 backdrop-blur-sm bg-neutral-900/50 hover:border-gestura-cyan transition-all duration-300">
+        <div className="relative border-2 border-gestura-cyan/50 rounded-3xl p-4 sm:p-6 md:p-8 backdrop-blur-sm bg-neutral-900/50 hover:border-gestura-cyan transition-all duration-300">
           {/* Glow effect */}
           <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-50 pointer-events-none" />
           
           <div className="relative">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex-1 text-center md:text-left">
-                <div className="text-6xl mb-4">{recommendedOption.icon}</div>
-                <h3 className="text-3xl font-bold mb-2 capitalize">
+                <div className="text-5xl sm:text-6xl mb-4">{recommendedOption.icon}</div>
+                <h3 className="text-2xl sm:text-3xl font-bold mb-2 capitalize">
                   {recommendedOption.os === 'macos' ? 'macOS' : recommendedOption.os}
                 </h3>
-                <p className="text-neutral-400 mb-4">{recommendedOption.filename}</p>
-                <p className="text-sm text-neutral-500">{recommendedOption.size}</p>
+                <p className="text-neutral-400 mb-2 sm:mb-4 text-sm sm:text-base">{recommendedOption.filename}</p>
+                <p className="text-xs sm:text-sm text-neutral-500">{recommendedOption.size}</p>
               </div>
 
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-full md:w-auto">
                 {DOWNLOAD_READY ? (
                   <a
                     href={CUSTOM_DOWNLOAD_URL}
-                    className="inline-block px-12 py-5 bg-gradient-to-r from-cyan-400 to-purple-400 text-white hover:scale-105 transition-all duration-300 rounded-full font-semibold tracking-wide cursor-pointer shadow-2xl shadow-cyan-400/30"
+                    className="inline-block w-full md:w-auto px-8 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-cyan-400 to-purple-400 text-white hover:scale-105 transition-all duration-300 rounded-full font-semibold tracking-wide cursor-pointer shadow-2xl shadow-cyan-400/30 text-center min-h-[44px]"
                   >
                     Download Now
                   </a>
                 ) : (
                   <button
                     disabled
-                    className="inline-block px-12 py-5 bg-neutral-700 text-neutral-400 cursor-not-allowed rounded-full font-semibold tracking-wide opacity-60"
+                    className="inline-block w-full md:w-auto px-8 sm:px-12 py-4 sm:py-5 bg-neutral-700 text-neutral-400 cursor-not-allowed rounded-full font-semibold tracking-wide opacity-60 min-h-[44px]"
                     title="Download coming soon"
                   >
                     Coming Soon
@@ -153,11 +153,11 @@ export default function DownloadButtons() {
             </div>
 
             {/* Quick Instructions */}
-            <div className="mt-8 pt-8 border-t border-neutral-800">
-              <h4 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4">
+            <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-neutral-800">
+              <h4 className="text-xs sm:text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4">
                 Quick Installation:
               </h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 {recommendedOption.instructions.map((step, idx) => (
                   <div key={idx} className="flex items-start gap-2">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gestura-cyan/20 text-gestura-cyan text-xs flex items-center justify-center font-bold">
@@ -178,26 +178,26 @@ export default function DownloadButtons() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <h3 className="text-xl font-semibold text-center mb-6 text-neutral-400">
+        <h3 className="text-lg sm:text-xl font-semibold text-center mb-6 text-neutral-400">
           Other Platforms
         </h3>
         
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
           {otherOptions.map((option) => (
             <div
               key={option.os}
-              className="border border-neutral-800 rounded-2xl p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-neutral-700 transition-all duration-300 hover:scale-105"
+              className="border border-neutral-800 rounded-2xl p-4 sm:p-6 backdrop-blur-sm bg-neutral-900/30 hover:border-neutral-700 transition-all duration-300 hover:scale-105"
             >
               <div className="text-center">
-                <div className="text-4xl mb-3">{option.icon}</div>
-                <h4 className="text-xl font-semibold mb-2 capitalize">
+                <div className="text-3xl sm:text-4xl mb-3">{option.icon}</div>
+                <h4 className="text-lg sm:text-xl font-semibold mb-2 capitalize">
                   {option.os === 'macos' ? 'macOS' : option.os}
                 </h4>
-                <p className="text-sm text-neutral-400 mb-4">{option.size}</p>
+                <p className="text-xs sm:text-sm text-neutral-400 mb-4">{option.size}</p>
                 {DOWNLOAD_READY ? (
                   <a
                     href={CUSTOM_DOWNLOAD_URL}
-                    className="inline-block px-8 py-3 border border-gestura-cyan/30 text-gestura-cyan hover:bg-gestura-cyan/10 transition-all duration-300 rounded-full font-medium"
+                    className="inline-block px-6 sm:px-8 py-3 border border-gestura-cyan/30 text-gestura-cyan hover:bg-gestura-cyan/10 transition-all duration-300 rounded-full font-medium text-sm sm:text-base min-h-[44px]"
                   >
                     Download
                   </a>

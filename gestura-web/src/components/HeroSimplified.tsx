@@ -57,7 +57,7 @@ export default function HeroSimplified() {
       </div>
 
       {/* Floating gesture icons */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
         {[
           { icon: '🖐️', x: '10%', y: '20%', delay: 0, duration: 6 },
           { icon: '👆', x: '80%', y: '30%', delay: 1, duration: 7 },
@@ -66,7 +66,7 @@ export default function HeroSimplified() {
         ].map((item, i) => (
           <motion.div
             key={i}
-            className="absolute text-6xl opacity-20"
+            className="absolute text-4xl md:text-6xl opacity-20"
             style={{ left: item.x, top: item.y }}
             animate={{
               y: [-20, 20, -20],

@@ -46,25 +46,25 @@ const technologies = [
 
 export default function TechStack() {
   return (
-    <section className="relative py-24 px-6 bg-[#0f1419] overflow-x-hidden">
+    <section className="relative py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-[#0f1419] overflow-x-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16 px-4"
+          className="text-center mb-12 sm:mb-16 px-4"
         >
-          <h2 className="text-3xl md:text-4xl font-light mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-light mb-3 sm:mb-4">
             🚀 Built on <span className="gradient-text">Proven Technology</span>
           </h2>
-          <p className="text-neutral-400 text-sm max-w-2xl mx-auto">
+          <p className="text-neutral-400 text-xs sm:text-sm max-w-2xl mx-auto">
             Established libraries and frameworks provide reliable hand tracking and system automation
           </p>
         </motion.div>
 
         {/* Tech Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
           {technologies.map((tech, catIndex) => (
             <motion.div
               key={catIndex}
@@ -72,12 +72,12 @@ export default function TechStack() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: catIndex * 0.1 }}
-              className="glass-panel p-6 rounded-lg"
+              className="glass-panel p-4 sm:p-6 rounded-lg"
             >
-              <h3 className="text-lg font-medium text-gestura-cyan mb-4">{tech.category}</h3>
-              <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gestura-cyan mb-3 sm:mb-4">{tech.category}</h3>
+              <div className="space-y-3 sm:space-y-4">
                 {tech.items.map((item, itemIndex) => (
-                  <div key={itemIndex} className="border-l-2 border-white/10 pl-4 hover:border-gestura-cyan/50 transition-colors">
+                  <div key={itemIndex} className="border-l-2 border-white/10 pl-3 sm:pl-4 hover:border-gestura-cyan/50 transition-colors">
                     <div className="text-sm font-medium text-white mb-1">{item.name}</div>
                     <p className="text-xs text-neutral-500 leading-relaxed">{item.description}</p>
                   </div>

@@ -22,7 +22,7 @@ export default function MinimalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-16 mb-16"
+          className="flex flex-wrap justify-center gap-8 sm:gap-12 md:gap-16 mb-12 sm:mb-16"
         >
           {[
             { value: '~30', label: 'FPS Target' },
@@ -34,10 +34,10 @@ export default function MinimalCTA() {
               whileHover={{ scale: 1.1 }}
               className="text-center cursor-pointer group"
             >
-              <div className="text-2xl md:text-3xl font-light gradient-text mb-2 transition-transform group-hover:scale-110">
+              <div className="text-xl sm:text-2xl md:text-3xl font-light gradient-text mb-2 transition-transform group-hover:scale-110">
                 {stat.value}
               </div>
-              <div className="text-xs text-neutral-500 uppercase tracking-widest">
+              <div className="text-[10px] sm:text-xs text-neutral-500 uppercase tracking-widest">
                 {stat.label}
               </div>
             </motion.div>
@@ -60,7 +60,7 @@ export default function MinimalCTA() {
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 bg-white text-black hover:bg-gestura-cyan transition-all duration-300 rounded-full font-medium cursor-pointer"
+            className="px-8 sm:px-10 py-3 sm:py-4 bg-white text-black hover:bg-gestura-cyan transition-all duration-300 rounded-full font-medium cursor-pointer min-h-[44px] text-sm sm:text-base"
           >
             Get Started
           </motion.a>
@@ -69,7 +69,7 @@ export default function MinimalCTA() {
             href="/download"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 border border-white/20 text-white hover:border-white transition-all duration-300 rounded-full font-light cursor-pointer"
+            className="px-8 sm:px-10 py-3 sm:py-4 border border-white/20 text-white hover:border-white transition-all duration-300 rounded-full font-light cursor-pointer min-h-[44px] text-sm sm:text-base"
           >
             Download Now
           </motion.a>
@@ -81,7 +81,7 @@ export default function MinimalCTA() {
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.6, duration: 1 }}
-          className="mt-20 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          className="mt-12 sm:mt-16 md:mt-20 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
         />
       </div>
     </section>

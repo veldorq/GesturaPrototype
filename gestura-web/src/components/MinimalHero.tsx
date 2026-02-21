@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export default function MinimalHero() {
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-x-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-x-hidden py-20 md:py-0">
       {/* Background with subtle gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-[#242b3d] to-[#0f1419] z-0" />
       
@@ -91,7 +91,7 @@ export default function MinimalHero() {
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer"
+            className="px-8 sm:px-10 py-3 sm:py-4 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer min-h-[44px] text-sm sm:text-base"
           >
             Get Started
           </motion.a>
@@ -100,7 +100,7 @@ export default function MinimalHero() {
             href="/download"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide cursor-pointer"
+            className="px-8 sm:px-10 py-3 sm:py-4 text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide cursor-pointer min-h-[44px] text-sm sm:text-base"
           >
             Download Now
           </motion.a>
