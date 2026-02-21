@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export default function MinimalCTA() {
   return (
-    <section className="relative py-32 px-6">
+    <section className="relative py-20 sm:py-24 md:py-32 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto text-center relative z-10">
         {/* Main Heading */}
         <motion.h2

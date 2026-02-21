@@ -67,7 +67,7 @@ export default function FeaturesPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-5xl md:text-7xl font-light leading-tight mb-6"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light leading-tight mb-4 sm:mb-6 px-4"
             >
               Control Everything<br />
               <span className="gradient-text-specs font-bold">With Your Hands</span>
@@ -77,7 +77,7 @@ export default function FeaturesPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto mb-10 font-light"
+              className="text-base sm:text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto mb-8 sm:mb-10 font-light px-4"
             >
               11+ natural gestures for seamless interaction. From navigation to media control, 
               Gestura transforms your hands into the ultimate input device.
@@ -91,14 +91,14 @@ export default function FeaturesPage() {
             >
               <Link
                 href="/download"
-                className="px-10 py-4 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer"
+                className="px-8 sm:px-10 py-3 sm:py-4 min-h-[44px] border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer text-sm sm:text-base"
               >
                 Download Now
               </Link>
               
               <Link
                 href="/how-it-works"
-                className="px-10 py-4 text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide"
+                className="px-8 sm:px-10 py-3 sm:py-4 min-h-[44px] text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide text-sm sm:text-base"
               >
                 See How It Works
               </Link>
@@ -107,7 +107,7 @@ export default function FeaturesPage() {
         </section>
 
         {/* Feature Highlights Grid */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
               {featureHighlights.map((highlight, index) => (
@@ -148,19 +148,19 @@ export default function FeaturesPage() {
         </section>
 
         {/* Gesture Categories */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           {/* Japanese character background */}
           <div className="max-w-7xl mx-auto relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16 px-4"
+              className="text-center mb-12 sm:mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Gesture Library
               </h2>
-              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">Master all available gestures for full control</p>
+              <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">Master all available gestures for full control</p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -204,18 +204,18 @@ export default function FeaturesPage() {
         </section>
 
         {/* Key Benefits Section */}
-        <section className="relative py-32 px-6">
+        <section className="relative py-20 sm:py-24 md:py-32 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-20"
+              className="text-center mb-12 sm:mb-16 md:mb-20 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Why Choose Gestura
               </h2>
-              <p className="text-lg text-neutral-400 max-w-2xl mx-auto font-light">
+              <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto font-light">
                 Built for creators, professionals, and anyone who wants a better way to interact with technology
               </p>
             </motion.div>
@@ -264,22 +264,22 @@ export default function FeaturesPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light mb-4 sm:mb-6 px-4">
                 Ready to Get Started?
               </h2>
-              <p className="text-lg text-neutral-400 mb-10 font-light">
+              <p className="text-base sm:text-lg text-neutral-400 mb-8 sm:mb-10 font-light px-4">
                 Download Gestura and experience the future of hands-free control
               </p>
               <Link
                 href="/download"
-                className="inline-block px-12 py-5 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer"
+                className="inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 min-h-[44px] border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer text-sm sm:text-base"
               >
                 Download Now
               </Link>

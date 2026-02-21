@@ -107,10 +107,10 @@ export default function HowItWorks() {
             </span>
           </motion.div>
 
-          <h2 className="text-3xl md:text-5xl font-light leading-tight mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light leading-tight mb-4 sm:mb-6">
             How <span className="gradient-text">Gestura</span> Works
           </h2>
-          <p className="text-base md:text-lg text-neutral-400 max-w-3xl mx-auto font-light">
+          <p className="text-sm sm:text-base md:text-lg text-neutral-400 max-w-3xl mx-auto font-light">
             From hand detection to action execution through multi-stage recognition and stabilization
           </p>
         </motion.div>
@@ -182,7 +182,7 @@ export default function HowItWorks() {
           viewport={{ once: true }}
           className="mb-12 sm:mb-16"
         >
-          <h3 className="text-xl sm:text-2xl md:text-3xl font-light text-center mb-3 sm:mb-4">
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-light text-center mb-3 sm:mb-4 break-words">
             Gesture <span className="gradient-text">Reference</span>
           </h3>
           <p className="text-center text-neutral-400 text-xs sm:text-sm mb-8 sm:mb-12 px-4">

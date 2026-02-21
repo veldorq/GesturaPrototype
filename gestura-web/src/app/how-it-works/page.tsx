@@ -169,7 +169,7 @@ export default function HowItWorksPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-5xl md:text-7xl font-light leading-tight mb-6"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light leading-tight mb-4 sm:mb-6 px-4"
             >
               How <span className="gradient-text-specs font-bold">Gestura</span><br />
               Works
@@ -179,7 +179,7 @@ export default function HowItWorksPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto mb-10 font-light"
+              className="text-base sm:text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto mb-8 sm:mb-10 font-light px-4"
             >
               From hand detection to system control in under 30 milliseconds. 
               Discover the technology that makes hands-free control possible.
@@ -193,14 +193,14 @@ export default function HowItWorksPage() {
             >
               <Link
                 href="/features"
-                className="px-10 py-4 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer"
+                className="px-8 sm:px-10 py-3 sm:py-4 min-h-[44px] border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer text-sm sm:text-base"
               >
                 Explore Features
               </Link>
               
               <Link
                 href="/download"
-                className="px-10 py-4 text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide"
+                className="px-8 sm:px-10 py-3 sm:py-4 min-h-[44px] text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide text-sm sm:text-base"
               >
                 Download Now
               </Link>
@@ -209,18 +209,18 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Process Steps */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16 px-4"
+              className="text-center mb-12 sm:mb-16 px-4"
             >
-              <h2 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-cyan-200 to-purple-400 bg-clip-text text-transparent py-2 leading-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-cyan-400 via-cyan-200 to-purple-400 bg-clip-text text-transparent py-2 leading-tight">
                 Four-Step Process
               </h2>
-              <p className="text-xl md:text-2xl text-neutral-300 max-w-3xl mx-auto font-light">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-neutral-300 max-w-3xl mx-auto font-light">
                 Lightning-fast gesture recognition powered by advanced AI
               </p>
             </motion.div>
@@ -300,18 +300,18 @@ export default function HowItWorksPage() {
         />
 
         {/* Gesture Reference */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16 px-4"
+              className="text-center mb-12 sm:mb-16 px-4"
             >
-              <h3 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Gesture Reference
               </h3>
-              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
                 Master these gestures to control your computer naturally
               </p>
             </motion.div>
@@ -365,7 +365,7 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Technical Specs */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -404,7 +404,7 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Technology Stack */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -475,29 +475,29 @@ export default function HowItWorksPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light mb-4 sm:mb-6 px-4">
                 Experience the Technology
               </h2>
-              <p className="text-lg text-neutral-400 mb-10 font-light">
+              <p className="text-base sm:text-lg text-neutral-400 mb-8 sm:mb-10 font-light px-4">
                 See Gestura in action. Download now and control your computer with natural hand gestures.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
                 <Link
                   href="/download"
-                  className="inline-block px-12 py-5 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer"
+                  className="inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 min-h-[44px] border border-white text-white hover:bg-white hover:text-black transition-all duration-300 rounded-full font-light tracking-wide cursor-pointer text-sm sm:text-base"
                 >
                   Download Gestura
                 </Link>
                 <Link
                   href="/features"
-                  className="inline-block px-12 py-5 text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide"
+                  className="inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 min-h-[44px] text-white/60 hover:text-white transition-colors duration-300 font-light tracking-wide text-sm sm:text-base"
                 >
                   View All Features
                 </Link>

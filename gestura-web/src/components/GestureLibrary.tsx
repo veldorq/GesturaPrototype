@@ -154,7 +154,7 @@ export default function GestureLibrary() {
     : gestures.filter(gesture => gesture.category === selectedCategory);
   
   return (
-    <section className="relative py-32 px-6 bg-[#0f1419] overflow-x-hidden">
+    <section className="relative py-20 sm:py-24 md:py-32 px-4 sm:px-6 bg-[#0f1419] overflow-x-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-purple-900/10 via-transparent to-transparent opacity-20 pointer-events-none" />
 
@@ -165,12 +165,12 @@ export default function GestureLibrary() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16 px-4"
+          className="text-center mb-12 sm:mb-16 px-4"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent py-2 leading-relaxed">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent py-2 leading-relaxed">
             Complete Gesture Library
           </h2>
-          <p className="text-lg text-neutral-400 max-w-2xl mx-auto mb-8">
+          <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto mb-6 sm:mb-8">
             {selectedCategory === "All" 
               ? "11 production-ready gestures covering all essential browser interactions. Each gesture has built-in debouncing to prevent accidental triggers."
               : `Showing ${filteredGestures.length} ${selectedCategory.toLowerCase()} gesture${filteredGestures.length !== 1 ? 's' : ''}. Click "All" to view all gestures.`

@@ -248,15 +248,15 @@ export default function DownloadPage() {
         </section>
 
         {/* Platform Support */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16 px-4"
+              className="text-center mb-12 sm:mb-16 px-4"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Available On All Platforms
               </h2>
             </motion.div>
@@ -310,18 +310,18 @@ export default function DownloadPage() {
         </section>
 
         {/* Getting Help */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="border border-neutral-800 rounded-2xl p-10 backdrop-blur-sm bg-neutral-900/30 text-center"
+              className="border border-neutral-800 rounded-2xl p-6 sm:p-8 md:p-10 backdrop-blur-sm bg-neutral-900/30 text-center"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
                 Need Help?
               </h2>
-              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
                 Documentation is included with your download. Check the README and Quick Start guides for setup instructions and troubleshooting.
               </p>
             </motion.div>
@@ -329,7 +329,7 @@ export default function DownloadPage() {
         </section>
 
         {/* Quick Links */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="grid md:grid-cols-2 gap-6">
               <motion.div
@@ -372,22 +372,22 @@ export default function DownloadPage() {
         </section>
 
         {/* Final CTA */}
-        <section className="relative py-20 px-6">
+        <section className="relative py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl md:text-5xl font-light mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light mb-4 sm:mb-6">
                 Ready to Begin?
               </h2>
-              <p className="text-lg text-neutral-400 mb-10 font-light">
+              <p className="text-base sm:text-lg text-neutral-400 mb-8 sm:mb-10 font-light px-4">
                 Download Gestura and transform how you interact with your computer
               </p>
               <button
                 disabled
-                className="inline-block px-12 py-5 border border-neutral-600 text-neutral-500 opacity-60 rounded-full font-light tracking-wide cursor-not-allowed"
+                className="inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 min-h-[44px] border border-neutral-600 text-neutral-500 opacity-60 rounded-full font-light tracking-wide cursor-not-allowed text-sm sm:text-base"
                 title="Download coming soon"
               >
                 Coming Soon

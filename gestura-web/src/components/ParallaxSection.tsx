@@ -14,7 +14,7 @@ export default function ParallaxSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.5, 1, 0.5]);
 
   return (
-    <section ref={containerRef} className="relative py-32 px-6 overflow-hidden">
+    <section ref={containerRef} className="relative py-20 sm:py-24 md:py-32 px-4 sm:px-6 overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0f1419] via-[#1a1f2e] to-[#0f1419]" />
 
