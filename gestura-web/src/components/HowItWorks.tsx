@@ -227,29 +227,29 @@ export default function HowItWorks() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-24 glass-panel p-8 rounded-lg"
+          className="mt-24 glass-panel p-6 sm:p-8 rounded-lg"
         >
-          <h3 className="text-xl font-light mb-8 text-center">Technical Specifications</h3>
+          <h3 className="text-lg sm:text-xl font-light mb-6 sm:mb-8 text-center">Technical Specifications</h3>
           
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-light gradient-text mb-2">~30</div>
-              <div className="text-xs text-neutral-500 uppercase tracking-wider">FPS Target</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-center">
+            <div className="px-2">
+              <div className="text-2xl sm:text-3xl font-light gradient-text mb-2">~30</div>
+              <div className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">FPS Target</div>
               <p className="text-xs text-neutral-600 mt-2">Real-time frame processing</p>
             </div>
-            <div>
-              <div className="text-3xl font-light gradient-text mb-2">1.5s</div>
-              <div className="text-xs text-neutral-500 uppercase tracking-wider">Dwell Time</div>
+            <div className="px-2">
+              <div className="text-2xl sm:text-3xl font-light gradient-text mb-2">1.5s</div>
+              <div className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">Dwell Time</div>
               <p className="text-xs text-neutral-600 mt-2">Deliberate activation period</p>
             </div>
-            <div>
-              <div className="text-3xl font-light gradient-text mb-2">21</div>
-              <div className="text-xs text-neutral-500 uppercase tracking-wider">Landmarks</div>
+            <div className="px-2">
+              <div className="text-2xl sm:text-3xl font-light gradient-text mb-2">21</div>
+              <div className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">Landmarks</div>
               <p className="text-xs text-neutral-600 mt-2">Hand points tracked per frame</p>
             </div>
-            <div>
-              <div className="text-3xl font-light gradient-text mb-2">100%</div>
-              <div className="text-xs text-neutral-500 uppercase tracking-wider">Local</div>
+            <div className="px-2">
+              <div className="text-2xl sm:text-3xl font-light gradient-text mb-2">100%</div>
+              <div className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">Local</div>
               <p className="text-xs text-neutral-600 mt-2">No cloud, all on-device</p>
             </div>
           </div>

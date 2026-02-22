@@ -373,38 +373,38 @@ export default function HowItWorksPage() {
               viewport={{ once: true }}
               className="relative border border-neutral-800 rounded-2xl p-8 md:p-12 backdrop-blur-sm bg-neutral-900/30"
             >
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 sm:mb-12 text-center bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed px-4">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-6 sm:mb-8 md:mb-10 text-center bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed px-4">
                 Technical Specifications
               </h3>
               
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 lg:gap-12 text-center">
-                <div className="flex flex-col items-center justify-start min-h-[140px] px-2">
-                  <div className="text-3xl sm:text-4xl font-bold mb-3 gradient-text" style={{ WebkitTextFillColor: 'transparent' }}>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 text-center px-2 sm:px-4">
+                <div className="flex flex-col items-center justify-start min-h-[120px] sm:min-h-[140px]">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 gradient-text" style={{ WebkitTextFillColor: 'transparent' }}>
                     <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">&lt;30ms</span>
                   </div>
                   <div className="text-xs sm:text-sm text-neutral-500 uppercase tracking-wider mb-2 font-semibold">Latency</div>
-                  <p className="text-xs text-neutral-400 leading-relaxed">End-to-end processing</p>
+                  <p className="text-xs text-neutral-400 leading-relaxed px-1">End-to-end processing</p>
                 </div>
-                <div className="flex flex-col items-center justify-start min-h-[140px] px-2">
-                  <div className="text-3xl sm:text-4xl font-bold mb-3 gradient-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                <div className="flex flex-col items-center justify-start min-h-[120px] sm:min-h-[140px]">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 gradient-text" style={{ WebkitTextFillColor: 'transparent' }}>
                     <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">99%</span>
                   </div>
                   <div className="text-xs sm:text-sm text-neutral-500 uppercase tracking-wider mb-2 font-semibold">Accuracy</div>
-                  <p className="text-xs text-neutral-400 leading-relaxed">Recognition rate</p>
+                  <p className="text-xs text-neutral-400 leading-relaxed px-1">Recognition rate</p>
                 </div>
-                <div className="flex flex-col items-center justify-start min-h-[140px] px-2">
-                  <div className="text-3xl sm:text-4xl font-bold mb-3 gradient-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                <div className="flex flex-col items-center justify-start min-h-[120px] sm:min-h-[140px]">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 gradient-text" style={{ WebkitTextFillColor: 'transparent' }}>
                     <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">30</span>
                   </div>
                   <div className="text-xs sm:text-sm text-neutral-500 uppercase tracking-wider mb-2 font-semibold">FPS</div>
-                  <p className="text-xs text-neutral-400 leading-relaxed">Real-time detection</p>
+                  <p className="text-xs text-neutral-400 leading-relaxed px-1">Real-time detection</p>
                 </div>
-                <div className="flex flex-col items-center justify-start min-h-[140px] px-2">
-                  <div className="text-3xl sm:text-4xl font-bold mb-3 gradient-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                <div className="flex flex-col items-center justify-start min-h-[120px] sm:min-h-[140px]">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 gradient-text" style={{ WebkitTextFillColor: 'transparent' }}>
                     <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">100%</span>
                   </div>
                   <div className="text-xs sm:text-sm text-neutral-500 uppercase tracking-wider mb-2 font-semibold">Local</div>
-                  <p className="text-xs text-neutral-400 leading-relaxed">No cloud processing</p>
+                  <p className="text-xs text-neutral-400 leading-relaxed px-1">No cloud processing</p>
                 </div>
               </div>
             </motion.div>

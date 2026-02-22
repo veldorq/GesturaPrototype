@@ -108,20 +108,20 @@ export default function TechnicalSpecs() {
               }}
             >
               {/* Icon */}
-              <div className="text-4xl mb-4">{spec.icon}</div>
+              <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{spec.icon}</div>
               
               {/* Metric name */}
-              <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">
+              <div className="text-xs sm:text-sm text-neutral-500 uppercase tracking-wider mb-2 font-semibold">
                 {spec.metric}
               </div>
               
               {/* Value */}
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3">
                 <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">{spec.value}</span>
               </div>
               
               {/* Detail */}
-              <p className="text-sm text-neutral-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
                 {spec.detail}
               </p>
 

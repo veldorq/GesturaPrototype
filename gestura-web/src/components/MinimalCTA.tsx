@@ -22,7 +22,7 @@ export default function MinimalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-8 sm:gap-12 md:gap-16 mb-12 sm:mb-16"
+          className="flex flex-wrap justify-center gap-6 sm:gap-10 md:gap-16 mb-12 sm:mb-16 px-4"
         >
           {[
             { value: '~30', label: 'FPS Target' },
@@ -32,16 +32,16 @@ export default function MinimalCTA() {
             <motion.div
               key={i}
               whileHover={{ scale: 1.1 }}
-              className="text-center cursor-pointer group"
+              className="text-center cursor-pointer group min-w-[80px] sm:min-w-[100px]"
             >
-              <div className="text-xl sm:text-2xl md:text-3xl font-light gradient-text mb-2 transition-transform group-hover:scale-110">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-light gradient-text mb-2 transition-transform group-hover:scale-110">
                 {stat.value}
               </div>
-              <div className="text-[10px] sm:text-xs text-neutral-500 uppercase tracking-widest">
+              <div className="text-xs sm:text-sm text-neutral-500 uppercase tracking-wider font-semibold">
                 {stat.label}
               </div>
             </motion.div>
-          ))}
+          ))}  
         </motion.div>
 
         {/* CTA Buttons */}

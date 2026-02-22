@@ -124,23 +124,23 @@ export default function FeaturesPage() {
                   
                   {/* Label */}
                   {highlight.metricLabel && (
-                    <div className="text-sm text-neutral-500 uppercase tracking-wider mb-2">
+                    <div className="text-xs sm:text-sm text-neutral-500 uppercase tracking-wider mb-2 font-semibold">
                       {highlight.metricLabel}
                     </div>
                   )}
                   
                   {/* Value */}
                   {highlight.metric && (
-                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3">
                       <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">{highlight.metric}</span>
                     </div>
                   )}
                   
                   {/* Title */}
-                  <h3 className="text-xl font-medium mb-3">{highlight.title}</h3>
+                  <h3 className="text-lg sm:text-xl font-medium mb-2 sm:mb-3">{highlight.title}</h3>
                   
                   {/* Description */}
-                  <p className="text-sm text-neutral-400 leading-relaxed">{highlight.description}</p>
+                  <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">{highlight.description}</p>
                 </motion.div>
               ))}
             </div>
