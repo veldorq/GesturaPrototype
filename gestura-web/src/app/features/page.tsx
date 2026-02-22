@@ -131,8 +131,8 @@ export default function FeaturesPage() {
                   
                   {/* Value */}
                   {highlight.metric && (
-                    <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">
-                      {highlight.metric}
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+                      <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">{highlight.metric}</span>
                     </div>
                   )}
                   

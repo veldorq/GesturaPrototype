@@ -62,7 +62,7 @@ export default function GestureShowcase() {
           <div className="absolute inset-0 bg-gradient-to-r from-gestura-cyan via-gestura-purple to-gestura-cyan opacity-50 blur-xl" />
           
           <div className="relative bg-[#0f1419]/90 backdrop-blur-2xl rounded-3xl p-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 text-center px-4">
               <motion.div
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
@@ -70,15 +70,15 @@ export default function GestureShowcase() {
                 transition={{ type: 'spring', stiffness: 200 }}
                 className="group"
               >
-                <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
-                  <span className="bg-gradient-to-r from-gestura-cyan to-blue-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform py-1 leading-relaxed">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-space font-semibold mb-2">
+                  <span className="bg-gradient-to-r from-gestura-cyan to-blue-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
                     &lt;30ms
                   </span>
                 </div>
-                <p className="text-gestura-text-secondary font-inter font-medium">
+                <p className="text-gestura-text-secondary font-inter font-medium text-sm sm:text-base">
                   Response Time
                 </p>
-                <p className="text-gestura-text-secondary/60 font-inter text-sm mt-2">
+                <p className="text-gestura-text-secondary/60 font-inter text-xs sm:text-sm mt-2">
                   Faster than human perception
                 </p>
               </motion.div>
@@ -90,15 +90,15 @@ export default function GestureShowcase() {
                 transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
                 className="group"
               >
-                <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
-                  <span className="bg-gradient-to-r from-gestura-purple to-pink-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform py-1 leading-relaxed">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-space font-semibold mb-2">
+                  <span className="bg-gradient-to-r from-gestura-purple to-pink-400 bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
                     99%
                   </span>
                 </div>
-                <p className="text-gestura-text-secondary font-inter font-medium">
+                <p className="text-gestura-text-secondary font-inter font-medium text-sm sm:text-base">
                   Accuracy Rate
                 </p>
-                <p className="text-gestura-text-secondary/60 font-inter text-sm mt-2">
+                <p className="text-gestura-text-secondary/60 font-inter text-xs sm:text-sm mt-2">
                   Reliable gesture recognition
                 </p>
               </motion.div>
@@ -110,15 +110,15 @@ export default function GestureShowcase() {
                 transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
                 className="group"
               >
-                <div className="text-4xl md:text-5xl font-space font-semibold mb-2">
-                  <span className="bg-gradient-to-r from-gestura-cyan to-gestura-purple bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform py-1 leading-relaxed">
-                    30FPS
+                <div className="text-3xl sm:text-4xl md:text-5xl font-space font-semibold mb-2">
+                  <span className="bg-gradient-to-r from-gestura-cyan to-gestura-purple bg-clip-text text-transparent group-hover:scale-110 inline-block transition-transform">
+                    30 FPS
                   </span>
                 </div>
-                <p className="text-gestura-text-secondary font-inter font-medium">
+                <p className="text-gestura-text-secondary font-inter font-medium text-sm sm:text-base">
                   Real-Time Tracking
                 </p>
-                <p className="text-gestura-text-secondary/60 font-inter text-sm mt-2">
+                <p className="text-gestura-text-secondary/60 font-inter text-xs sm:text-sm mt-2">
                   Smooth, responsive control
                 </p>
               </motion.div>

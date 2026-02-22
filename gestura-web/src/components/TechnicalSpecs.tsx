@@ -85,10 +85,11 @@ export default function TechnicalSpecs() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16 px-4">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
-            🔧 Technical Specifications
+          <div className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6">🔧</div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+            Technical Specifications
           </h2>
-          <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-neutral-400 max-w-2xl mx-auto px-4">
             Real performance metrics from the PROTOTYPE.PY configuration. No marketing fluff—just the actual numbers running in production.
           </p>
         </div>
@@ -116,8 +117,8 @@ export default function TechnicalSpecs() {
               </div>
               
               {/* Value */}
-              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3 py-1 leading-relaxed">
-                {spec.value}
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+                <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">{spec.value}</span>
               </div>
               
               {/* Detail */}

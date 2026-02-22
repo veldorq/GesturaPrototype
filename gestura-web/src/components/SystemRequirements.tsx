@@ -74,10 +74,11 @@ export default function SystemRequirements() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 sm:mb-16 px-4"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
-            💻 System Requirements
+          <div className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6">💻</div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
+            System Requirements
           </h2>
-          <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-neutral-400 max-w-2xl mx-auto px-4">
             Gestura requires Python 3.10+ and a working webcam. Compatible with Windows, macOS, and Linux.
           </p>
         </motion.div>
