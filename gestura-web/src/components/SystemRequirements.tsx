@@ -74,7 +74,6 @@ export default function SystemRequirements() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 sm:mb-16 px-4"
         >
-          <div className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6">💻</div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
             System Requirements
           </h2>
@@ -183,19 +182,19 @@ export default function SystemRequirements() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-12 p-6 border border-neutral-700 rounded-2xl bg-neutral-900/50 backdrop-blur-sm"
+          className="mt-12 p-4 sm:p-6 border border-neutral-700 rounded-2xl bg-neutral-900/50 backdrop-blur-sm"
         >
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-2">
+          <div className="flex flex-col items-center md:items-center justify-center gap-4 text-center md:text-left">
+            <div className="w-full">
+              <h4 className="text-lg sm:text-xl font-semibold text-white mb-2">
                 One-Command Setup
               </h4>
-              <p className="text-neutral-400 text-sm">
+              <p className="text-neutral-400 text-sm sm:text-base">
                 Install all dependencies automatically using pip
               </p>
             </div>
-            <div className="bg-black/50 px-4 py-3 rounded-lg border border-neutral-700 font-mono text-sm text-cyan-400 whitespace-nowrap">
-              pip install -r requirements.txt
+            <div className="w-full max-w-full overflow-x-auto bg-black/50 px-4 py-3 rounded-lg border border-neutral-700 font-mono text-xs sm:text-sm text-cyan-400">
+              <code className="block text-center md:text-left">pip install -r requirements.txt</code>
             </div>
           </div>
         </motion.div>

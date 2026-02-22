@@ -75,7 +75,6 @@ export default function FAQ() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 sm:mb-16 px-4"
         >
-          <div className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6">❓</div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2 leading-relaxed">
             Frequently Asked Questions
           </h2>
