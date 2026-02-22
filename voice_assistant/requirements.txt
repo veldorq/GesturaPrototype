@@ -1,0 +1,79 @@
+# Gestura Voice Assistant Requirements
+# Production-ready offline voice control system
+
+# ═══════════════════════════════════════════════════════════════
+# CORE DEPENDENCIES (Required)
+# ═══════════════════════════════════════════════════════════════
+
+# Speech recognition framework
+SpeechRecognition>=3.10.0
+
+# Audio input (microphone access)
+PyAudio>=0.2.13
+
+# System control (mouse, keyboard)
+pyautogui>=0.9.54
+pynput>=1.7.6
+
+# ═══════════════════════════════════════════════════════════════
+# OFFLINE RECOGNITION (Recommended)
+# ═══════════════════════════════════════════════════════════════
+
+# Vosk - fast offline speech recognition
+vosk>=0.3.45
+
+# Alternative audio backend
+sounddevice>=0.4.6
+
+# ═══════════════════════════════════════════════════════════════
+# VOICE FEEDBACK (Optional)
+# ═══════════════════════════════════════════════════════════════
+
+# Text-to-speech engine
+pyttsx3>=2.90
+
+# ═══════════════════════════════════════════════════════════════
+# GESTURE SYSTEM INTEGRATION (If needed)
+# ═══════════════════════════════════════════════════════════════
+
+# Computer vision
+opencv-python>=4.8.0
+
+# Hand tracking
+mediapipe>=0.10.0
+
+# ═══════════════════════════════════════════════════════════════
+# DEVELOPMENT (Optional)
+# ═══════════════════════════════════════════════════════════════
+
+# Type checking
+# mypy>=1.8.0
+
+# Code formatting
+# black>=24.0.0
+
+# Testing
+# pytest>=8.0.0
+
+# ═══════════════════════════════════════════════════════════════
+# INSTALLATION NOTES
+# ═══════════════════════════════════════════════════════════════
+#
+# Windows:
+#   pip install pipwin
+#   pipwin install pyaudio
+#
+# Linux:
+#   sudo apt-get install python3-pyaudio portaudio19-dev
+#   pip install -r requirements.txt
+#
+# macOS:
+#   brew install portaudio
+#   pip install -r requirements.txt
+#
+# Vosk Model (separate download):
+#   Download from: https://alphacephei.com/vosk/models
+#   Recommended: vosk-model-small-en-us-0.15 (40 MB)
+#   Extract to: models/vosk-model-small-en-us-0.15/
+#
+# ═══════════════════════════════════════════════════════════════

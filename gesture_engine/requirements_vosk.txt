@@ -1,0 +1,36 @@
+# Vosk-based Voice Control Requirements
+# Install with: pip install -r requirements_vosk.txt
+
+# Core dependencies (required)
+vosk>=0.3.45                 # Offline speech recognition
+sounddevice>=0.4.6           # Audio input
+pyautogui>=0.9.54           # System control (mouse, keyboard)
+pynput>=1.7.6                # Alternative system control
+pyttsx3>=2.90                # Text-to-speech feedback
+
+# Computer vision (for gesture integration)
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+numpy>=1.24.0
+
+# Optional: Additional features
+# Pillow>=10.0.0             # Screenshot enhancement
+
+# Installation Notes:
+# ==================
+#
+# 1. Install all requirements:
+#    pip install -r requirements_vosk.txt
+#
+# 2. Download Vosk model:
+#    Visit: https://alphacephei.com/vosk/models
+#    Download: vosk-model-small-en-us-0.15.zip (40 MB)
+#    Extract to: SOuvikmeet/models/vosk-model-small-en-us-0.15/
+#
+# 3. Platform-specific:
+#    Windows: No additional steps
+#    Linux: sudo apt-get install portaudio19-dev python3-pyaudio
+#    macOS: brew install portaudio
+#
+# 4. Verify installation:
+#    python gesture_engine/voice_controller.py

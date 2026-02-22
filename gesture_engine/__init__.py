@@ -28,7 +28,7 @@ from gesture_engine.main import GestureEngine, EngineMode, EngineState
 from gesture_engine.hand_tracker import TwoHandTracker, HandData, HandLabel
 from gesture_engine.gesture_classifier import GestureClassifier, GestureType, GestureResult
 from gesture_engine.gesture_trainer import GestureTrainer, TrainedGesture
-from gesture_engine.voice_controller import VoiceControllerClass, VoiceCommand
+# VoiceController is new Vosk-based system - VoiceControllerClass/VoiceCommand no longer exist
 from gesture_engine.command_executor import CommandExecutor, ActionType, ActionResult
 from gesture_engine.smoothing import (
     MovingAverageFilter,
@@ -70,8 +70,7 @@ __all__ = [
     "TrainedGesture",
     
     # Voice Control
-    "VoiceControllerClass",
-    "VoiceCommand",
+    # VoiceController and VoiceCommand removed (replaced with Vosk-based system)
     
     # Command Execution
     "CommandExecutor",

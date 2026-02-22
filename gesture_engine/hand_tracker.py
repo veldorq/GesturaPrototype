@@ -89,9 +89,9 @@ class TwoHandTracker:
         self.config = CONFIG.hand_tracking
         
         # Initialize MediaPipe Hands
-        self.mp_hands = mp.solutions.hands
-        self.mp_drawing = mp.solutions.drawing_utils
-        self.mp_drawing_styles = mp.solutions.drawing_styles
+        self.mp_hands = mp.solutions.hands  # type: ignore
+        self.mp_drawing = mp.solutions.drawing_utils  # type: ignore
+        self.mp_drawing_styles = mp.solutions.drawing_styles  # type: ignore
         
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
@@ -301,10 +301,10 @@ class TwoHandTracker:
             return None
         
         # Use wrist landmarks (index 0)
-        left_wrist = np.array(self.left_hand.landmarks[0])
-        right_wrist = np.array(self.right_hand.landmarks[0])
+        left_wrist = np.array(self.left_hand.landmarks[0])  # type: ignore
+        right_wrist = np.array(self.right_hand.landmarks[0])  # type: ignore
         
-        return np.linalg.norm(left_wrist - right_wrist)
+        return float(np.linalg.norm(left_wrist - right_wrist))
     
     def reset_smoothing(self) -> None:
         """Reset smoothing filters (e.g., when hand re-enters frame)."""

@@ -30,6 +30,7 @@ USAGE:
 import cv2
 import mediapipe as mp
 import pyautogui
+import numpy as np
 import time
 import subprocess
 import platform
@@ -73,6 +74,30 @@ except ImportError:
     VOICE_CONTROL_AVAILABLE = False
     VoiceController = None  # type: ignore
     print("⚠️  Voice control not available (voice_commands.py not found)")
+
+# =============================================================================
+# TEMPORAL PERSISTENCE SYSTEM (Production-Grade Stability)
+# =============================================================================
+try:
+    from gesture_temporal import TemporalGestureValidator
+    from temporal_state_machine import GestureStateMachine as TemporalStateMachine
+    from temporal_state_machine import GestureState  # type: ignore
+    from gesture_smoother import LandmarkSmoother as TemporalLandmarkSmoother, GestureConfidenceScorer
+    from false_positive_filter import MotionGate, GestureHysteresis
+    from frame_history import FrameHistoryBuffer
+    TEMPORAL_PERSISTENCE_AVAILABLE = True
+    print("✅ Temporal persistence system loaded")
+except ImportError as e:
+    TEMPORAL_PERSISTENCE_AVAILABLE = False
+    TemporalGestureValidator = None  # type: ignore
+    TemporalStateMachine = None  # type: ignore
+    GestureState = None  # type: ignore
+    TemporalLandmarkSmoother = None  # type: ignore
+    GestureConfidenceScorer = None  # type: ignore
+    MotionGate = None  # type: ignore
+    GestureHysteresis = None  # type: ignore
+    FrameHistoryBuffer = None  # type: ignore
+    print(f"⚠️  Temporal persistence system not available: {e}")
 
 
 # ============================================================================
@@ -314,6 +339,37 @@ class Config:
         "mute": True,
         "screenshot": True,
     }
+    
+    # ========================================================================
+    # TEMPORAL PERSISTENCE SYSTEM (Production-Grade Stability)
+    # ========================================================================
+    
+    ENABLE_TEMPORAL_PERSISTENCE = True  # Master toggle for entire system
+    
+    # Temporal validation settings
+    TEMPORAL_WINDOW_SIZE = 10  # Frames for majority voting (8-15 recommended)
+    TEMPORAL_CONFIRMATION_THRESHOLD = 0.7  # 70% majority required
+    TEMPORAL_MIN_HOLD_SECONDS = 0.25  # Minimum gesture hold time (0.2-0.4s)
+    
+    # State machine settings
+    TEMPORAL_COOLDOWN_SECONDS = 0.6  # Cooldown after gesture execution (0.5-1.0s)
+    
+    # Landmark smoothing settings (separate from legacy smoother)
+    TEMPORAL_SMOOTHER_ALPHA = 0.35  # EMA alpha (0.3-0.5, lower = smoother)
+    
+    # Confidence scoring settings
+    TEMPORAL_CONFIDENCE_BUFFER = 8  # Frames for variance calculation
+    TEMPORAL_CONFIDENCE_GATE = 0.40  # Minimum confidence to recognize gesture
+    
+    # Motion gating settings
+    TEMPORAL_VELOCITY_THRESHOLD = 0.05  # Max wrist velocity for recognition
+    TEMPORAL_MOTION_HISTORY = 4  # Frames for velocity calculation
+    
+    # Hysteresis settings
+    TEMPORAL_HYSTERESIS_FRAMES = 5  # Frames before gesture change accepted
+    
+    # Frame history settings
+    TEMPORAL_HISTORY_SIZE = 90  # Frames to store for debugging (60-120)
     
     # Advanced features
     ENABLE_SOUND_FEEDBACK = False  # Audio confirmation
@@ -2268,8 +2324,87 @@ class HandGestureControlSystem:
                 print(f"   ⚠️  Voice control not available: {e}")
                 self.voice_controller = None
         
+        # =================================================================
+        # TEMPORAL PERSISTENCE SYSTEM (Production-Grade Stability)
+        # =================================================================
+        if TEMPORAL_PERSISTENCE_AVAILABLE and Config.ENABLE_TEMPORAL_PERSISTENCE:
+            try:
+                # Temporal landmark smoother (separate from legacy smoother)
+                if TemporalLandmarkSmoother is not None:
+                    self.temporal_smoother = TemporalLandmarkSmoother(
+                        alpha=Config.TEMPORAL_SMOOTHER_ALPHA,
+                        num_landmarks=21
+                    )
+                
+                # Gesture confidence scorer (variance-based)
+                if GestureConfidenceScorer is not None:
+                    self.confidence_scorer = GestureConfidenceScorer(
+                        buffer_size=Config.TEMPORAL_CONFIDENCE_BUFFER
+                    )
+                
+                # Motion gate (blocks detection during fast movement)
+                if MotionGate is not None:
+                    self.motion_gate = MotionGate(
+                        velocity_threshold=Config.TEMPORAL_VELOCITY_THRESHOLD,
+                        history_len=Config.TEMPORAL_MOTION_HISTORY
+                    )
+                
+                # Gesture hysteresis (prevents rapid toggling)
+                if GestureHysteresis is not None:
+                    self.gesture_hysteresis = GestureHysteresis(
+                        hysteresis_frames=Config.TEMPORAL_HYSTERESIS_FRAMES
+                    )
+                
+                # Temporal validator (multi-frame confirmation)
+                if TemporalGestureValidator is not None:
+                    self.temporal_validator = TemporalGestureValidator(
+                        window_size=Config.TEMPORAL_WINDOW_SIZE,
+                        confirmation_threshold=Config.TEMPORAL_CONFIRMATION_THRESHOLD,
+                        min_hold_seconds=Config.TEMPORAL_MIN_HOLD_SECONDS
+                    )
+                
+                # Temporal state machine (separate from existing state machine)
+                if TemporalStateMachine is not None:
+                    self.temporal_state_machine = TemporalStateMachine(
+                        cooldown_seconds=Config.TEMPORAL_COOLDOWN_SECONDS,
+                        on_activate=None  # Will be set later if needed
+                    )
+                
+                # Frame history buffer (for debugging and analysis)
+                if FrameHistoryBuffer is not None:
+                    self.frame_history = FrameHistoryBuffer(
+                        max_frames=Config.TEMPORAL_HISTORY_SIZE
+                    )
+                
+                print("   ✅ Temporal persistence system enabled")
+                print(f"      - Landmark smoothing: EMA (α={Config.TEMPORAL_SMOOTHER_ALPHA})")
+                print(f"      - Temporal validation: {Config.TEMPORAL_WINDOW_SIZE}-frame window, {int(Config.TEMPORAL_CONFIRMATION_THRESHOLD * 100)}% threshold")
+                print("      - Motion gating: Active")
+                print(f"      - Hysteresis filtering: {Config.TEMPORAL_HYSTERESIS_FRAMES} frames")
+            except Exception as e:
+                print(f"   ⚠️  Temporal persistence initialization failed: {e}")
+                self.temporal_smoother = None
+                self.confidence_scorer = None
+                self.motion_gate = None
+                self.gesture_hysteresis = None
+                self.temporal_validator = None
+                self.temporal_state_machine = None
+                self.frame_history = None
+        else:
+            self.temporal_smoother = None
+            self.confidence_scorer = None
+            self.motion_gate = None
+            self.gesture_hysteresis = None
+            self.temporal_validator = None
+            self.temporal_state_machine = None
+            self.frame_history = None
+        
         # Program control
         self.running = True  # Flag to control main loop (for rock sign exit)
+        
+        # UI tracking variables
+        self.lighting_warning = None
+        self.position_warning = None
         
         # Verify all components initialized
         components_status = [
@@ -2575,9 +2710,188 @@ class HandGestureControlSystem:
         except Exception as e:
             print(f"WARNING: Action execution error: {e}")
     
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MODERN UI HELPER FUNCTIONS
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    def _draw_rounded_panel(self, frame, x, y, width, height, color, alpha=0.7, border_color=None, border_thickness=2):
+        """
+        Draw a semi-transparent rounded rectangle panel.
+        
+        Args:
+            frame: OpenCV frame
+            x, y: Top-left position
+            width, height: Panel dimensions
+            color: BGR color tuple
+            alpha: Transparency (0.0 = transparent, 1.0 = opaque)
+            border_color: Optional border color
+            border_thickness: Border line thickness
+        """
+        # Create semi-transparent overlay
+        overlay = frame.copy()
+        
+        # Draw rounded rectangle (approximated with small rectangles)
+        radius = 8
+        
+        # Main body
+        cv2.rectangle(overlay, (x + radius, y), (x + width - radius, y + height), color, -1)
+        cv2.rectangle(overlay, (x, y + radius), (x + width, y + height - radius), color, -1)
+        
+        # Corner circles
+        cv2.circle(overlay, (x + radius, y + radius), radius, color, -1)
+        cv2.circle(overlay, (x + width - radius, y + radius), radius, color, -1)
+        cv2.circle(overlay, (x + radius, y + height - radius), radius, color, -1)
+        cv2.circle(overlay, (x + width - radius, y + height - radius), radius, color, -1)
+        
+        # Blend with original frame
+        cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+        
+        # Draw border if specified
+        if border_color:
+            # Draw border segments
+            cv2.line(frame, (x + radius, y), (x + width - radius, y), border_color, border_thickness)
+            cv2.line(frame, (x + radius, y + height), (x + width - radius, y + height), border_color, border_thickness)
+            cv2.line(frame, (x, y + radius), (x, y + height - radius), border_color, border_thickness)
+            cv2.line(frame, (x + width, y + radius), (x + width, y + height - radius), border_color, border_thickness)
+            
+            # Draw corner arcs
+            cv2.ellipse(frame, (x + radius, y + radius), (radius, radius), 180, 0, 90, border_color, border_thickness)
+            cv2.ellipse(frame, (x + width - radius, y + radius), (radius, radius), 270, 0, 90, border_color, border_thickness)
+            cv2.ellipse(frame, (x + radius, y + height - radius), (radius, radius), 90, 0, 90, border_color, border_thickness)
+            cv2.ellipse(frame, (x + width - radius, y + height - radius), (radius, radius), 0, 0, 90, border_color, border_thickness)
+    
+    def _draw_text_with_shadow(self, frame, text, x, y, font, scale, color, thickness, shadow_offset=2):
+        """
+        Draw text with a subtle shadow for better readability.
+        
+        Args:
+            frame: OpenCV frame
+            text: Text string
+            x, y: Position
+            font: OpenCV font constant
+            scale: Font scale
+            color: Text color (BGR)
+            thickness: Text thickness
+            shadow_offset: Shadow offset in pixels
+        """
+        # Draw shadow
+        cv2.putText(frame, text, (x + shadow_offset, y + shadow_offset),
+                   font, scale, (0, 0, 0), thickness + 1, cv2.LINE_AA)
+        # Draw main text
+        cv2.putText(frame, text, (x, y),
+                   font, scale, color, thickness, cv2.LINE_AA)
+    
+    def _draw_progress_bar(self, frame, x, y, width, height, progress, bg_color, fill_color, border_color=None):
+        """
+        Draw a horizontal progress bar with rounded ends.
+        
+        Args:
+            frame: OpenCV frame
+            x, y: Top-left position
+            width, height: Bar dimensions
+            progress: Fill percentage (0.0 to 1.0)
+            bg_color: Background color (BGR)
+            fill_color: Fill color (BGR)
+            border_color: Optional border color
+        """
+        progress = max(0.0, min(1.0, progress))  # Clamp to [0, 1]
+        
+        # Draw background
+        cv2.rectangle(frame, (x, y), (x + width, y + height), bg_color, -1)
+        
+        # Draw filled portion
+        if progress > 0:
+            fill_width = int(width * progress)
+            cv2.rectangle(frame, (x, y), (x + fill_width, y + height), fill_color, -1)
+        
+        # Draw border
+        if border_color:
+            cv2.rectangle(frame, (x, y), (x + width, y + height), border_color, 1)
+    
+    def _get_status_color(self, value, thresholds):
+        """
+        Get color based on value and thresholds (green/yellow/red system).
+        
+        Args:
+            value: Current value
+            thresholds: dict with 'good', 'warning' keys
+            
+        Returns:
+            BGR color tuple
+        """
+        if value >= thresholds.get('good', 30):
+            return (0, 255, 0)  # Green
+        elif value >= thresholds.get('warning', 20):
+            return (0, 255, 255)  # Yellow
+        else:
+            return (0, 0, 255)  # Red
+    
+    def check_lighting_quality(self, frame):
+        """
+        Check frame lighting quality and return warning if needed.
+        
+        Returns:
+            tuple: (quality_score, warning_message) or (score, None) if lighting is good
+        """
+        # Convert to grayscale to analyze brightness
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        avg_brightness = np.mean(gray)
+        
+        # Check contrast
+        std_brightness = np.std(gray)
+        
+        if avg_brightness < 60:
+            return (avg_brightness, "⚠️ TOO DARK - Increase lighting!")
+        elif avg_brightness > 200:
+            return (avg_brightness, "⚠️ TOO BRIGHT - Reduce glare!")
+        elif std_brightness < 30:
+            return (avg_brightness, "⚠️ LOW CONTRAST - Adjust lighting!")
+        else:
+            return (avg_brightness, None)
+    
+    def check_hand_position(self, hand_landmarks, frame_width, frame_height):
+        """
+        Check if hand is optimally positioned and provide guidance.
+        
+        Returns:
+            str or None: Warning message if hand needs repositioning
+        """
+        if not hand_landmarks:
+            return None
+        
+        # Get wrist position (landmark 0)
+        wrist = hand_landmarks.landmark[0]
+        wrist_x = wrist.x * frame_width
+        wrist_y = wrist.y * frame_height
+        
+        # Check horizontal position
+        if wrist_x < frame_width * 0.15:
+            return "[<-] Move hand RIGHT for better tracking"
+        elif wrist_x > frame_width * 0.85:
+            return "[->] Move hand LEFT for better tracking"
+        
+        # Check vertical position
+        if wrist_y < frame_height * 0.1:
+            return "[v] Move hand DOWN into center"
+        elif wrist_y > frame_height * 0.9:
+            return "[^] Move hand UP into center"
+        
+        # Check if hand is too far (small size)
+        # Calculate hand size using distance between wrist and middle finger tip
+        middle_tip = hand_landmarks.landmark[12]
+        hand_size = np.sqrt((middle_tip.x - wrist.x)**2 + (middle_tip.y - wrist.y)**2)
+        
+        # More lenient thresholds to reduce false warnings
+        if hand_size < 0.12:
+            return "[<] Move hand CLOSER to camera"
+        elif hand_size > 0.85:
+            return "[>] Move hand FURTHER from camera"
+        
+        return None
+    
     def draw_info_overlay(self, frame, gesture, hand_landmarks):
         """
-        Draw enhanced information overlay on frame.
+        Draw modern, professional HUD overlay with structured panels.
         
         Args:
             frame: OpenCV frame
@@ -2586,14 +2900,16 @@ class HandGestureControlSystem:
         """
         height, width, _ = frame.shape
         
-        # Draw hand landmarks
+        # ═══════════════════════════════════════════════════════════════════
+        # STEP 1: DRAW HAND LANDMARKS & VISUAL EFFECTS
+        # ═══════════════════════════════════════════════════════════════════
         if hand_landmarks:
             self.mp_draw.draw_landmarks(
                 frame, 
                 hand_landmarks,
                 self.mp_hands.HAND_CONNECTIONS,
-                self.mp_draw.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3),
-                self.mp_draw.DrawingSpec(color=(255, 255, 255), thickness=2)
+                self.mp_draw.DrawingSpec(color=(0, 255, 100), thickness=2, circle_radius=3),
+                self.mp_draw.DrawingSpec(color=(200, 200, 200), thickness=2)
             )
             
             # Add trail effect for index finger
@@ -2608,72 +2924,258 @@ class HandGestureControlSystem:
         if self.visual_effects:
             self.visual_effects.draw_gesture_flash(frame, gesture)
         
-        # Main info box (top-left)
-        info_height = 180 if Config.is_advanced_ui_enabled() else 120
-        cv2.rectangle(frame, (10, 10), (450, info_height), (0, 0, 0), -1)
-        cv2.rectangle(frame, (10, 10), (450, info_height), (0, 255, 0), 2)
+        # ═══════════════════════════════════════════════════════════════════
+        # STEP 2: TOP-LEFT PANEL - SYSTEM STATUS
+        # ═══════════════════════════════════════════════════════════════════
+        panel_padding = 20
+        panel_x = 15
+        panel_y = 15
+        panel_w = 280
+        panel_h = 120 if not Config.is_advanced_ui_enabled() else 160
         
-        # Display FPS with color coding and performance indicator
-        fps_color = (0, 255, 0) if self.fps >= 27 else (0, 255, 255) if self.fps >= 20 else (0, 0, 255)
-        fps_status = "⭐ Optimal" if self.fps >= 27 else "⚠️ Low" if self.fps >= 20 else "❌ Poor"
-        cv2.putText(frame, f"FPS: {self.fps:.1f} {fps_status}", (20, 40),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, fps_color, 2)
+        # Draw semi-transparent panel
+        self._draw_rounded_panel(frame, panel_x, panel_y, panel_w, panel_h, 
+                                 (20, 20, 20), alpha=0.75, 
+                                 border_color=(0, 255, 150), border_thickness=2)
         
-        # Display current gesture with color
-        # OPTIMIZATION: Use cached gesture name (avoid string operations on every frame)
+        # FPS Display (Large, prominent)
+        fps_color = self._get_status_color(self.fps, {'good': 27, 'warning': 20})
+        fps_text = f"{self.fps:.0f}"
+        
+        # Calculate FPS number width to position label correctly
+        fps_num_size = cv2.getTextSize(fps_text, cv2.FONT_HERSHEY_DUPLEX, 1.2, 2)[0]
+        
+        self._draw_text_with_shadow(frame, fps_text, panel_x + 20, panel_y + 50,
+                                    cv2.FONT_HERSHEY_DUPLEX, 1.2, fps_color, 2)
+        
+        # FPS Label (aligned right of number with consistent spacing)
+        cv2.putText(frame, "FPS", (panel_x + 25 + fps_num_size[0], panel_y + 50),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (180, 180, 180), 1, cv2.LINE_AA)
+        
+        # FPS subtitle
+        cv2.putText(frame, "TRACKING", (panel_x + 20, panel_y + 25),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (120, 120, 120), 1, cv2.LINE_AA)
+        
+        # System status (aligned below FPS)
+        if self.recognizer.hand_size_baseline:
+            status_text = "✓ CALIBRATED"
+            status_color = (0, 255, 100)
+        else:
+            status_text = "⏱ CALIBRATING..."
+            status_color = (0, 200, 255)
+        
+        cv2.putText(frame, status_text, (panel_x + 20, panel_y + 80),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, status_color, 1, cv2.LINE_AA)
+        
+        # Subtitle
+        cv2.putText(frame, "Real-time detection", (panel_x + 20, panel_y + 68),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.35, (100, 100, 100), 1, cv2.LINE_AA)
+        
+        # Action counter (advanced UI only) - aligned properly
+        if Config.is_advanced_ui_enabled() and self.history:
+            stats = self.history.get_session_stats()
+            actions_text = f"{stats['total_actions']} actions"
+            cv2.putText(frame, actions_text, (panel_x + 20, panel_y + 110),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1, cv2.LINE_AA)
+            
+            rate_text = f"{stats['actions_per_minute']:.1f}/min"
+            cv2.putText(frame, rate_text, (panel_x + 20, panel_y + 130),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1, cv2.LINE_AA)
+        
+        # ═══════════════════════════════════════════════════════════════════
+        # STEP 3: TOP-RIGHT PANEL - DETECTION MODE & VOICE
+        # ═══════════════════════════════════════════════════════════════════
+        mode_panel_w = 200
+        mode_panel_x = width - mode_panel_w - 15
+        mode_panel_y = 15
+        mode_panel_h = 90
+        
+        self._draw_rounded_panel(frame, mode_panel_x, mode_panel_y, mode_panel_w, mode_panel_h,
+                                 (20, 20, 20), alpha=0.75,
+                                 border_color=(100, 100, 100), border_thickness=1)
+        
+        # Detection mode label
+        cv2.putText(frame, "MODE", (mode_panel_x + 15, mode_panel_y + 25),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (120, 120, 120), 1, cv2.LINE_AA)
+        
+        # Detection mode value
+        if self.recognizer.cnn_enabled and self.recognizer.cnn_classifier:
+            mode_text = "CNN"
+            mode_color = (255, 200, 0)
+        else:
+            mode_text = "RULE-BASED"
+            mode_color = (120, 120, 120)
+        
+        cv2.putText(frame, mode_text, (mode_panel_x + 15, mode_panel_y + 45),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, mode_color, 1, cv2.LINE_AA)
+        
+        # Voice status
+        if self.voice_controller:
+            cv2.putText(frame, "VOICE", (mode_panel_x + 15, mode_panel_y + 63),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (120, 120, 120), 1, cv2.LINE_AA)
+            
+            if self.voice_controller.is_listening:
+                blink = int(time.time() * 3) % 2
+                voice_color = (0, 255, 100) if blink else (0, 200, 80)
+                voice_text = "🎤 ON"
+            else:
+                voice_color = (100, 100, 100)
+                voice_text = "🔇 OFF"
+            
+            cv2.putText(frame, voice_text, (mode_panel_x + 15, mode_panel_y + 80),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, voice_color, 1, cv2.LINE_AA)
+        
+        # ═══════════════════════════════════════════════════════════════════
+        # STEP 4: CENTER-TOP - CURRENT GESTURE (PROMINENT DISPLAY)
+        # ═══════════════════════════════════════════════════════════════════
         gesture_name = self._gesture_name_cache.get(gesture, "NONE")
-        gesture_color = self.visual_effects.color_map.get(gesture, (0, 255, 0)) if self.visual_effects else (0, 255, 0)
-        cv2.putText(frame, f"Gesture: {gesture_name}", (20, 75),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, gesture_color, 2)
+        gesture_color = self.visual_effects.color_map.get(gesture, (100, 100, 100)) if self.visual_effects else (100, 100, 100)
         
-        # Display buffer status
+        # Calculate center position for gesture text
+        gesture_font_scale = 1.4
+        gesture_text_size = cv2.getTextSize(gesture_name, cv2.FONT_HERSHEY_DUPLEX, gesture_font_scale, 3)[0]
+        gesture_x = (width - gesture_text_size[0]) // 2
+        gesture_y = 65
+        
+        # Draw gesture panel
+        gesture_panel_padding = 25
+        self._draw_rounded_panel(frame, 
+                                 gesture_x - gesture_panel_padding, 
+                                 gesture_y - 45,
+                                 gesture_text_size[0] + gesture_panel_padding * 2,
+                                 70,
+                                 (15, 15, 15), alpha=0.8,
+                                 border_color=gesture_color, border_thickness=2)
+        
+        # Draw gesture text
+        self._draw_text_with_shadow(frame, gesture_name, gesture_x, gesture_y,
+                                    cv2.FONT_HERSHEY_DUPLEX, gesture_font_scale, gesture_color, 3, shadow_offset=3)
+        
+        # ═══════════════════════════════════════════════════════════════════
+        # STEP 5: BOTTOM PANEL - BUFFER PROGRESS BAR
+        # ═══════════════════════════════════════════════════════════════════
+        buffer_panel_y = height - 90
+        buffer_panel_h = 50
+        buffer_panel_x = 15
+        buffer_panel_w = width - 30
+        
+        self._draw_rounded_panel(frame, buffer_panel_x, buffer_panel_y, buffer_panel_w, buffer_panel_h,
+                                 (15, 15, 15), alpha=0.7,
+                                 border_color=(80, 80, 80), border_thickness=1)
+        
+        # Buffer progress bar
         buffer_maxlen = self.stabilizer.buffer.maxlen if self.stabilizer.buffer.maxlen is not None else Config.GESTURE_BUFFER_SIZE
         buffer_fill = len(self.stabilizer.buffer) / buffer_maxlen
-        buffer_text = f"Buffer: {len(self.stabilizer.buffer)}/{buffer_maxlen}"
-        cv2.putText(frame, buffer_text, (20, 105),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
         
-        # PHASE 4: Display CNN recognition status
-        cnn_status_y = 135 if not Config.is_advanced_ui_enabled() else 165
-        if self.recognizer.cnn_enabled and self.recognizer.cnn_classifier:
-            cnn_color = (0, 255, 255)  # Cyan for CNN active
-            cv2.putText(frame, "CNN: ON", (320, 40),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, cnn_color, 2)
+        progress_bar_x = buffer_panel_x + 110
+        progress_bar_y = buffer_panel_y + 20
+        progress_bar_w = buffer_panel_w - 180
+        progress_bar_h = 18
+        
+        # Label
+        cv2.putText(frame, "BUFFER", (buffer_panel_x + 20, buffer_panel_y + 30),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (180, 180, 180), 1, cv2.LINE_AA)
+        
+        # Progress bar with gradient effect
+        if buffer_fill < 0.5:
+            bar_color = (0, 100, 255)  # Red-ish when low
+        elif buffer_fill < 0.8:
+            bar_color = (0, 200, 255)  # Yellow when medium
         else:
-            cv2.putText(frame, "Rule-based", (320, 40),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
+            bar_color = (0, 255, 150)  # Green when full
         
-        if Config.is_advanced_ui_enabled():
-            # Display session stats
-            if self.history:
-                stats = self.history.get_session_stats()
-                actions_text = f"Actions: {stats['total_actions']} ({stats['actions_per_minute']:.1f}/min)"
-                cv2.putText(frame, actions_text, (20, 135),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1)
+        self._draw_progress_bar(frame, progress_bar_x, progress_bar_y, 
+                                progress_bar_w, progress_bar_h,
+                                buffer_fill,
+                                bg_color=(40, 40, 40),
+                                fill_color=bar_color,
+                                border_color=(100, 100, 100))
+        
+        # Buffer count text
+        buffer_text = f"{len(self.stabilizer.buffer)}/{buffer_maxlen}"
+        cv2.putText(frame, buffer_text, (progress_bar_x + progress_bar_w + 15, progress_bar_y + 14),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1, cv2.LINE_AA)
+        
+        # ═══════════════════════════════════════════════════════════════════
+        # STEP 6: WARNINGS & GUIDANCE (TOP CENTER - DYNAMIC)
+        # ═══════════════════════════════════════════════════════════════════
+        warning_y_offset = 150
+        
+        # Lighting warnings
+        brightness, lighting_warning = self.check_lighting_quality(frame)
+        if lighting_warning:
+            text_size = cv2.getTextSize(lighting_warning, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
+            warning_x = (width - text_size[0]) // 2
+            
+            self._draw_rounded_panel(frame, warning_x - 15, warning_y_offset - 30,
+                                     text_size[0] + 30, 45,
+                                     (0, 0, 180), alpha=0.85,
+                                     border_color=(0, 0, 255), border_thickness=2)
+            
+            cv2.putText(frame, lighting_warning, (warning_x, warning_y_offset),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
+            
+            warning_y_offset += 60
+        
+        # Hand positioning guidance
+        if hand_landmarks:
+            position_warning = self.check_hand_position(hand_landmarks, width, height)
+            if position_warning:
+                text_size = cv2.getTextSize(position_warning, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
+                warning_x = (width - text_size[0]) // 2
                 
-                # Auto-calibration status
-                if self.recognizer.hand_size_baseline:
-                    cv2.putText(frame, "✓ Calibrated", (20, 165),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                self._draw_rounded_panel(frame, warning_x - 15, warning_y_offset - 30,
+                                         text_size[0] + 30, 45,
+                                         (20, 100, 200), alpha=0.85,
+                                         border_color=(0, 165, 255), border_thickness=2)
+                
+                cv2.putText(frame, position_warning, (warning_x, warning_y_offset),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
         
-        # Gesture hints (bottom)
+        # ═══════════════════════════════════════════════════════════════════
+        # STEP 7: ADVANCED UI - TEMPORAL PERSISTENCE & HINTS
+        # ═══════════════════════════════════════════════════════════════════
         if Config.is_advanced_ui_enabled():
-            hint_y = height - 100
-            cv2.rectangle(frame, (10, hint_y), (width - 10, height - 10), (0, 0, 0), -1)
-            
-            hints = [
-                "Palm: Scroll | Fist: Up | Index: Move | Peace: Click | Swipe: Nav",
-                "3 Fingers: Screenshot | 4 Fingers: Refresh | Thumb: Zoom",
-                "Press 'q' to quit | 's' for stats | 'h' to hide UI | 'c' to toggle CNN"
-            ]
-            
-            for i, hint in enumerate(hints):
-                cv2.putText(frame, hint, (20, hint_y + 25 + i*20),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-        else:
-            # Simple quit instruction
-            cv2.putText(frame, "Press 'q' to quit | 's' for stats | 'c' to toggle CNN", (20, height - 20),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+            # Temporal Persistence status (bottom-right corner)
+            if TEMPORAL_PERSISTENCE_AVAILABLE and self.temporal_smoother:
+                tp_panel_w = 250
+                tp_panel_h = 50
+                tp_panel_x = width - tp_panel_w - 15
+                tp_panel_y = height - tp_panel_h - 100  # Raised higher to avoid buffer bar
+                
+                self._draw_rounded_panel(frame, tp_panel_x, tp_panel_y, tp_panel_w, tp_panel_h,
+                                         (0, 30, 0), alpha=0.75,
+                                         border_color=(0, 200, 100), border_thickness=1)
+                
+                conf_text = "TEMPORAL: ON"
+                if hasattr(self, 'confidence_scorer') and self.confidence_scorer and hasattr(self, '_last_confidence'):
+                    conf_text += f" | {self._last_confidence:.2f}"
+                
+                cv2.putText(frame, conf_text, (tp_panel_x + 15, tp_panel_y + 25),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 120), 1, cv2.LINE_AA)
+                
+                if self.frame_history:
+                    stability = self.frame_history.gesture_stability_score()
+                    cv2.putText(frame, f"Stability: {stability:.0%}", (tp_panel_x + 15, tp_panel_y + 42),
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.35, (100, 200, 100), 1, cv2.LINE_AA)
+        
+        # ═══════════════════════════════════════════════════════════════════
+        # STEP 8: KEYBOARD SHORTCUTS (BOTTOM - MINIMAL)
+        # ═══════════════════════════════════════════════════════════════════
+        shortcuts_y = height - 25
+        shortcuts_text = "Q: Quit  |  S: Stats  |  C: Toggle CNN  |  V: Toggle Voice  |  H: Hide UI"
+        text_size = cv2.getTextSize(shortcuts_text, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)[0]
+        shortcuts_x = (width - text_size[0]) // 2
+        
+        # Semi-transparent background
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (shortcuts_x - 10, shortcuts_y - 18), 
+                     (shortcuts_x + text_size[0] + 10, shortcuts_y + 5),
+                     (0, 0, 0), -1)
+        cv2.addWeighted(overlay, 0.6, frame, 0.4, 0, frame)
+        
+        cv2.putText(frame, shortcuts_text, (shortcuts_x, shortcuts_y),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 255, 255), 1, cv2.LINE_AA)
         
         return frame
     
@@ -2699,7 +3201,7 @@ class HandGestureControlSystem:
             5. Execute browser control action
             6. Display visual feedback
         """
-        print("[STARTING] Starting video capture...\n")
+        print("\n[STARTING] Starting video capture...\n")
         
         # STABILITY: Camera retry logic for robustness
         max_retries = 3
@@ -2737,23 +3239,79 @@ class HandGestureControlSystem:
                 if results.multi_hand_landmarks:
                     hand_landmarks = results.multi_hand_landmarks[0]
                     
-                    # NEW: Advanced landmark smoothing for ultra-stable tracking
-                    if self.landmark_smoother is not None:
-                        # Apply smoothing to all 21 landmarks
-                        smoothed_landmarks = self.landmark_smoother.smooth_landmarks(
-                            hand_landmarks.landmark
-                        )
+                    # =================================================================
+                    # TEMPORAL PERSISTENCE PIPELINE (Production-Grade)
+                    # =================================================================
+                    if TEMPORAL_PERSISTENCE_AVAILABLE and hasattr(self, 'temporal_smoother') and self.temporal_smoother:
+                        # Step 1: Temporal landmark smoothing (EMA filtering)
+                        smoothed_landmarks_array = self.temporal_smoother.update(hand_landmarks.landmark)
+                        
+                        # Step 2: Calculate gesture confidence (variance-based)
+                        gesture_confidence = 0.0
+                        if hasattr(self, 'confidence_scorer') and self.confidence_scorer:
+                            gesture_confidence = self.confidence_scorer.update(smoothed_landmarks_array)
+                            self._last_confidence = gesture_confidence  # Store for display
+                        
+                        # Step 3: Motion gate check (block during fast movement)
+                        hand_is_still = True
+                        if hasattr(self, 'motion_gate') and self.motion_gate:
+                            hand_is_still = self.motion_gate.update(smoothed_landmarks_array)
+                        
+                        # Step 4: Gesture recognition (only if motion gate allows)
+                        raw_gesture_name = None
+                        if hand_is_still and gesture_confidence >= 0.40:
+                            # Use existing gesture recognizer
+                            current_gesture = self.recognizer.recognize_gesture_hybrid(hand_landmarks, frame) \
+                                if Config.ENABLE_CNN_CLASSIFIER else \
+                                self.recognizer.recognize_gesture(hand_landmarks)
+                            
+                            if current_gesture != GestureType.NONE:
+                                raw_gesture_name = current_gesture.name
+                        
+                        # Step 5: Hysteresis filtering (prevent rapid toggles)
+                        stable_gesture = raw_gesture_name
+                        if hasattr(self, 'gesture_hysteresis') and self.gesture_hysteresis:
+                            stable_gesture = self.gesture_hysteresis.update(raw_gesture_name)
+                        
+                        # Step 6: Temporal validation (multi-frame confirmation)
+                        confirmed_gesture = stable_gesture
+                        if hasattr(self, 'temporal_validator') and self.temporal_validator:
+                            confirmed_gesture = self.temporal_validator.update(stable_gesture)
+                        
+                        # Step 7: Record to frame history
+                        if hasattr(self, 'frame_history') and self.frame_history:
+                            self.frame_history.record(raw_gesture_name, gesture_confidence, smoothed_landmarks_array)
+                        
+                        # Step 8: Update temporal state machine
+                        # Note: We'll use the existing stabilizer for now to maintain compatibility
+                        if confirmed_gesture:
+                            # Convert back to GestureType enum
+                            try:
+                                current_gesture = GestureType[confirmed_gesture]
+                            except KeyError:
+                                current_gesture = GestureType.NONE
+                        else:
+                            current_gesture = GestureType.NONE
                     
-                    # PERFORMANCE IMPROVEMENT: Legacy smoothing pipeline (if available)
-                    # Reduces hand tremor, improves pointer stability and swipe consistency
-                    if self.recognizer.smoothing_pipeline is not None:
-                        # Smooth coordinates (additional layer for extra stability)
-                        self.recognizer.smoothing_pipeline.smooth_landmarks(
-                            hand_landmarks.landmark
-                        )
-                    
-                    # PHASE 4: Hybrid CNN + Rule-based Recognition with temporal voting
-                    current_gesture = self.recognizer.recognize_gesture_hybrid(hand_landmarks, frame)
+                    else:
+                        # Fallback: Original gesture recognition pipeline
+                        # NEW: Advanced landmark smoothing for ultra-stable tracking
+                        if self.landmark_smoother is not None:
+                            # Apply smoothing to all 21 landmarks
+                            smoothed_landmarks = self.landmark_smoother.smooth_landmarks(
+                                hand_landmarks.landmark
+                            )
+                        
+                        # PERFORMANCE IMPROVEMENT: Legacy smoothing pipeline (if available)
+                        # Reduces hand tremor, improves pointer stability and swipe consistency
+                        if self.recognizer.smoothing_pipeline is not None:
+                            # Smooth coordinates (additional layer for extra stability)
+                            self.recognizer.smoothing_pipeline.smooth_landmarks(
+                                hand_landmarks.landmark
+                            )
+                        
+                        # PHASE 4: Hybrid CNN + Rule-based Recognition with temporal voting
+                        current_gesture = self.recognizer.recognize_gesture_hybrid(hand_landmarks, frame)
                 
                 # STATE MACHINE: Update with current detection (enforces NONE→CANDIDATE→CONFIRMED→COOLDOWN)
                 current_time = time.time()
@@ -2845,14 +3403,16 @@ class HandGestureControlSystem:
                     else:
                         print("WARNING: CNN module not available - using rule-based recognition only")
                 elif key == ord('v'):
-                    # NEW: Toggle voice control on/off
-                    if self.voice_controller and hasattr(self.voice_controller, 'available') and self.voice_controller.available:
-                        if hasattr(self.voice_controller, 'is_listening') and self.voice_controller.is_listening:
+                    # Toggle voice control on/off
+                    if self.voice_controller:
+                        if self.voice_controller.is_listening:
                             self.voice_controller.stop_listening()
                             print("[VOICE] 🔇 Voice control disabled")
                         else:
                             if self.voice_controller.start_listening():
                                 print("[VOICE] 🎤 Voice control enabled")
+                            else:
+                                print("[VOICE] ⚠️  Failed to start voice control")
                     else:
                         print("[VOICE] ⚠️  Voice control not available")
         
@@ -2906,7 +3466,11 @@ class HandGestureControlSystem:
             if not command_data:
                 break
             
-            command, phrase = command_data
+            # Extract command and phrase from tuple
+            if isinstance(command_data, tuple) and len(command_data) == 2:
+                command, phrase = command_data  # type: ignore
+            else:
+                continue
             
             # Check if command is enabled in config
             if command in Config.VOICE_COMMANDS_ENABLED and not Config.VOICE_COMMANDS_ENABLED[command]:

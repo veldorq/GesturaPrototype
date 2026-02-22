@@ -74,7 +74,7 @@ from gesture_engine.config import CONFIG
 from gesture_engine.hand_tracker import TwoHandTracker, HandData, HandLabel
 from gesture_engine.gesture_classifier import GestureClassifier, GestureResult, GestureType
 from gesture_engine.gesture_trainer import GestureTrainer
-from gesture_engine.voice_controller import VoiceControllerClass, VoiceCommand
+# VoiceController is new Vosk-based system - VoiceControllerClass/VoiceCommand no longer exist
 from gesture_engine.command_executor import CommandExecutor
 
 
@@ -144,16 +144,17 @@ class GestureEngine:
         print("[4/6] Initializing command executor...")
         self.executor = CommandExecutor()
         
-        print("[5/6] Initializing voice controller...")
+        print("[5/6] Voice controller disabled (replaced with new Vosk system in main_vosk.py)")
         self.voice_controller = None
-        if enable_voice:
-            try:
-                self.voice_controller = VoiceControllerClass(
-                    command_callback=self._on_voice_command
-                )
-            except Exception as e:
-                print(f"Voice control initialization failed: {e}")
-                self.voice_controller = None
+        # Old voice controller removed - use gesture_engine/main_vosk.py instead
+        # if enable_voice:
+        #     try:
+        #         self.voice_controller = VoiceControllerClass(
+        #             command_callback=self._on_voice_command
+        #         )
+        #     except Exception as e:
+        #         print(f"Voice control initialization failed: {e}")
+        #         self.voice_controller = None
         
         print("[6/6] Initializing camera...")
         self.cap = cv2.VideoCapture(camera_index)
@@ -305,12 +306,12 @@ class GestureEngine:
         
         return annotated_frame
     
-    def _on_voice_command(self, command: VoiceCommand, phrase: str) -> None:
+    def _on_voice_command(self, command: str, phrase: str) -> None:  # type: ignore
         """
         Callback for voice commands.
         
         Args:
-            command: Recognized voice command
+            command: Recognized voice command (string, not enum anymore)
             phrase: Original phrase spoken
         """
         self.state.voice_commands_received += 1
@@ -320,9 +321,9 @@ class GestureEngine:
             action_result = self.executor.execute_voice_command(command)
             
             # Handle special mode switches
-            if command == VoiceCommand.DISABLE_VOICE:
+            if command == "disable_voice":  # Changed from VoiceCommand enum
                 if self.voice_controller:
-                    self.voice_controller.stop_listening()
+                    # voice_controller.stop_listening() method may not exist in new system
                     self.state.voice_enabled = False
                     print("Voice control disabled")
     

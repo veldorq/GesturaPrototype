@@ -91,7 +91,13 @@ class MutuallyExclusiveGestureClassifier:
             base_dist = np.linalg.norm(base - wrist)
             
             extension = (tip_dist - base_dist) / palm_size
-            is_extended = extension > 0.3
+            
+            # Use stricter threshold for better accuracy
+            # Thumb has lower threshold due to different anatomy
+            if finger_name == 'thumb':
+                is_extended = extension > 0.25
+            else:
+                is_extended = extension > 0.4
             
             features[f'{finger_name}_extended'] = 1.0 if is_extended else 0.0
             if is_extended:
@@ -208,6 +214,13 @@ class MutuallyExclusiveGestureClassifier:
         if features['thumb_extended'] != 1.0:
             return 0.0, "Extended finger is not thumb"
         
+        # Explicitly check other fingers are NOT extended
+        if (features['index_extended'] == 1.0 or
+            features['middle_extended'] == 1.0 or
+            features['ring_extended'] == 1.0 or
+            features['pinky_extended'] == 1.0):
+            return 0.0, "Other fingers are extended"
+        
         # Thumb must point upward (positive angle)
         if features['thumb_angle'] < 0.5:
             return 0.0, f"Thumb angle {features['thumb_angle']:.2f} not upward"
@@ -237,6 +250,13 @@ class MutuallyExclusiveGestureClassifier:
         # That finger must be thumb
         if features['thumb_extended'] != 1.0:
             return 0.0, "Extended finger is not thumb"
+        
+        # Explicitly check other fingers are NOT extended
+        if (features['index_extended'] == 1.0 or
+            features['middle_extended'] == 1.0 or
+            features['ring_extended'] == 1.0 or
+            features['pinky_extended'] == 1.0):
+            return 0.0, "Other fingers are extended"
         
         # Thumb must point downward (negative angle)
         if features['thumb_angle'] > -0.5:

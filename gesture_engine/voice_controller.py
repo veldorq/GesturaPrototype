@@ -1,364 +1,204 @@
 """
-Voice Control Module
+Voice Controller - Vosk-Based Offline Speech Recognition
 
-Integrates voice command recognition with gesture control system.
-Supports offline speech recognition using speech_recognition library.
+Handles microphone input, Vosk speech recognition, and command dispatch.
+Runs entirely in a background daemon thread — never blocks main thread.
 
 Author: Gestura Development Team
-Version: 2.0.0
+Version: 3.0.0 (Vosk-based)
 """
 
+import json
 import threading
 import queue
-import time
-from typing import Optional, Callable, Dict, Any
-from enum import Enum
 
 try:
-    import speech_recognition as sr
-    SPEECH_RECOGNITION_AVAILABLE = True
+    import sounddevice as sd  # type: ignore
+    SOUNDDEVICE_AVAILABLE = True
 except ImportError:
-    SPEECH_RECOGNITION_AVAILABLE = False
-    print("Warning: speech_recognition not installed. Voice control disabled.")
+    SOUNDDEVICE_AVAILABLE = False
+    print("[Voice] Warning: sounddevice not installed. Install with: pip install sounddevice")
 
-from gesture_engine.config import CONFIG
+try:
+    from vosk import Model, KaldiRecognizer  # type: ignore
+    VOSK_AVAILABLE = True
+except ImportError:
+    VOSK_AVAILABLE = False
+    print("[Voice] Warning: vosk not installed. Install with: pip install vosk")
 
-
-class VoiceCommand(Enum):
-    """Recognized voice commands."""
-    ENABLE_SCROLL = "enable_scroll"
-    ENABLE_NAVIGATION = "enable_navigation"
-    DISABLE_VOICE = "disable_voice"
-    MOUSE_CLICK = "mouse_click"
-    MOUSE_DOUBLE_CLICK = "mouse_double_click"
-    BROWSER_BACK = "browser_back"
-    BROWSER_FORWARD = "browser_forward"
-    BROWSER_NEW_TAB = "browser_new_tab"
-    BROWSER_CLOSE_TAB = "browser_close_tab"
-    UNKNOWN = "unknown"
+from gesture_engine import config
+from gesture_engine.voice_commands import dispatch
 
 
 class VoiceController:
     """
-    Voice command recognition and processing.
+    Continuously listens via microphone, recognises speech using Vosk (offline),
+    and dispatches matched commands via voice_commands.dispatch().
     
     Features:
-    - Continuous background listening
-    - Configurable command vocabulary
-    - Timeout handling
-    - Thread-safe command queue
-    - Voice-triggered mode switching
+    - Offline speech recognition (no internet required)
+    - Non-blocking background thread
+    - Thread-safe command execution
+    - Graceful error handling
     """
-    
-    def __init__(self, command_callback: Optional[Callable] = None):
-        """
-        Initialize voice controller.
+
+    def __init__(self):
+        """Initialize voice controller with Vosk model."""
+        if not VOSK_AVAILABLE:
+            raise RuntimeError(
+                "[Voice] Vosk not available. Install with: pip install vosk\n"
+                "Download model from: https://alphacephei.com/vosk/models"
+            )
         
-        Args:
-            command_callback: Function called when command recognized
-                             Signature: callback(command: VoiceCommand, phrase: str)
-        """
-        if not SPEECH_RECOGNITION_AVAILABLE:
-            raise RuntimeError("speech_recognition library not available")
+        if not SOUNDDEVICE_AVAILABLE:
+            raise RuntimeError(
+                "[Voice] sounddevice not available. Install with: pip install sounddevice"
+            )
         
-        self.config = CONFIG.voice
-        self.command_callback = command_callback
+        self._audio_queue: queue.Queue = queue.Queue()
+        self._thread: Optional[threading.Thread] = None  # type: ignore
+        self._model: Optional[Any] = None  # type: ignore  # Model class from vosk
         
-        # Speech recognizer
-        self.recognizer = sr.Recognizer()  # type: ignore
-        self.recognizer.energy_threshold = self.config.energy_threshold
-        self.recognizer.pause_threshold = self.config.pause_threshold
-        
-        # Microphone
-        self.microphone: Optional[sr.Microphone] = None  # type: ignore
-        
-        # Command mapping (phrase -> command)
-        self.command_map: Dict[str, VoiceCommand] = {}
-        self._load_command_map()
-        
-        # Listening state
-        self.is_listening = False
-        self.listen_thread: Optional[threading.Thread] = None
-        self.command_queue: queue.Queue = queue.Queue()
-        
-        # Statistics
-        self.commands_recognized = 0
-        self.last_command_time = 0.0
-    
-    def _load_command_map(self) -> None:
-        """Load command phrases from configuration."""
-        for phrase, action in self.config.voice_commands.items():
-            try:
-                command = VoiceCommand(action)
-                self.command_map[phrase.lower()] = command
-            except ValueError:
-                print(f"Warning: Unknown voice command action: {action}")
-    
-    def start_listening(self) -> bool:
-        """
-        Start background voice listening thread.
-        
-        Returns:
-            True if started successfully, False otherwise
-        """
-        if self.is_listening:
-            print("Already listening")
-            return False
-        
-        # Initialize microphone
+        print("[Voice] Loading Vosk model...")
         try:
-            self.microphone = sr.Microphone()  # type: ignore
-            with self.microphone as source:
-                print("Calibrating microphone for ambient noise...")
-                self.recognizer.adjust_for_ambient_noise(source, duration=1)
-            print("Microphone ready")
+            self._model = Model(config.VOSK_MODEL_PATH)  # type: ignore
+            print("[Voice] ✅ Vosk model loaded successfully")
         except Exception as e:
-            print(f"Failed to initialize microphone: {e}")
-            return False
-        
-        # Start listening thread
-        self.is_listening = True
-        self.listen_thread = threading.Thread(target=self._listen_loop, daemon=True)
-        self.listen_thread.start()
-        
-        print("Voice listening started")
-        return True
-    
-    def stop_listening(self) -> None:
-        """Stop background voice listening."""
-        self.is_listening = False
-        if self.listen_thread:
-            self.listen_thread.join(timeout=2.0)
-        print("Voice listening stopped")
-    
-    def _listen_loop(self) -> None:
-        """Background listening loop (runs in separate thread)."""
-        if not self.microphone:
-            print("Error: Microphone not initialized")
+            raise RuntimeError(
+                f"[Voice] Failed to load Vosk model at '{config.VOSK_MODEL_PATH}'.\n"
+                f"Download it from https://alphacephei.com/vosk/models\n"
+                f"Recommended: vosk-model-small-en-us-0.15 (40 MB)\n"
+                f"Original error: {e}"
+            )
+
+    # ── Public API ────────────────────────────────────────────────────────────
+
+    def start(self) -> None:
+        """Start the background listening thread."""
+        if self._thread and self._thread.is_alive():
+            print("[Voice] Already listening")
             return
         
-        while self.is_listening:
-            try:
-                # Listen for audio
-                with self.microphone as source:
-                    print("Listening for command...")
-                    audio = self.recognizer.listen(
-                        source,
-                        timeout=self.config.timeout_seconds,
-                        phrase_time_limit=5.0
-                    )
-                
-                # Recognize speech
-                try:
-                    # Use Google Speech Recognition (free, online)
-                    text = self.recognizer.recognize_google(  # type: ignore
-                        audio,
-                        language=self.config.language
-                    )
-                    
-                    print(f"Heard: '{text}'")
-                    
-                    # Process command
-                    self._process_phrase(text)
-                
-                except sr.UnknownValueError:  # type: ignore
-                    print("Could not understand audio")
-                except sr.RequestError as e:  # type: ignore
-                    print(f"Recognition service error: {e}")
-            
-            except sr.WaitTimeoutError:  # type: ignore
-                # No speech detected, continue listening
-                continue
-            except Exception as e:
-                print(f"Listening error: {e}")
-                time.sleep(1)
-    
-    def _process_phrase(self, phrase: str) -> None:
+        self._thread = threading.Thread(
+            target=self._listen_loop,
+            name="VoiceControllerThread",
+            daemon=True,   # Exits automatically when main thread exits
+        )
+        self._thread.start()
+        print("[Voice] 🎤 Listening started (Vosk offline recognition)")
+
+    def stop(self) -> None:
+        """Signal the listening loop to stop (config.running handles this)."""
+        print("[Voice] Stopping listener...")
+        with config.state_lock:
+            config.running = False
+
+    def is_running(self) -> bool:
+        """Check if voice controller is actively listening."""
+        return self._thread is not None and self._thread.is_alive()
+
+    # ── Internal ──────────────────────────────────────────────────────────────
+
+    def _audio_callback(
+        self,
+        indata,
+        frames: int,
+        time,
+        status,
+    ) -> None:
         """
-        Process recognized phrase and extract command.
-        
-        Args:
-            phrase: Recognized text from speech
+        Called by sounddevice on each audio block.
+        Puts raw bytes into the queue for the recognition loop to consume.
         """
-        phrase_lower = phrase.lower().strip()
-        
-        # Match against command map
-        command = VoiceCommand.UNKNOWN
-        matched_phrase = None
-        
-        for cmd_phrase, cmd in self.command_map.items():
-            if cmd_phrase in phrase_lower:
-                command = cmd
-                matched_phrase = cmd_phrase
-                break
-        
-        if command != VoiceCommand.UNKNOWN:
-            # Add to queue
-            self.command_queue.put((command, phrase))
-            self.commands_recognized += 1
-            self.last_command_time = time.time()
-            
-            print(f"Command recognized: {command.value}")
-            
-            # Call callback if provided
-            if self.command_callback:
-                try:
-                    self.command_callback(command, phrase)
-                except Exception as e:
-                    print(f"Callback error: {e}")
-        else:
-            print(f"No matching command for: '{phrase}'")
-    
-    def get_command(self, timeout: float = 0.0) -> Optional[tuple]:
+        if status:
+            # Log device warnings without crashing
+            print(f"[Voice] Audio status: {status}")
+        self._audio_queue.put(bytes(indata))
+
+    def _listen_loop(self) -> None:
         """
-        Get next command from queue.
-        
-        Args:
-            timeout: Maximum time to wait (0 = non-blocking)
-            
-        Returns:
-            Tuple of (VoiceCommand, original_phrase) or None
+        Main recognition loop. Runs in background thread.
+        Reads audio blocks from the queue and feeds them to Vosk.
         """
+        recogniser = KaldiRecognizer(self._model, config.SAMPLE_RATE)  # type: ignore
+        
+        print("[Voice] Initializing microphone stream...")
+
         try:
-            if timeout > 0:
-                return self.command_queue.get(timeout=timeout)
-            else:
-                return self.command_queue.get_nowait()
-        except queue.Empty:
-            return None
-    
-    def has_pending_commands(self) -> bool:
-        """Check if commands are waiting in queue."""
-        return not self.command_queue.empty()
-    
-    def clear_command_queue(self) -> None:
-        """Clear all pending commands."""
-        while not self.command_queue.empty():
-            try:
-                self.command_queue.get_nowait()
-            except queue.Empty:
-                break
-    
-    def add_custom_command(self, phrase: str, command: VoiceCommand) -> None:
-        """
-        Add custom voice command at runtime.
-        
-        Args:
-            phrase: Voice phrase to recognize
-            command: Command to trigger
-        """
-        self.command_map[phrase.lower()] = command
-        print(f"Added custom command: '{phrase}' -> {command.value}")
-    
-    def remove_custom_command(self, phrase: str) -> bool:
-        """
-        Remove custom voice command.
-        
-        Args:
-            phrase: Voice phrase to remove
-            
-        Returns:
-            True if removed, False if not found
-        """
-        phrase_lower = phrase.lower()
-        if phrase_lower in self.command_map:
-            del self.command_map[phrase_lower]
-            print(f"Removed command: '{phrase}'")
-            return True
-        return False
-    
-    def list_commands(self) -> Dict[str, str]:
-        """Get all registered voice commands."""
-        return {phrase: cmd.value for phrase, cmd in self.command_map.items()}
-    
-    def get_statistics(self) -> Dict[str, Any]:
-        """Get voice controller statistics."""
-        return {
-            "is_listening": self.is_listening,
-            "commands_recognized": self.commands_recognized,
-            "pending_commands": self.command_queue.qsize(),
-            "last_command_time": self.last_command_time,
-            "registered_commands": len(self.command_map)
-        }
+            with sd.RawInputStream(  # type: ignore
+                samplerate=config.SAMPLE_RATE,
+                blocksize=config.AUDIO_BLOCK_SIZE,
+                dtype="int16",
+                channels=1,
+                callback=self._audio_callback,
+            ):
+                print("[Voice] ✅ Microphone stream open. Listening for commands...")
+                
+                while config.running:
+                    try:
+                        # Block briefly to avoid burning CPU, then check config.running
+                        audio_block = self._audio_queue.get(timeout=0.5)
+                    except queue.Empty:
+                        continue
 
+                    if recogniser.AcceptWaveform(audio_block):
+                        # Complete phrase recognized
+                        result = json.loads(recogniser.Result())
+                        text = result.get("text", "").strip()
 
-# Fallback implementation when speech_recognition not available
-class VoiceControllerStub:
-    """Stub implementation when voice control dependencies not available."""
-    
-    def __init__(self, command_callback: Optional[Callable] = None):
-        print("Voice control disabled (dependencies not installed)")
-        self.is_listening = False
-    
-    def start_listening(self) -> bool:
-        print("Voice control not available")
-        return False
-    
-    def stop_listening(self) -> None:
-        pass
-    
-    def get_command(self, timeout: float = 0.0) -> Optional[tuple]:
-        return None
-    
-    def has_pending_commands(self) -> bool:
-        return False
-    
-    def clear_command_queue(self) -> None:
-        pass
-    
-    def list_commands(self) -> Dict[str, str]:
-        return {}
-    
-    def get_statistics(self) -> Dict[str, Any]:
-        return {"is_listening": False, "error": "Not available"}
+                        if text:
+                            print(f"[Voice] 🎤 Heard: '{text}'")
+                            matched = dispatch(text)
+                            if not matched:
+                                # Unrecognised — log once, don't spam
+                                print(f"[Voice] ⚠️  No command matched for: '{text}'")
+                    else:
+                        # Partial result (ongoing speech)
+                        partial = json.loads(recogniser.PartialResult())
+                        partial_text = partial.get("partial", "").strip()
+                        if partial_text:
+                            # Optional: show partial results for debugging
+                            # print(f"[Voice] Partial: '{partial_text}'", end='\r')
+                            pass
 
+                print("[Voice] Listen loop exited normally")
 
-# Export appropriate class based on availability
-if SPEECH_RECOGNITION_AVAILABLE:
-    VoiceControllerClass = VoiceController
-else:
-    VoiceControllerClass = VoiceControllerStub
+        except Exception as e:  # type: ignore  # catches all errors including sd.PortAudioError
+            print(f"[Voice] ❌ Microphone error: {e}")
+            print("[Voice] Possible causes:")
+            print("  - Microphone not connected")
+            print("  - Microphone permissions denied")
+            print("  - Another application is using the microphone")
+            import traceback
+            traceback.print_exc()
+        finally:
+            print("[Voice] Microphone stream closed")
 
 
 if __name__ == "__main__":
-    # Test voice controller
-    print("Voice Controller Test")
-    print("=" * 50)
-    
-    if not SPEECH_RECOGNITION_AVAILABLE:
-        print("ERROR: speech_recognition not installed")
-        print("Install with: pip install SpeechRecognition pyaudio")
-        exit(1)
-    
-    def on_command(command: VoiceCommand, phrase: str):
-        print(f"\n>>> Command detected: {command.value}")
-        print(f">>> Original phrase: '{phrase}'")
-    
-    controller = VoiceController(command_callback=on_command)
-    
-    print("\nAvailable commands:")
-    for phrase, cmd in controller.list_commands().items():
-        print(f"  '{phrase}' -> {cmd}")
-    
-    print("\nStarting voice listening...")
-    print("Say a command or press Ctrl+C to stop\n")
-    
+    # Quick test
+    print("Testing Voice Controller...")
     try:
-        if controller.start_listening():
-            # Keep running
-            while True:
-                time.sleep(1)
-                
-                # Check for commands in queue
-                while controller.has_pending_commands():
-                    cmd, phrase = controller.get_command()
-                    print(f"Processed from queue: {cmd.value}")
-    
+        controller = VoiceController()
+        print("✅ Controller initialized")
+        
+        from gesture_engine.voice_commands import list_commands
+        list_commands()
+        
+        print("\n▶️  Starting voice recognition...")
+        print("   Speak one of the commands above")
+        print("   Press Ctrl+C to stop\n")
+        
+        controller.start()
+        
+        # Keep running until interrupted
+        import time
+        while config.running:
+            time.sleep(0.5)
+            
     except KeyboardInterrupt:
-        print("\nStopping...")
-        controller.stop_listening()
-    
-    print("\nStatistics:")
-    stats = controller.get_statistics()
-    for key, value in stats.items():
-        print(f"  {key}: {value}")
+        print("\n\n⚠️  Interrupted by user")
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+    finally:
+        print("\n👋 Test complete")

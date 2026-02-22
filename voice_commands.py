@@ -113,6 +113,7 @@ class VoiceCommandController:
             self.listen_thread.start()
             
             print("🎤 Voice listening started")
+            print("🎤 Available commands: " + ", ".join([f"'{cmd}'" for cmd in self.commands.keys()]))
             return True
             
         except Exception as e:
@@ -137,15 +138,24 @@ class VoiceCommandController:
             print("⚠️  Microphone not initialized")
             return
         
+        print("🎤 [VOICE DEBUG] Listening thread started, waiting for speech...")
+        listen_count = 0
+        
         while self.is_listening:
             try:
                 with self.microphone as source:
                     # Listen with timeout
+                    listen_count += 1
+                    if listen_count % 10 == 1:  # Print every 10th listen attempt
+                        print(f"🎤 [VOICE DEBUG] Listening... (attempt {listen_count})")
+                    
                     audio = self.recognizer.listen(
                         source,
                         timeout=3.0,
                         phrase_time_limit=5.0
                     )
+                    
+                    print("🎤 [VOICE DEBUG] Audio detected, recognizing...")
                     
                     # Recognize speech
                     try:
@@ -154,6 +164,8 @@ class VoiceCommandController:
                             language=self.language
                         ).lower()
                         
+                        print(f"🎤 [VOICE DEBUG] Recognized text: '{text}'")
+                        
                         # Match to command
                         command = self._match_command(text)
                         if command:
@@ -161,16 +173,24 @@ class VoiceCommandController:
                             self.commands_recognized += 1
                             self.last_command_time = time.time()
                             print(f"🎤 Voice command: {command} ('{text}')")
+                        else:
+                            print(f"🎤 [VOICE DEBUG] No matching command for: '{text}'")
                     
                     except sr.UnknownValueError:  # type: ignore
-                        pass  # Could not understand audio
+                        print("🎤 [VOICE DEBUG] Could not understand audio")
                     except sr.RequestError as e:  # type: ignore
                         print(f"❌ Speech recognition error: {e}")
+                        print("   (Check internet connection - Google Speech API requires internet)")
             
             except sr.WaitTimeoutError:  # type: ignore
-                continue  # Normal timeout
+                # No speech detected in timeout period
+                if listen_count <= 3:  # Only show first few times
+                    print("🎤 [VOICE DEBUG] No speech detected (timeout), continuing...")
+                continue
             except Exception as e:
                 print(f"⚠️  Error in voice listen loop: {e}")
+                import traceback
+                traceback.print_exc()
                 time.sleep(1)
     
     def _match_command(self, text: str) -> Optional[str]:

@@ -189,6 +189,32 @@ class GestureEngineConfig:
                         setattr(section_config, key, value)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SHARED STATE FOR VOICE + GESTURE INTEGRATION
+# ═══════════════════════════════════════════════════════════════════════════════
+# These variables enable voice commands to control the gesture system.
+# Both threads (gesture on main, voice on background) read/write these safely.
+
+import threading
+
+# Thread lock for safely modifying shared state
+state_lock = threading.Lock()
+
+# Gesture system state
+gesture_active = True          # Set False to pause gesture detection
+running = True                 # Set False to shut down all threads
+
+# Voice feedback
+VOICE_FEEDBACK_ENABLED = True  # Set False to disable TTS responses
+
+# Vosk model path (offline speech recognition)
+VOSK_MODEL_PATH = "models/vosk-model-small-en-us-0.15"
+
+# Audio settings for Vosk
+SAMPLE_RATE = 16000            # Required by Vosk
+AUDIO_BLOCK_SIZE = 8000        # Frames per audio block (~0.5s at 16kHz)
+
+
 # Global configuration instance
 CONFIG = GestureEngineConfig()
 

@@ -104,7 +104,7 @@ class GeometricFeatureExtractor:
     @staticmethod
     def calculate_distance(p1: np.ndarray, p2: np.ndarray) -> float:
         """Calculate Euclidean distance between two points."""
-        return np.linalg.norm(p1 - p2)
+        return float(np.linalg.norm(p1 - p2))
     
     @classmethod
     def is_finger_extended(cls, hand_data: HandData, finger_tip_idx: int) -> bool:
@@ -352,9 +352,13 @@ class GestureClassifier:
         if fingers_extended == 5:
             return GestureType.PALM, 0.95
         
-        # THUMBS UP: Only thumb extended
+        # THUMBS UP: Only thumb extended, all other fingers curled
         if (fingers_extended == 1 and
-            features["thumb_extended"]):
+            features["thumb_extended"] and
+            not features["index_extended"] and
+            not features["middle_extended"] and
+            not features["ring_extended"] and
+            not features["pinky_extended"]):
             return GestureType.THUMBS_UP, 0.85
         
         # PEACE: Index + Middle extended

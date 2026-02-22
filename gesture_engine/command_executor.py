@@ -15,7 +15,7 @@ from enum import Enum
 from dataclasses import dataclass
 
 from gesture_engine.gesture_classifier import GestureType
-from gesture_engine.voice_controller import VoiceCommand
+# VoiceCommand no longer exists - voice commands handled by voice_commands module
 from gesture_engine.config import CONFIG
 
 # Disable PyAutoGUI fail-safe (Ctrl+C still works)
@@ -97,18 +97,18 @@ class CommandExecutor:
         
         return self._execute_action(action_name, source="gesture", details=gesture.value)
     
-    def execute_voice_command(self, command: VoiceCommand) -> Optional[ActionResult]:
+    def execute_voice_command(self, command: str) -> Optional[ActionResult]:  # type: ignore
         """
         Execute action for voice command.
         
         Args:
-            command: Recognized voice command
+            command: Recognized voice command (String, not enum anymore)
             
         Returns:
             ActionResult if action executed, None if skipped
         """
-        action_name = command.value
-        return self._execute_action(action_name, source="voice", details=command.value)
+        action_name = command  # command is now a string, not an enum
+        return self._execute_action(action_name, source="voice", details=command)
     
     def _execute_action(
         self,

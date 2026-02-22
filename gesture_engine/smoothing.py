@@ -326,7 +326,7 @@ if __name__ == "__main__":
             point = LandmarkPoint(val, 0, 0)
             smoothed_point = f.smooth(point)
             smoothed.append(smoothed_point.x)
-        results[name] = smoothed
+        results[name] = smoothed  # type: ignore
     
     # Plot comparison
     plt.figure(figsize=(12, 6))

@@ -189,20 +189,21 @@ class GestureTrainer:
         
         # Create trained gesture
         trained_gesture = TrainedGesture(
-            name=self.recording_name,
+            name=self.recording_name or "unknown",
             feature_vectors=list(feature_vectors),
             mean_vector=mean_vector,
             std_vector=std_vector,
             confidence_threshold=self.config.match_threshold,
-            hand_label=self.recording_hand_label,
+            hand_label=self.recording_hand_label or "unknown",
             timestamp=time.time(),
             sample_count=len(feature_vectors)
         )
         
         # Add to library
-        self.trained_gestures[self.recording_name] = trained_gesture
+        gesture_name = self.recording_name or "unknown"
+        self.trained_gestures[gesture_name] = trained_gesture
         
-        print(f"Gesture '{self.recording_name}' trained successfully!")
+        print(f"Gesture '{gesture_name}' trained successfully!")
         print(f"Samples: {trained_gesture.sample_count}")
         
         # Save automatically
@@ -399,6 +400,7 @@ if __name__ == "__main__":
     
     for gesture_name in trainer.list_gestures():
         info = trainer.get_gesture_info(gesture_name)
-        print(f"\n{gesture_name}:")
-        for key, value in info.items():
-            print(f"  {key}: {value}")
+        if info:
+            print(f"\n{gesture_name}:")
+            for key, value in info.items():
+                print(f"  {key}: {value}")
