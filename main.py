@@ -18,6 +18,7 @@ from actions import BrowserActions
 from ui import OverlayRenderer
 from config import Constants, Settings, ConfigValidator, ConfigValidationError
 from utils import setup_logging, get_logger, PerformanceMetrics
+from voice_control import VoiceControllerClass, VoiceCommand
 
 # Initialize logging
 setup_logging(log_level="INFO", enable_file_logging=True)
@@ -62,7 +63,10 @@ class AccessAble:
             
             # Initialize hand detector
             logger.info("Initializing hand detection...")
-            self.hand_detector = HandDetector()
+            self.hand_detector = HandDetector(
+                use_smoothing=Constants.USE_SMOOTHING,
+                smoothing_type=Constants.SMOOTHING_TYPE
+            )
             
             # Initialize gesture system
             logger.info("Loading gesture library...")
@@ -76,6 +80,25 @@ class AccessAble:
             # Initialize UI overlay
             logger.info("Initializing UI...")
             self.overlay = OverlayRenderer()
+            
+            # Initialize voice control (optional)
+            self.voice_controller = None
+            if Constants.ENABLE_VOICE_CONTROL:
+                logger.info("Initializing voice control...")
+                try:
+                    self.voice_controller = VoiceControllerClass(
+                        language=Constants.VOICE_LANGUAGE
+                    )
+                    if self.voice_controller.start_listening():
+                        logger.info("Voice control enabled")
+                    else:
+                        self.voice_controller = None
+                        logger.warning("Voice control initialization failed")
+                except Exception as e:
+                    logger.warning(f"Voice control unavailable: {e}")
+                    self.voice_controller = None
+            else:
+                logger.info("Voice control disabled in config")
             
             # Application state
             self.is_running = False
@@ -126,6 +149,10 @@ class AccessAble:
                     
                     # Process frame
                     self._process_frame(frame)
+                    
+                    # Process voice commands if enabled
+                    if self.voice_controller:
+                        self._process_voice_commands()
                     
                     # Display frame
                     cv2.imshow('AccessAble - Gesture Navigation', frame)
@@ -228,6 +255,38 @@ class AccessAble:
             2
         )
     
+    def _process_voice_commands(self) -> None:
+        """
+        Process any pending voice commands.
+        Executes corresponding actions for recognized voice commands.
+        """
+        while self.voice_controller.has_pending_commands():
+            command_data = self.voice_controller.get_command()
+            if not command_data:
+                break
+            
+            command, phrase = command_data
+            logger.info(f"Voice command: {command.value} ('{phrase}')")
+            
+            # Handle voice commands
+            if command == VoiceCommand.CLICK:
+                self.actions.execute('left_click')
+            elif command == VoiceCommand.GO_BACK:
+                self.actions.execute('browser_back')
+            elif command == VoiceCommand.GO_FORWARD:
+                self.actions.execute('browser_forward')
+            elif command == VoiceCommand.NEW_TAB:
+                self.actions.execute('new_tab')
+            elif command == VoiceCommand.CLOSE_TAB:
+                self.actions.execute('close_tab')
+            elif command == VoiceCommand.REFRESH:
+                self.actions.execute('refresh')
+            elif command == VoiceCommand.DISABLE_VOICE:
+                self.voice_controller.stop_listening()
+                logger.info("Voice control disabled by voice command")
+            elif command == VoiceCommand.HELP:
+                logger.info("Voice Commands: click, go back, go forward, new tab, close tab, refresh, disable voice")
+    
     def _handle_keyboard(self, key: int) -> None:
         """
         Handle keyboard input for application control.
@@ -260,6 +319,18 @@ class AccessAble:
             logger.info("=== Performance Metrics ===")
             for key, value in metrics.items():
                 logger.info(f"{key}: {value:.2f}")
+        
+        # V - Toggle voice control
+        elif key == ord('v') or key == ord('V'):
+            if self.voice_controller:
+                if self.voice_controller.is_listening:
+                    self.voice_controller.stop_listening()
+                    logger.info("Voice control disabled")
+                else:
+                    if self.voice_controller.start_listening():
+                        logger.info("Voice control enabled")
+            else:
+                logger.warning("Voice control not available")
     
     def _cleanup(self) -> None:
         """Clean up resources and shut down gracefully."""
@@ -277,6 +348,10 @@ class AccessAble:
             
             # Release hand detector
             self.hand_detector.release()
+            
+            # Release voice controller
+            if self.voice_controller:
+                self.voice_controller.stop_listening()
             
             # Close all windows
             cv2.destroyAllWindows()

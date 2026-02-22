@@ -129,7 +129,7 @@ class CalibrationSystem:
         if all_palm_sizes:
             avg_palm_size = np.mean(all_palm_sizes)
             # Assume average palm size is around 0.2 (normalized coordinates)
-            self.profile.hand_size_scale = avg_palm_size / 0.2
+            self.profile.hand_size_scale = float(avg_palm_size / 0.2)
             self.profile.samples_count = len(all_palm_sizes)
     
     def _compute_feature_adjustments(self) -> None:
@@ -192,7 +192,7 @@ class CalibrationSystem:
         
         return adjusted
     
-  def get_confidence_multiplier(self) -> float:
+    def get_confidence_multiplier(self) -> float:
         """
         Get confidence multiplier based on calibration quality.
         

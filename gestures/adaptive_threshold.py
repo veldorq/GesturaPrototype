@@ -92,7 +92,7 @@ class AdaptiveThresholds:
             'total_activations': total,
             'successful_rate': (self.successful_activations / total * 100) if total > 0 else 0,
             'false_positive_rate': (self.false_positives / total * 100) if total > 0 else 0,
-            'avg_confidence': np.mean(list(self.recent_confidences)) if self.recent_confidences else 0,
+            'avg_confidence': float(np.mean(list(self.recent_confidences))) if self.recent_confidences else 0.0,
         }
     
     def reset(self) -> None:

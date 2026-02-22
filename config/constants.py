@@ -25,6 +25,19 @@ class Constants:
     MIN_DETECTION_CONFIDENCE: float = 0.7  # Higher = fewer false positives
     MIN_TRACKING_CONFIDENCE: float = 0.5  # Lower = more stable tracking
     
+    # === Smoothing Configuration ===
+    USE_SMOOTHING: bool = True  # Enable landmark smoothing
+    SMOOTHING_TYPE: str = "exponential"  # Options: "moving_avg", "exponential", "kalman"
+    SMOOTHING_WINDOW_SIZE: int = 5  # For moving average
+    SMOOTHING_ALPHA: float = 0.3  # For exponential smoothing (0-1, lower = more smoothing)
+    KALMAN_PROCESS_NOISE: float = 0.01  # For Kalman filter
+    KALMAN_MEASUREMENT_NOISE: float = 0.1  # For Kalman filter
+    
+    # === Voice Control Configuration ===
+    ENABLE_VOICE_CONTROL: bool = False  # Voice control off by default
+    VOICE_LANGUAGE: str = "en-US"  # Language code for speech recognition
+    VOICE_CALIBRATION_DURATION: float = 1.0  # Seconds to calibrate mic
+    
     # === Gesture Recognition Configuration ===
     GESTURE_CONFIDENCE_THRESHOLD: float = 0.75  # Minimum confidence to trigger
     DWELL_TIME_SECONDS: float = 1.5  # How long to hold gesture before activation

@@ -55,6 +55,25 @@ except ImportError:
     print("WARNING: Smoothing pipeline not available - install filterpy/scipy for better stability")
     print("   pip install filterpy scipy")
 
+# Landmark smoothing for hand jitter reduction
+try:
+    from landmark_smoothing import create_landmark_smoother, LandmarkSmoother
+    LANDMARK_SMOOTHING_AVAILABLE = True
+except ImportError:
+    LANDMARK_SMOOTHING_AVAILABLE = False
+    create_landmark_smoother = None  # type: ignore
+    LandmarkSmoother = None  # type: ignore
+    print("⚠️  Landmark smoothing not available (landmark_smoothing.py not found)")
+
+# Voice control for hands-free operation
+try:
+    from voice_commands import VoiceController
+    VOICE_CONTROL_AVAILABLE = True
+except ImportError:
+    VOICE_CONTROL_AVAILABLE = False
+    VoiceController = None  # type: ignore
+    print("⚠️  Voice control not available (voice_commands.py not found)")
+
 
 # ============================================================================
 # CAMERA INITIALIZATION WITH RETRY
@@ -137,7 +156,7 @@ class Config:
     # Hand detection settings
     MIN_DETECTION_CONFIDENCE = 0.7
     MIN_TRACKING_CONFIDENCE = 0.7
-    MAX_NUM_HANDS = 1
+    MAX_NUM_HANDS = 2
     
     # Gesture stabilization - HACKATHON STABLE (prioritize reliability over speed)
     GESTURE_BUFFER_SIZE = 5  # Frames to buffer - STABLE (was 3, too fast for clean demo)
@@ -265,6 +284,36 @@ class Config:
     CNN_MUST_PASS_THROUGH_STATE_MACHINE = True  # CNN output NEVER directly triggers actions
     CNN_CONFIDENCE_FILTER_REQUIRED = True  # Must filter low-confidence predictions
     CNN_TEMPORAL_VOTING_REQUIRED = True  # Must require frame consistency
+    
+    # ========================================================================
+    # LANDMARK SMOOTHING (Reduces hand jitter)
+    # ========================================================================
+    
+    ENABLE_LANDMARK_SMOOTHING = False  # Disabled - using existing smoothing pipeline for performance
+    SMOOTHING_TYPE = "exponential"  # Options: "exponential", "moving_avg", "kalman"
+    SMOOTHING_ALPHA = 0.3  # For exponential (0.2-0.5, lower = smoother)
+    SMOOTHING_WINDOW_SIZE = 5  # For moving average (3-7 frames)
+    
+    # ========================================================================
+    # VOICE CONTROL (Hands-free commands)
+    # ========================================================================
+    
+    ENABLE_VOICE_CONTROL = True  # Enable voice control (toggle with 'v' key)
+    VOICE_LANGUAGE = "en-US"  # Language code for speech recognition
+    VOICE_COMMANDS_ENABLED = {
+        "click": True,
+        "scroll_up": True,
+        "scroll_down": True,
+        "back": True,
+        "forward": True,
+        "new_tab": True,
+        "close_tab": True,
+        "refresh": True,
+        "zoom_in": True,
+        "zoom_out": True,
+        "mute": True,
+        "screenshot": True,
+    }
     
     # Advanced features
     ENABLE_SOUND_FEEDBACK = False  # Audio confirmation
@@ -2190,6 +2239,35 @@ class HandGestureControlSystem:
         self._target_frame_time = 1.0 / Config.FPS_TARGET  # ~33ms for 30 FPS
         self._last_frame_time = time.time()
         
+        # NEW: Landmark smoothing for jitter reduction
+        self.landmark_smoother = None
+        if Config.ENABLE_LANDMARK_SMOOTHING and LANDMARK_SMOOTHING_AVAILABLE and create_landmark_smoother:
+            try:
+                self.landmark_smoother = create_landmark_smoother(  # type: ignore
+                    smoothing_type=Config.SMOOTHING_TYPE,
+                    alpha=Config.SMOOTHING_ALPHA,
+                    window_size=Config.SMOOTHING_WINDOW_SIZE
+                )
+                print(f"   ✅ Landmark smoothing enabled ({Config.SMOOTHING_TYPE})")
+            except Exception as e:
+                print(f"   ⚠️  Landmark smoothing failed to initialize: {e}")
+        
+        # NEW: Voice control for hands-free operation
+        self.voice_controller = None
+        if VOICE_CONTROL_AVAILABLE and VoiceController:
+            try:
+                self.voice_controller = VoiceController(language=Config.VOICE_LANGUAGE)  # type: ignore
+                if Config.ENABLE_VOICE_CONTROL:
+                    if self.voice_controller.start_listening():
+                        print("   ✅ Voice control enabled")
+                    else:
+                        self.voice_controller = None
+                else:
+                    print("   ⏸️  Voice control available (disabled, press 'v' to enable)")
+            except Exception as e:
+                print(f"   ⚠️  Voice control not available: {e}")
+                self.voice_controller = None
+        
         # Program control
         self.running = True  # Flag to control main loop (for rock sign exit)
         
@@ -2240,6 +2318,7 @@ class HandGestureControlSystem:
         print("="*70)
         print("\nKEYBOARD SHORTCUTS:")
         print(f"    'q' - Quit | 's' - Stats | 'h' - Toggle UI | 'b' - Launch {Config.BROWSER_LAUNCH_TARGET.title()}")
+        print(f"    'v' - Toggle Voice Control | 'c' - Toggle CNN Mode")
         print("="*70 + "\n")
     
     def execute_gesture_action(self, gesture, hand_landmarks, is_first_confirmation=False):
@@ -2658,12 +2737,17 @@ class HandGestureControlSystem:
                 if results.multi_hand_landmarks:
                     hand_landmarks = results.multi_hand_landmarks[0]
                     
-                    # PERFORMANCE IMPROVEMENT: Smooth landmark coordinates
+                    # NEW: Advanced landmark smoothing for ultra-stable tracking
+                    if self.landmark_smoother is not None:
+                        # Apply smoothing to all 21 landmarks
+                        smoothed_landmarks = self.landmark_smoother.smooth_landmarks(
+                            hand_landmarks.landmark
+                        )
+                    
+                    # PERFORMANCE IMPROVEMENT: Legacy smoothing pipeline (if available)
                     # Reduces hand tremor, improves pointer stability and swipe consistency
-                    # Pipeline: Raw landmarks → EMA smoothing → Smoothed landmarks
                     if self.recognizer.smoothing_pipeline is not None:
-                        # Smooth coordinates (reduces jitter in pointer mode)
-                        # Note: smooth_landmarks modifies landmarks in-place
+                        # Smooth coordinates (additional layer for extra stability)
                         self.recognizer.smoothing_pipeline.smooth_landmarks(
                             hand_landmarks.landmark
                         )
@@ -2690,6 +2774,10 @@ class HandGestureControlSystem:
                     # FIX #1: Only trigger cooldown for non-continuous gestures
                     if confirmed_gesture not in self.state_machine.CONTINUOUS_GESTURES:
                         self.state_machine.trigger_cooldown(current_time)
+                
+                # NEW: Process voice commands (if enabled)
+                if self.voice_controller and self.voice_controller.has_pending_commands():
+                    self.process_voice_commands()
                 
                 # For display: Use state machine's current gesture (not raw detection)
                 display_gesture = confirmed_gesture if confirmed_gesture != GestureType.NONE else current_gesture
@@ -2756,6 +2844,17 @@ class HandGestureControlSystem:
                             print("   CNN temporal voting buffers reset")
                     else:
                         print("WARNING: CNN module not available - using rule-based recognition only")
+                elif key == ord('v'):
+                    # NEW: Toggle voice control on/off
+                    if self.voice_controller and hasattr(self.voice_controller, 'available') and self.voice_controller.available:
+                        if hasattr(self.voice_controller, 'is_listening') and self.voice_controller.is_listening:
+                            self.voice_controller.stop_listening()
+                            print("[VOICE] 🔇 Voice control disabled")
+                        else:
+                            if self.voice_controller.start_listening():
+                                print("[VOICE] 🎤 Voice control enabled")
+                    else:
+                        print("[VOICE] ⚠️  Voice control not available")
         
         except KeyboardInterrupt:
             print("\nWARNING: Interrupted by user")
@@ -2794,6 +2893,62 @@ class HandGestureControlSystem:
         
         print("="*60 + "\n")
     
+    def process_voice_commands(self):
+        """
+        Process pending voice commands from voice controller.
+        Executes corresponding browser actions for recognized voice commands.
+        """
+        if not self.voice_controller or not hasattr(self.voice_controller, 'has_pending_commands'):
+            return
+        
+        while self.voice_controller.has_pending_commands():
+            command_data = self.voice_controller.get_command()
+            if not command_data:
+                break
+            
+            command, phrase = command_data
+            
+            # Check if command is enabled in config
+            if command in Config.VOICE_COMMANDS_ENABLED and not Config.VOICE_COMMANDS_ENABLED[command]:
+                print(f"[VOICE] Command '{command}' is disabled in config")
+                continue
+            
+            print(f"🎤 [VOICE] Executing: {command}")
+            
+            # Map voice commands to actions
+            try:
+                if command == "click":
+                    pyautogui.click()
+                elif command == "scroll_up":
+                    pyautogui.scroll(Config.SCROLL_BASE_AMOUNT)
+                elif command == "scroll_down":
+                    pyautogui.scroll(-Config.SCROLL_BASE_AMOUNT)
+                elif command == "back":
+                    pyautogui.hotkey('alt', 'left')
+                elif command == "forward":
+                    pyautogui.hotkey('alt', 'right')
+                elif command == "new_tab":
+                    pyautogui.hotkey('ctrl', 't')
+                elif command == "close_tab":
+                    pyautogui.hotkey('ctrl', 'w')
+                elif command == "refresh":
+                    pyautogui.hotkey('ctrl', 'r')
+                elif command == "zoom_in":
+                    pyautogui.hotkey('ctrl', 'plus')
+                elif command == "zoom_out":
+                    pyautogui.hotkey('ctrl', 'minus')
+                elif command == "mute":
+                    pyautogui.press('volumemute')
+                elif command == "screenshot":
+                    pyautogui.hotkey('win', 'shift', 's')
+                elif command == "disable_voice":
+                    self.voice_controller.stop_listening()
+                    print("[VOICE] 🔇 Voice control disabled by voice command")
+                elif command == "help":
+                    print("[VOICE] Available commands: click, scroll up/down, go back/forward, new/close tab, refresh, zoom in/out, mute, screenshot")
+            except Exception as e:
+                print(f"⚠️  [VOICE] Error executing command '{command}': {e}")
+    
     def cleanup(self):
         """Clean up resources safely with detailed feedback"""
         print("\n" + "="*70)
@@ -2814,6 +2969,12 @@ class HandGestureControlSystem:
             if hasattr(self, 'hands') and self.hands is not None:
                 self.hands.close()
                 print("✅ MediaPipe hands module closed")
+            
+            # NEW: Stop voice controller
+            if hasattr(self, 'voice_controller') and self.voice_controller is not None:
+                if hasattr(self.voice_controller, 'is_listening') and self.voice_controller.is_listening:
+                    self.voice_controller.stop_listening()
+                print("✅ Voice control stopped")
             
             # Print session summary
             if self.frame_count > 0:

@@ -23,6 +23,9 @@ def setup_logging(
         log_dir: Directory for log files. If None, uses ./logs
         enable_file_logging: Whether to write logs to file
     """
+    # Initialize log_file variable
+    log_file = None
+    
     # Create log directory
     if enable_file_logging:
         if log_dir is None:
@@ -54,7 +57,7 @@ def setup_logging(
     root_logger.addHandler(console_handler)
     
     # File handler
-    if enable_file_logging:
+    if enable_file_logging and log_file:
         file_handler = logging.FileHandler(log_file, encoding='utf-8')
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)

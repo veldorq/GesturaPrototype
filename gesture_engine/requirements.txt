@@ -1,0 +1,21 @@
+# Gestura 2.0 - Gesture Engine Requirements
+# Install with: pip install -r gesture_engine/requirements.txt
+
+# Core dependencies
+opencv-python>=4.8.0        # Camera capture and image processing
+mediapipe>=0.10.0           # Hand landmark detection
+numpy>=1.24.0               # Numerical operations and smoothing algorithms
+
+# System control
+pyautogui>=0.9.54           # Mouse and keyboard automation
+
+# Voice control (optional but recommended)
+SpeechRecognition>=3.10.0   # Speech-to-text recognition
+pyaudio>=0.2.13             # Microphone input (required for speech recognition)
+
+# Optional: Visualization and debugging
+matplotlib>=3.7.0           # For plotting smoothing performance (used in test code)
+
+# Note: If pyaudio installation fails on Windows, you may need to:
+# 1. Download the appropriate .whl file from https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio
+# 2. Install with: pip install PyAudio‑0.2.13‑cpXX‑cpXXm‑win_amd64.whl

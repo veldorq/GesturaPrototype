@@ -9,6 +9,7 @@ import numpy as np
 from typing import Optional, List, Tuple
 from dataclasses import dataclass
 from config.constants import Constants
+from hand_tracking.smoothing import LandmarkSmoother
 
 
 @dataclass
@@ -90,7 +91,9 @@ class HandDetector:
         self,
         max_hands: int = Constants.MAX_NUM_HANDS,
         detection_confidence: float = Constants.MIN_DETECTION_CONFIDENCE,
-        tracking_confidence: float = Constants.MIN_TRACKING_CONFIDENCE
+        tracking_confidence: float = Constants.MIN_TRACKING_CONFIDENCE,
+        use_smoothing: bool = True,
+        smoothing_type: str = "exponential"
     ):
         """
         Initialize MediaPipe hand detector.
@@ -99,10 +102,13 @@ class HandDetector:
             max_hands: Maximum number of hands to detect
             detection_confidence: Minimum confidence for initial detection
             tracking_confidence: Minimum confidence for tracking across frames
+            use_smoothing: Enable landmark smoothing (default: True)
+            smoothing_type: Type of smoothing ('moving_avg', 'exponential', 'kalman')
         """
         self.max_hands = max_hands
         self.detection_confidence = detection_confidence
         self.tracking_confidence = tracking_confidence
+        self.use_smoothing = use_smoothing
         
         # Initialize MediaPipe Hands
         self.mp_hands = mp.solutions.hands
@@ -116,6 +122,20 @@ class HandDetector:
             min_detection_confidence=self.detection_confidence,
             min_tracking_confidence=self.tracking_confidence
         )
+        
+        # Initialize landmark smoother
+        self.smoother = None
+        if self.use_smoothing:
+            if smoothing_type == "moving_avg":
+                self.smoother = LandmarkSmoother(filter_type="moving_avg", window_size=5)
+            elif smoothing_type == "exponential":
+                self.smoother = LandmarkSmoother(filter_type="exponential", alpha=0.3)
+            elif smoothing_type == "kalman":
+                self.smoother = LandmarkSmoother(
+                    filter_type="kalman",
+                    process_noise=0.01,
+                    measurement_noise=0.1
+                )
     
     def detect(self, frame: np.ndarray) -> Optional[HandLandmarks]:
         """
@@ -147,8 +167,15 @@ class HandDetector:
             for lm in hand_landmarks.landmark
         ]
         
+        # Apply smoothing if enabled
+        if self.use_smoothing and self.smoother:
+            landmarks = self.smoother.smooth_landmarks(landmarks)
+        
         # Extract handedness and confidence
-        handedness = hand_handedness.classification[0].label
+        # MediaPipe returns labels from camera perspective (mirrored)
+        # Swap them: "Left" from camera = Right hand of user
+        handedness_raw = hand_handedness.classification[0].label
+        handedness = "Right" if handedness_raw == "Left" else "Left"
         confidence = hand_handedness.classification[0].score
         
         return HandLandmarks(
